@@ -1,3 +1,16 @@
+faut lancer 
+```bash
+#à la racine du projet
+rm -rf build/*
+
+cd build
+
+cmake ..
+
+make
+```
+
+
 [ Interface ImGui ] ---> modifie ---> [ Scene Manager ]
        |                                      |
        v                                      v
