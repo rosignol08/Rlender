@@ -7,13 +7,13 @@
 #include "SceneNode.h"
 
 int main(void) {
-    // 1. Initialisation de la fenêtre Raylib
+    //la fenêtre Raylib pour voir le rendu
     const int screenWidth = 1280;
     const int screenHeight = 720;
     InitWindow(screenWidth, screenHeight, "Rlender - Test ImGui");
     SetTargetFPS(60);
 
-    // 2. Initialisation de la caméra 3D
+    //la camera 3D pour voir la scene
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 5.0f, 5.0f, 5.0f };
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -21,7 +21,7 @@ int main(void) {
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    // 3. Initialisation de rlImGui
+    //init rlImGui
     rlImGuiSetup(true);
 
     // Variable pour la position de notre cube test
@@ -39,7 +39,7 @@ int main(void) {
     // Boucle principale
     while (!WindowShouldClose()) {
         
-        // DESSIN
+        // DESSIN idée de base
         BeginDrawing();
             ClearBackground(DARKGRAY);
             //TODO faire un vrai truc ici
