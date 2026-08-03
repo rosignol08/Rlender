@@ -19,7 +19,7 @@ int main(void) {
     int compteurModifs = 0; //un compteur pour dire que
     int limiteSauvgarde = 5;
     bool flag_changements = false;//le flag pour dire si un changement a été fait
-
+    std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
     //la fenêtre Raylib pour voir le rendu
     const int screenWidth = 1280;
     const int screenHeight = 720;
@@ -106,6 +106,7 @@ int main(void) {
                         noeudSelectionne = sceneNodes[i].get();
                         noeudSelectionne->isSelected = true;
                     }
+                    
                 }
                 ImGui::End();
             rlImGuiEnd();
@@ -115,7 +116,7 @@ int main(void) {
             //si on a eu un changement on augmente le compteur
             compteurModifs++;
             //faut regenerer le code
-            //contenu = GenererCodeComplet(
+            contenu = GenererCodeComplet(sceneNodes);
             flag_changements = false; //faut penser à le rebaisser le flag hein
         }
         if(compteurModifs >= limiteSauvgarde){

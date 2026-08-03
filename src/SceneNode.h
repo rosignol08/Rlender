@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include "raylib.h"
-std::string GenererCodeComplet();
+std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
 //la classe pour representer un objets de la scene
 class SceneNode {
     public:
