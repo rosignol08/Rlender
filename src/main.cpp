@@ -7,6 +7,18 @@
 #include "SceneNode.h"
 
 int main(void) {
+
+    /*
+    - la partie sauvgade
+    en gros on peut utiliser un compteur pour dire apres 5 ou 10 modif on enregistre le fichier sinon on garde en ram
+    pour eviter la sur utilisation du disque dur ssd etc
+    ça doit etre modifiable dans les parametres du logiciel plus tard
+    limiteSauvgarde c'est la limite dynamique du compteur c'est ça que faut changer pour reduite au augmenter le nombre de sauvgardes etc
+    */
+    int compteurModifs = 0; //un compteur pour dire que
+    int limiteSauvgarde = 5;
+    bool flag_changements = false;//le flag pour dire si un changement a été fait
+
     //la fenêtre Raylib pour voir le rendu
     const int screenWidth = 1280;
     const int screenHeight = 720;
@@ -59,10 +71,15 @@ int main(void) {
                     ImGui::Text("Modification de : %s", noeudSelectionne->nom.c_str());
                     ImGui::Separator();
                 
-                    //sliders pour modifier dynamiquement les variables !
-                    ImGui::DragFloat3("Position", &noeudSelectionne->position.x, 0.1f);
-                    ImGui::DragFloat3("Rotation", &noeudSelectionne->rotation.x, 1.0f);
-                    ImGui::DragFloat3("Taille", &noeudSelectionne->taille.x, 0.1f);
+                    //sliders pour modifier dynamiquement les variables
+                    if(
+                        //TODO ajouter les bouton pour ajouter des objets ici aussi
+                        ImGui::DragFloat3("Position", &noeudSelectionne->position.x, 0.1f);
+                        ImGui::DragFloat3("Rotation", &noeudSelectionne->rotation.x, 1.0f);
+                        ImGui::DragFloat3("Taille", &noeudSelectionne->taille.x, 0.1f);
+                    ){
+                        flag_changements = true;
+                    }
 
                     // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0) 
                     // et Raylib des unsigned char (0 à 255), on fera ça plus tard si tu veux.
@@ -93,6 +110,10 @@ int main(void) {
             rlImGuiEnd();
 
         EndDrawing();
+        if(flag_changements){
+            //si on a eu un changement on augmente le compteur
+            compteurModifs++;
+        }
     }
 
     // Nettoyage

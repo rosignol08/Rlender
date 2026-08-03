@@ -1,0 +1,3 @@
+/*
+ici je defini des fonction pour les sauvgardes pour aleger le code dans le main
+*/
