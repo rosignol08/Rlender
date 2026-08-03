@@ -84,30 +84,73 @@ class CameraNode : public SceneNode{
     public:
         Vector3 target = {0.0f, 0.0f, 0.0f};
         float fovy = 45.0f;//par defaut
-        CameraMode mode_camera = CAMERA_FREE;//par défaut
-    CameraNode(){
+        CameraMode mode_camera = CAMERA_FREE;//par defaut
+        CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
+        CameraNode(){
         nom = "camera3D";
     }
-    std::string GetDrawCode(){
-        std::stringstream code;
+
+    void Draw() override {  
         //on dessine la camera en wireframe comme godot etc
-        code << "            DrawCubeWires(position, 1.0f, 1.0f, 1.0f, PURPLE);\n";
-        code << "            DrawLine3D(position, target, PURPLE);\n";        
+        DrawCubeWires(position, 1.0f, 1.0f, 1.0f, PURPLE);
+        DrawLine3D(position, target, PURPLE);
+        
+        if (isSelected) {
+            DrawCubeWires(position, 1.0f, 1.0f, 1.0f, YELLOW);
+            DrawLine3D(position, target, YELLOW);
+        }
+    }
+    
+
+    std::string GetDrawCode(){
+        //faut ajouter cette ligne dans la boucle de rendu
+        std::stringstream code;
+        code << "     UpdateCamera(&" << nom << " , " << mode_camera << ");\n";
         return code.str();
     }
+    
 
     std::string GetInitCode(){
         std::stringstream code;
-        code << " Camera3D camera = { 0 };\n";
-        code << " camera.position = " << position << ";\n";
-        code << " camera.target = " << target << ";\n";
-        code << " camera.up = { 0.0f, 1.0f, 0.0f };\n";
-        code << " camera.fovy = " << fovy << ";\n";
-        code << " camera.projection = " << mode_camera << ";\n";
+        code << " Camera3D " << nom << " = { 0 };\n";
+        code << nom << ".position = {" << position.x << "f, " << position.y << "f, " << position.z << "f};\n";
+        code << nom << ".target = {" << target.x << "f, " << target.y << "f, " << target.z << "f};\n";
+        code << nom << ".up = { 0.0f, 1.0f, 0.0f };\n";
+        code << nom << ".fovy = " << fovy << ";\n";
+        code << nom << ".projection = " << projetction_cam << ";\n";
+        return code.str();
     }
 
 };
 
 class Camera2DNode : public SceneNode{
-    
-}
+    int screenWidth = 1280;
+    int screenHeight = 720;
+    Vector2 offset_camera = {screenWidth/2,screenHeight/2}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
+    Vector2 target_camera = {position.x,position.y};//par exemple
+    float rotation_camera = rotation.x;
+    float     zoom_camera = 1.0f;
+
+    void Draw() override {
+        if (!isSelected) {
+            //haut gauche vers droite
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
+            //haut bas vers droite
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) - taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) - taille.x}, PURPLE);
+            //haut gauche vers bas
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
+            //haut droit vers bas
+            DrawLine3D({(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
+        }else{
+            //haut gauche vers droite
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
+            //haut bas vers droite
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) - taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) - taille.x}, YELLOW);
+            //haut gauche vers bas
+            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
+            //haut droit vers bas
+            DrawLine3D({(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
+
+        }
+    }
+};
