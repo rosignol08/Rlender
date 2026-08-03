@@ -17,7 +17,7 @@ int main(void) {
     limiteSauvgarde c'est la limite dynamique du compteur c'est ça que faut changer pour reduite au augmenter le nombre de sauvgardes etc
     */
     int compteurModifs = 0; //un compteur pour dire que
-    int limiteSauvgarde = 5;
+    int limiteSauvgarde = 50;
     bool flag_changements = false;//le flag pour dire si un changement a été fait
     std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
     //la fenêtre Raylib pour voir le rendu
@@ -63,7 +63,7 @@ int main(void) {
             }
                 DrawGrid(10, 1.0f);
             EndMode3D();
-
+            
             // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
             rlImGuiBegin();
                 ImGui::Begin("Inspecteur");
@@ -116,7 +116,7 @@ int main(void) {
                 }
                 ImGui::End();
             rlImGuiEnd();
-
+        DrawFPS(10, 10);//pour debug si le logiciel tourne bien
         EndDrawing();
         if(flag_changements){
             //si on a eu un changement on augmente le compteur
@@ -124,6 +124,7 @@ int main(void) {
             //faut regenerer le code
             contenu = GenererCodeComplet(sceneNodes);
             flag_changements = false; //faut penser à le rebaisser le flag hein
+            //std::cout << "changement : " << compteurModifs << std::endl;
         }
         if(compteurModifs >= limiteSauvgarde){
             //la je peut lancer la sauvgarde
