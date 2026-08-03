@@ -17,4 +17,4 @@ class SceneManager{
         void AjouterCamera2D(); //idem pour une caméra2D
         void SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         //des getters pour que l'interface graphique accede aux bon noeuds etc
-}
+};
