@@ -89,7 +89,21 @@ class CameraNode : public SceneNode{
         nom = "camera3D";
     }
     std::string GetDrawCode(){
+        std::stringstream code;
         //on dessine la camera en wireframe comme godot etc
+        code << "            DrawCubeWires(position, 1.0f, 1.0f, 1.0f, PURPLE);\n";
+        code << "            DrawLine3D(position, target, PURPLE);\n";        
+        return code.str();
+    }
+
+    std::string GetInitCode(){
+        std::stringstream code;
+        code << " Camera3D camera = { 0 };\n";
+        code << " camera.position = " << position << ";\n";
+        code << " camera.target = " << target << ";\n";
+        code << " camera.up = { 0.0f, 1.0f, 0.0f };\n";
+        code << " camera.fovy = " << fovy << ";\n";
+        code << " camera.projection = " << mode_camera << ";\n";
     }
 
 };
