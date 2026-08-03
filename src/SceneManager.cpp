@@ -16,7 +16,7 @@ void SceneManager::AjouterCube(){
     // on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.push_back(std::make_unique<CubeNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
-    std::string identifiant = "_" + compteur;//un numéro de compteur
+    std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
     sceneNodes.back()->nom = nom_ancien + identifiant; //nouveau nom c'est une concaténation des 2 chaines
     sceneNodes.back()->isSelected = true;
     compteur++;
@@ -27,7 +27,7 @@ void SceneManager::AjouterCamera3D(){
     static u_int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     sceneNodes.push_back(std::make_unique<CameraNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
-    std::string identifiant = "_" + compteur;//un numéro de compteur
+    std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
     sceneNodes.back()->nom = nom_ancien + identifiant; //nouveau nom c'est une concaténation des 2 chaines
     sceneNodes.back()->isSelected = true;
     compteur++;
@@ -38,7 +38,7 @@ void SceneManager::AjouterCamera2D(){
     static u_int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     sceneNodes.push_back(std::make_unique<Camera2DNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
-    std::string identifiant = "_" + compteur;//un numéro de compteur
+    std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
     sceneNodes.back()->nom = nom_ancien + identifiant; //nouveau nom c'est une concaténation des 2 chaines
     sceneNodes.back()->isSelected = true;
     compteur++;
@@ -77,7 +77,10 @@ void SceneManager::SetSelection(SceneNode* noeud){
     //faut d'abord que je deselectionne
     Deselectionne();
     //ensuite on selectione le nouveau
-    noeud->isSelected = true;
+    if (noeud != nullptr) {//check de securite
+        noeud->isSelected = true;
+        noeudSelectionne = noeud;
+    }
 }
 
 const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
