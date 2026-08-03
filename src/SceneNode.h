@@ -127,30 +127,41 @@ class Camera2DNode : public SceneNode{
     int screenWidth = 1280;
     int screenHeight = 720;
     Vector2 offset_camera = {screenWidth/2,screenHeight/2}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
-    Vector2 target_camera = {position.x,position.y};//par exemple
-    float rotation_camera = rotation.x;
+    //Vector2 target_camera = {position.x,position.y};//par exemple
+    //float rotation_camera = rotation.x;
     float     zoom_camera = 1.0f;
 
     void Draw() override {
-        if (!isSelected) {
-            //haut gauche vers droite
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
-            //haut bas vers droite
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) - taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) - taille.x}, PURPLE);
-            //haut gauche vers bas
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
-            //haut droit vers bas
-            DrawLine3D({(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, PURPLE);
-        }else{
-            //haut gauche vers droite
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
-            //haut bas vers droite
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) - taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) - taille.x}, YELLOW);
-            //haut gauche vers bas
-            DrawLine3D({(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) - taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
-            //haut droit vers bas
-            DrawLine3D({(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, {(screenWidth/2) + taille.x,0.0f,(screenHeight/2) + taille.x}, YELLOW);
+        Color couleurLigne = isSelected ? YELLOW : PURPLE;
 
-        }
+        //les 4 coins du cadre autour de la pos 3D du noeud
+        Vector3 p1 = {position.x - taille.x, position.y, position.z - taille.y};
+        Vector3 p2 = {position.x + taille.x, position.y, position.z - taille.y};
+        Vector3 p3 = {position.x + taille.x, position.y, position.z + taille.y};
+        Vector3 p4 = {position.x - taille.x, position.y, position.z + taille.y};
+
+        //le rectangle
+        DrawLine3D(p1, p2, couleurLigne); //haut
+        DrawLine3D(p3, p4, couleurLigne); //bas
+        DrawLine3D(p4, p1, couleurLigne); //gauche
+        DrawLine3D(p2, p3, couleurLigne); //droite
+    }
+
+    std::string GetDrawCode(){
+        return "";
+    }
+    
+    std::string GetCleanupCode(){
+        return "";
+    }
+
+    std::string GetInitCode(){
+        std::stringstream code;
+        code << " Camera2D " << nom << " = { 0 };\n";
+        code << nom << ".target = {" << position.x << "f, " << position.y << "f};\n";
+        code << nom << ".offset = {" << offset_camera.x << "f, " << offset_camera.y << "f};\n";
+        code << nom << ".rotation = " << rotation.x << ";\n";
+        code << nom << ".zoom = " << zoom_camera << ";\n";
+        return code.str();
     }
 };
