@@ -1,8 +1,4 @@
-/*
-ici je defini des fonction pour les sauvgardes pour aleger le code dans le main
-*/
-#include <iostream>
-#include <fstream>
+#include "sauvgarde.h"
 
 /*
 fonction utilitaire pour enregistrer un flux de char dans un fichier sur le disque dur
@@ -11,5 +7,18 @@ TODO : voir si faut donner juste le nom ou l'arborescence ici
 */
 void sauvgarde(std::string nom_fichier,std::string contenu){
     std::fstream mon_fichier;
-    mon_fichier.open("nom_fichier", ios::out);
+    //mon_fichier.open(nom_fichier, std::ios::trunc);//pour effacer
+    //if(!mon_fichier){
+    //    std::cerr << "ERREUR : je peut pas ouvir le fichier " << std::endl;
+    //}
+    //mon_fichier.close();
+    //ensuite on réécrit dedans maintenant qu'il est vide
+    mon_fichier.open(nom_fichier, std::ios::out);//pour ecrire
+    if(!mon_fichier){
+        std::cerr << "ERREUR : je peut pas ouvir le fichier " << std::endl;
+    }else{
+        //si tout est nikel on peut ecrire dedans
+        mon_fichier << contenu;
+    }
+    mon_fichier.close();
 }

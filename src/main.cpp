@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>//pour les unique ptr
 #include "SceneNode.h"
+#include "sauvgarde.h"
 
 int main(void) {
 
@@ -74,9 +75,9 @@ int main(void) {
                     //sliders pour modifier dynamiquement les variables
                     if(
                         //TODO ajouter les bouton pour ajouter des objets ici aussi
-                        ImGui::DragFloat3("Position", &noeudSelectionne->position.x, 0.1f);
-                        ImGui::DragFloat3("Rotation", &noeudSelectionne->rotation.x, 1.0f);
-                        ImGui::DragFloat3("Taille", &noeudSelectionne->taille.x, 0.1f);
+                        ImGui::DragFloat3("Position", &noeudSelectionne->position.x, 0.1f)
+                        ||ImGui::DragFloat3("Rotation", &noeudSelectionne->rotation.x, 1.0f)
+                        ||ImGui::DragFloat3("Taille", &noeudSelectionne->taille.x, 0.1f)
                     ){
                         flag_changements = true;
                     }
@@ -113,6 +114,14 @@ int main(void) {
         if(flag_changements){
             //si on a eu un changement on augmente le compteur
             compteurModifs++;
+            //faut regenerer le code
+            //contenu = GenererCodeComplet(
+            flag_changements = false; //faut penser à le rebaisser le flag hein
+        }
+        if(compteurModifs >= limiteSauvgarde){
+            //la je peut lancer la sauvgarde
+            sauvgarde("projet_exemple.cpp",contenu);
+            compteurModifs = 0;
         }
     }
 
