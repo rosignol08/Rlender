@@ -17,4 +17,8 @@ class SceneManager{
         void AjouterCamera2D(); //idem pour une caméra2D
         void SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         //des getters pour que l'interface graphique accede aux bon noeuds etc
+        SceneNode* GetSelection();
+        void SetSelection(SceneNode* noeud); //Permet à ImGui de dire "l'utilisateur a cliqué sur cet objet"
+        void Deselectionne();//pour déséléctionner l'element courrant dans le vecteur
+        const std::vector<std::unique_ptr<SceneNode>>& GetNodes() const;//renvoie une reference const vers le vecteur pour eviter que generercodecomplet copie tout
 };
