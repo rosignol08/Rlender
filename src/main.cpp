@@ -89,8 +89,14 @@ int main(void) {
                 }
 
                 ImGui::Text("Bienvenue dans ton editeur !");
-                // Ce slider va modifier directement les coordonnées du cube
-                ImGui::DragFloat3("Position Cube", cubePosition, 0.1f);
+                if(
+
+                    //slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
+                    ImGui::DragFloat3("Position Cube", cubePosition, 0.1f)
+                ){
+                    flag_changements = true;
+                }
+                ImGui::End();
                 ImGui::Begin("Hierarchie");
                 for (size_t i = 0; i < sceneNodes.size(); i++) {
                     //un label unique pour chaque objet
