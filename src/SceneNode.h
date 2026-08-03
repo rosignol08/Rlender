@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 #include "raylib.h"
-std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
+
 //la classe pour representer un objets de la scene
 class SceneNode {
     public:
@@ -57,6 +57,12 @@ class CubeNode : public SceneNode{
     std::string ToCode(){
         return "";
     }
+    std::string GetDrawCode(){
+        return "";
+    }
+    std::string GetInitCode(){
+        return "";
+    }
 };
 
 //pour representer une sphere
@@ -76,6 +82,12 @@ class SphereNode : public SceneNode{
     }
 
     std::string ToCode(){
+        return "";
+    }
+    std::string GetDrawCode(){
+        return "";
+    }
+    std::string GetInitCode(){
         return "";
     }
 };
@@ -124,9 +136,9 @@ class CameraNode : public SceneNode{
 };
 
 class Camera2DNode : public SceneNode{
-    int screenWidth = 1280;
-    int screenHeight = 720;
-    Vector2 offset_camera = {screenWidth/2,screenHeight/2}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
+    int screenWidth = 1280.0f;
+    int screenHeight = 720.0f;
+    Vector2 offset_camera = {screenWidth/2.0f,screenHeight/2.0f}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
     //Vector2 target_camera = {position.x,position.y};//par exemple
     //float rotation_camera = rotation.x;
     float     zoom_camera = 1.0f;
@@ -165,3 +177,4 @@ class Camera2DNode : public SceneNode{
         return code.str();
     }
 };
+std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
