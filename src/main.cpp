@@ -37,12 +37,16 @@ int main(void) {
     ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
     */
     CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
+    CameraProjection type_projection_camera = CAMERA_PERSPECTIVE; //type de base
     Camera3D cameraEditeur = { 0 };
     cameraEditeur.position = (Vector3){ 0.0f, 10.0f, 10.0f };
     cameraEditeur.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     cameraEditeur.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     cameraEditeur.fovy = 45.0f;
-    cameraEditeur.projection = CAMERA_PERSPECTIVE;//possibilité de changer ça apres
+    cameraEditeur.projection = type_projection_camera;//possibilité de changer ça apres
+
+    bool perspect = true;
+    bool orto = false;
 
     //init rlImGui
     rlImGuiSetup(true);
@@ -54,17 +58,17 @@ int main(void) {
         while (!WindowShouldClose()) {
             //gestion de la camera de l'editeur
             if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-                DisableCursor(); // Lock la souris une seule fois au début du drag
+                DisableCursor(); //lock la souris au début du drag
             }
 
-            // 2. Tant que le clic droit est MAINTENU
+            //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 UpdateCamera(&cameraEditeur, modeCameraActif);
             }
 
-            // 3. Détection du moment où on RELÂCHE le clic droit
+            //detec du moment où on relache le clic droit
             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                EnableCursor(); // Libère la souris une seule fois
+                EnableCursor(); //ça libere la souris une seule fois
             }
 
         // DESSIN idée de base
@@ -152,6 +156,30 @@ int main(void) {
                 ImGui::Text("Maintenez le Clic Droit pour naviguer !");
                 ImGui::End();
 
+                //pour changer le type de la caméra
+                ImGui::Begin("Type de caméra");
+                if(ImGui::Button("Perspective",{1.0f,1.0f})){
+                    //si on clique sur ce bouton ça change le mode
+                    if(!perspect){
+                        perspect = true;
+                        orto = false;
+                        type_projection_camera = CAMERA_PERSPECTIVE;
+                        //on met a jour la perspective
+                        cameraEditeur.projection = type_projection_camera;
+                    }
+                }
+                if(ImGui::Button("Ortogonal",{1.0f,1.0f})){
+                    //idem ici
+                    if(!orto){
+                        orto = true;
+                        perspect = false;
+                        type_projection_camera = CAMERA_ORTHOGRAPHIC;
+                        //on met a jour la perspective
+                        cameraEditeur.projection = type_projection_camera;
+                    }
+                }
+                
+                ImGui::End();
             rlImGuiEnd();
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
