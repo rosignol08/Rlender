@@ -86,3 +86,43 @@ void SceneManager::SetSelection(SceneNode* noeud){
 const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
     return sceneNodes;
 }
+
+void SceneManager::SauvegarderProjet(std::string cheminFichier) {
+    nlohmann::json projet_json;
+    
+    // On crée un tableau JSON pour stocker notre liste de noeuds
+    projet_json["noeuds"] = nlohmann::json::array();
+
+    for (auto &noeud : sceneNodes) {
+        SceneNode* actuel = noeud.get();
+
+        //objet JSON temporaire pour ce noeud là
+        nlohmann::json noeud_json;
+        
+        noeud_json["nom"] = actuel->nom;
+        noeud_json["isSelected"] = actuel->isSelected;
+
+        //les Vector3 de Raylib en tableaux JSON = [x, y, z]
+        noeud_json["position"] = { actuel->position.x, actuel->position.y, actuel->position.z };
+        noeud_json["rotation"] = { actuel->rotation.x, actuel->rotation.y, actuel->rotation.z };
+        noeud_json["taille"]   = { actuel->taille.x, actuel->taille.y, actuel->taille.z };
+
+        //idem pour la couleur
+        noeud_json["couleur"]  = { actuel->couleur.r, actuel->couleur.g, actuel->couleur.b, actuel->couleur.a };
+
+        //ajout du noeud à la sauvgarde du projet
+        projet_json["noeuds"].push_back(noeud_json);
+    }
+
+    std::ofstream file(cheminFichier);
+    if (!file) {
+        std::cerr << "Erreur : problème à l'ouverture du fichier " << cheminFichier << std::endl;
+        return;
+    }
+
+    //std::setw(4) pour l'indentations. 
+    file << std::setw(4) << projet_json << std::endl;
+    file.close();
+    
+    std::cout << "Projet sauvegarde avec succes dans : " << cheminFichier << std::endl;
+}

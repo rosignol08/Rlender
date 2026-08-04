@@ -1,7 +1,9 @@
 #include <string>
 #include <sstream> //pour std::stringstream
+#include <iostream>
 #include <vector>
 #include <memory>
+#include <fstream>
 #include "raylib.h"
 #pragma once
 
@@ -165,7 +167,7 @@ class Camera2DNode : public SceneNode{
     std::string ToCode(){
         return "";
     }
-    
+
     std::string GetDrawCode(){
         return "";
     }

@@ -1,4 +1,5 @@
 #include "SceneNode.h"
+#include "json.hpp"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -22,4 +23,8 @@ class SceneManager{
         void       SetSelection(SceneNode* noeud); //Permet à ImGui de dire "l'utilisateur a cliqué sur cet objet"
         void       Deselectionne();//pour déséléctionner l'element courrant dans le vecteur
         const std::vector<std::unique_ptr<SceneNode>>& GetNodes() const;//renvoie une reference const vers le vecteur pour eviter que generercodecomplet copie tout
+
+        //pour la sauvgarde
+        void SauvegarderProjet(std::string cheminFichier);//parcour le vecteur d'objets et remplis le json
+        void ChargerProjet(std::string cheminFichier);//vide la scene actuelle et remplis avec le json lu
 };

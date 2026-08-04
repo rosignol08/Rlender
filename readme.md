@@ -134,3 +134,8 @@ Au lieu de dessiner la 3D directement sur le fond de la fenêtre, dessine ta sc�
 rlImGui (Raylib + ImGui) : Le dépôt GitHub officiel de raylib-extras/rlImGui. C'est le pont le plus propre pour lier les deux bibliothèques.
 
 Dear ImGui Demo : Quand tu auras ImGui d'installé, appelle la fonction ImGui::ShowDemoWindow(); dans ta boucle. C'est une mine d'or interactive qui montre tous les widgets possibles (boutons, sliders, arbres, onglets) avec le code C++ correspondant juste à côté !
+
+
+remerciments :
+pour le parser json
+- https://github.com/nlohmann/json
