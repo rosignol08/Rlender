@@ -59,19 +59,17 @@ int main(void) {
     // Boucle principale
         while (!WindowShouldClose()) {
             //gestion de la camera de l'editeur
-            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
-                DisableCursor(); //lock la souris au début du drag
-            }
-
             //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-                UpdateCamera(&cameraEditeur, modeCameraActif);
                 //on compte le temps
                 tempsMaintien += GetFrameTime();
                 //si on a appuié assez de temps et qu'on est pas déjà entrain de voler
                 if(tempsMaintien >= tempsExige && !modeFlyActif){
                     modeFlyActif = true;
-
+                    DisableCursor();
+                }
+                if(modeFlyActif){
+                    UpdateCamera(&cameraEditeur, modeCameraActif);
                 }
             }
 
@@ -150,8 +148,27 @@ int main(void) {
 
                 //la partie caméra
                 //la progress bar stylée qui apparait si on commence à maintenir le clic
-                if(!modeFlyActif && tempsMaintien > 0.0f){
-                    ImGui::ProgressBar(tempsMaintien / tempsExige,{10.0f,50.0f});//idem issue #4
+                if (!modeFlyActif && tempsMaintien > 0.0f) {
+                    //recup le centre de l'ecant
+                    float centreX = GetScreenWidth() / 2.0f;
+                    float centreY = GetScreenHeight() / 2.0f;
+                                
+                    //ImGui place la prochaine fenêtre au centre
+                    ImGui::SetNextWindowPos({centreX, centreY}, ImGuiCond_Always, {0.5f, 0.5f});
+                                
+                    //desactivation de tous
+                    ImGuiWindowFlags flagsFlottant = ImGuiWindowFlags_NoTitleBar 
+                                                   | ImGuiWindowFlags_NoResize 
+                                                   | ImGuiWindowFlags_NoMove 
+                                                   | ImGuiWindowFlags_NoBackground 
+                                                   | ImGuiWindowFlags_NoScrollbar;
+                                
+                    //ouvre la fenêtre fantôme
+                    ImGui::Begin("BarreChargement", nullptr, flagsFlottant);
+                                
+                    //dessin de la barre issue #4
+                    ImGui::ProgressBar(tempsMaintien / tempsExige, {150.0f, 15.0f});
+                    ImGui::End();
                 }
                 ImGui::Begin("Contrôle Caméra");
                 ImGui::Text("Mode de déplacement :");
