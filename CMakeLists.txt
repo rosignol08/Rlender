@@ -7,7 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(SRCS
     src/main.cpp
     src/CodeGenerator.cpp
-    src/sauvgarde.cpp
+    src/Sauvgarde.cpp
+    src/SceneManager.cpp
     lib/rlImGui/rlImGui.cpp
     lib/imgui/imgui.cpp
     lib/imgui/imgui_demo.cpp

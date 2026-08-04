@@ -5,7 +5,7 @@
 #include <iostream>
 #include <memory>//pour les unique ptr
 #include "SceneNode.h"
-#include "sauvgarde.h"
+#include "Sauvgarde.h"
 #include "SceneManager.h"
 
 int main(void) {
@@ -60,7 +60,7 @@ int main(void) {
             EndMode3D();
             
             //variable temporaire pour les acces repeté du pointeur pour pas réécrire "La_scene.GetSelection()->" à chaque fois
-            SceneNode* noeuds_selectione = La_scene.GetSelection();
+            SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
             // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
             rlImGuiBegin();
@@ -96,15 +96,15 @@ int main(void) {
                 }
                 ImGui::End();
                 ImGui::Begin("Hierarchie");
-                for (size_t i = 0; i < La_scene.GetNodes().size(); i++) {
+                for (size_t i = 0; i < La_scene.SceneManager::GetNodes().size(); i++) {
                     //un label unique pour chaque objet
-                    std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
+                    std::string label = La_scene.SceneManager::GetNodes()[i]->nom + "##" + std::to_string(i);
 
                     //faut mettre a jour le pointeur selectioneur
                     if (ImGui::Selectable(label.c_str(), noeuds_selectione == La_scene.GetNodes()[i].get())) {
 
                         //faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
-                        La_scene.SetSelection(La_scene.GetNodes()[i].get());
+                        La_scene.SceneManager::SetSelection(La_scene.SceneManager::GetNodes()[i].get());
                         
                         flag_changements = true;
                     }
@@ -118,13 +118,13 @@ int main(void) {
             //si on a eu un changement on augmente le compteur
             compteurModifs++;
             //faut regenerer le code
-            contenu = GenererCodeComplet(La_scene.GetNodes());//on donne à manger tous les noeuds de la scene
+            contenu = GenererCodeComplet(La_scene.SceneManager::GetNodes());//on donne à manger tous les noeuds de la scene
             flag_changements = false; //faut penser à le rebaisser le flag hein
             //std::cout << "changement : " << compteurModifs << std::endl;
         }
         if(compteurModifs >= limiteSauvgarde){
             //la je peut lancer la sauvgarde
-            sauvgarde("projet_exemple.cpp",contenu);
+            Sauvgarde("projet_exemple.cpp",contenu);
             compteurModifs = 0;
         }
     }

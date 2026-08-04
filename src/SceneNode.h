@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "raylib.h"
+#pragma once
 
 //la classe pour representer un objets de la scene
 class SceneNode {
