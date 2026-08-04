@@ -50,7 +50,6 @@ int main(void) {
     float tempsMaintien = 0.0f;//le temps actuel accumulé
     float tempsExige = 0.5f;//TODO issue #7
     bool modeFlyActif = false;//pour savoir si on est en mode fly
-
     //init rlImGui
     rlImGuiSetup(true);
 
@@ -67,11 +66,22 @@ int main(void) {
             //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 UpdateCamera(&cameraEditeur, modeCameraActif);
+                //on compte le temps
+                tempsMaintien += GetFrameTime();
+                //si on a appuié assez de temps et qu'on est pas déjà entrain de voler
+                if(tempsMaintien >= tempsExige && !modeFlyActif){
+                    modeFlyActif = true;
+
+                }
             }
 
             //detec du moment où on relache le clic droit
             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                EnableCursor(); //ça libere la souris une seule fois
+                tempsMaintien = 0.0f;//on reset le temps
+                if(modeFlyActif){
+                    EnableCursor(); //ça libere la souris une seule fois
+                    modeFlyActif = false;
+                }
             }
 
         // DESSIN idée de base
@@ -139,20 +149,27 @@ int main(void) {
 
 
                 //la partie caméra
+                //la progress bar stylée qui apparait si on commence à maintenir le clic
+                if(!modeFlyActif && tempsMaintien > 0.0f){
+                    ImGui::ProgressBar(tempsMaintien / tempsExige,{10.0f,50.0f});//idem issue #4
+                }
                 ImGui::Begin("Contrôle Caméra");
                 ImGui::Text("Mode de déplacement :");
-                
-                if (ImGui::RadioButton("Première Personne (FPS)", modeCameraActif == CAMERA_FIRST_PERSON)) {
-                    modeCameraActif = CAMERA_FIRST_PERSON;
-                }
-                if (ImGui::RadioButton("Caméra Libre (Free)", modeCameraActif == CAMERA_FREE)) {
+                if(modeFlyActif){
+                    UpdateCamera(&cameraEditeur, modeCameraActif);
+                }else{
+                    if (ImGui::RadioButton("Première Personne (FPS)", modeCameraActif == CAMERA_FIRST_PERSON)) {
+                        modeCameraActif = CAMERA_FIRST_PERSON;
+                    }
+                    if (ImGui::RadioButton("Caméra Libre (Free)", modeCameraActif == CAMERA_FREE)) {
                     modeCameraActif = CAMERA_FREE;
-                }
-                if (ImGui::RadioButton("Caméra Orbitale (Orbital)", modeCameraActif == CAMERA_ORBITAL)) {
-                    modeCameraActif = CAMERA_ORBITAL;
-                }
-                if (ImGui::RadioButton("Troisième Personne (TPS)", modeCameraActif == CAMERA_THIRD_PERSON)) {
-                    modeCameraActif = CAMERA_THIRD_PERSON;
+                    }
+                    if (ImGui::RadioButton("Caméra Orbitale (Orbital)", modeCameraActif == CAMERA_ORBITAL)) {
+                        modeCameraActif = CAMERA_ORBITAL;
+                    }
+                    if (ImGui::RadioButton("Troisième Personne (TPS)", modeCameraActif == CAMERA_THIRD_PERSON)) {
+                        modeCameraActif = CAMERA_THIRD_PERSON;
+                    }
                 }
 
                 ImGui::Separator();
