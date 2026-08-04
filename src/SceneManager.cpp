@@ -126,3 +126,30 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
     
     std::cout << "Projet sauvegarde avec succes dans : " << cheminFichier << std::endl;
 }
+
+
+//vide la scene actuelle et remplis avec le json lu
+void SceneManager::ChargerProjet(std::string cheminFichier){
+    sceneNodes.clear();//on vide les noeuds d'avant
+    std::ifstream file(cheminFichier);
+    if (!file) {
+        std::cerr << "Erreur : problème à l'ouverture du fichier " << cheminFichier << std::endl;
+        return;
+    }
+    nlohmann::json projet_json;
+    file >> projet_json; //on met le fichier dans le json et on le parse
+    //normalement file est une liste de liste donc on peut faire ça pour boucler sur tous les elements
+    for(int i = 0 ; i < projet_json.size() ; i++){
+        //on cree un obj temporaire
+        SceneNode *noeud;
+        noeud->couleur = projet_json["noeuds"]["couleur"];
+        noeud-> = projet_json["noeuds"]["couleur"];
+        noeud-> = projet_json["noeuds"]["couleur"];
+        noeud-> = projet_json["noeuds"]["couleur"];
+        sceneNodes.push_back(noeud);
+    }
+
+    //std::setw(4) pour l'indentations. 
+    //file << std::setw(4) << projet_json << std::endl;
+    file.close();
+}
