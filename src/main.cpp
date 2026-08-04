@@ -47,6 +47,9 @@ int main(void) {
 
     bool perspect = true;
     bool orto = false;
+    float tempsMaintien = 0.0f;//le temps actuel accumulé
+    float tempsExige = 0.5f;//TODO issue #7
+    bool modeFlyActif = false;//pour savoir si on est en mode fly
 
     //init rlImGui
     rlImGuiSetup(true);
@@ -168,7 +171,7 @@ int main(void) {
                         cameraEditeur.projection = type_projection_camera;
                     }
                 }
-                if(ImGui::Button("Ortogonal",{30.0f,30.0f})){//TODO changer les valeur par des % de la taille de la fenetre pour que ça soit responsive
+                if(ImGui::Button("Ortogonal",{30.0f,30.0f})){//TODO issue #6
                     //idem ici
                     if(!orto){
                         orto = true;
