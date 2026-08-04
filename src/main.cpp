@@ -158,7 +158,7 @@ int main(void) {
 
                 //pour changer le type de la caméra
                 ImGui::Begin("Type de caméra");
-                if(ImGui::Button("Perspective",{1.0f,1.0f})){
+                if(ImGui::Button("Perspective",{30.0f,30.0f})){
                     //si on clique sur ce bouton ça change le mode
                     if(!perspect){
                         perspect = true;
@@ -168,7 +168,7 @@ int main(void) {
                         cameraEditeur.projection = type_projection_camera;
                     }
                 }
-                if(ImGui::Button("Ortogonal",{1.0f,1.0f})){
+                if(ImGui::Button("Ortogonal",{30.0f,30.0f})){//TODO changer les valeur par des % de la taille de la fenetre pour que ça soit responsive
                     //idem ici
                     if(!orto){
                         orto = true;
@@ -178,7 +178,7 @@ int main(void) {
                         cameraEditeur.projection = type_projection_camera;
                     }
                 }
-                
+
                 ImGui::End();
             rlImGuiEnd();
 
