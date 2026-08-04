@@ -6,6 +6,7 @@
 #include <memory>//pour les unique ptr
 #include "SceneNode.h"
 #include "sauvgarde.h"
+#include "SceneManager.h"
 
 int main(void) {
 
@@ -20,6 +21,11 @@ int main(void) {
     int limiteSauvgarde = 50;
     bool flag_changements = false;//le flag pour dire si un changement a été fait
     std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
+
+    //pour gerer les objets de la scene:
+
+    SceneManager La_scene;
+
     //la fenêtre Raylib pour voir le rendu
     const int screenWidth = 1280;
     const int screenHeight = 720;
@@ -40,15 +46,6 @@ int main(void) {
     // Variable pour la position de notre cube test
     float cubePosition[3] = { 0.0f, 0.0f, 0.0f };
 
-    //tous nos elements dans la scene
-    std::vector<std::unique_ptr<SceneNode>> sceneNodes;
-    
-    //test ajout elements
-    sceneNodes.push_back(std::make_unique<CubeNode>());
-
-    sceneNodes.back()->position = {2.0f, 0.0f, 0.0f};
-    //pointeur pour retenir quel objet on est en train de modifier
-    SceneNode* noeudSelectionne = nullptr;
     // Boucle principale
     while (!WindowShouldClose()) {
         
@@ -56,28 +53,29 @@ int main(void) {
         BeginDrawing();
             ClearBackground(DARKGRAY);
             //TODO faire un vrai truc ici
-            // A. Dessin de la scène 3D
             BeginMode3D(camera);
-            for (auto& node : sceneNodes) {
-                node->Draw(); // Appellera le bon Draw() selon si c'est un Cube ou une Sphère !
-            }
-                DrawGrid(10, 1.0f);
+            //cette ligne dessine tout
+            La_scene.DrawScene();
+            DrawGrid(10, 1.0f);
             EndMode3D();
             
+            //variable temporaire pour les acces repeté du pointeur pour pas réécrire "La_scene.GetSelection()->" à chaque fois
+            SceneNode* noeuds_selectione = La_scene.GetSelection();
+
             // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
             rlImGuiBegin();
                 ImGui::Begin("Inspecteur");
-                if (noeudSelectionne != nullptr) {
+                if (noeuds_selectione != nullptr){
                     //affiche le nom de l'objet tout en haut
-                    ImGui::Text("Modification de : %s", noeudSelectionne->nom.c_str());
+                    ImGui::Text("Modification de : %s", noeuds_selectione->nom.c_str());
                     ImGui::Separator();
                 
                     //sliders pour modifier dynamiquement les variables
                     if(
-                        //TODO ajouter les bouton pour ajouter des objets ici aussi
-                        ImGui::DragFloat3("Position", &noeudSelectionne->position.x, 0.1f)
-                        ||ImGui::DragFloat3("Rotation", &noeudSelectionne->rotation.x, 1.0f)
-                        ||ImGui::DragFloat3("Taille", &noeudSelectionne->taille.x, 0.1f)
+                        //TODO ajouter les bouton pour ajouter des objetsg ici aussi
+                        ImGui::DragFloat3("Position", &noeuds_selectione->position.x, 0.1f)
+                        ||ImGui::DragFloat3("Rotation", &noeuds_selectione->rotation.x, 1.0f)
+                        ||ImGui::DragFloat3("Taille", &noeuds_selectione->taille.x, 0.1f)
                     ){
                         flag_changements = true;
                     }
@@ -98,19 +96,17 @@ int main(void) {
                 }
                 ImGui::End();
                 ImGui::Begin("Hierarchie");
-                for (size_t i = 0; i < sceneNodes.size(); i++) {
+                for (size_t i = 0; i < La_scene.GetNodes().size(); i++) {
                     //un label unique pour chaque objet
-                    std::string label = sceneNodes[i]->nom + "##" + std::to_string(i);
+                    std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
 
                     //faut mettre a jour le pointeur selectioneur
-                    if (ImGui::Selectable(label.c_str(), noeudSelectionne == sceneNodes[i].get())) {
+                    if (ImGui::Selectable(label.c_str(), noeuds_selectione == La_scene.GetNodes()[i].get())) {
 
-                        //faut désélectionner l'ancien
-                        if (noeudSelectionne != nullptr) noeudSelectionne->isSelected = false;
-
-                        //et sélectionner le nouveau
-                        noeudSelectionne = sceneNodes[i].get();
-                        noeudSelectionne->isSelected = true;
+                        //faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
+                        La_scene.SetSelection(La_scene.GetNodes()[i].get());
+                        
+                        flag_changements = true;
                     }
                     
                 }
@@ -122,7 +118,7 @@ int main(void) {
             //si on a eu un changement on augmente le compteur
             compteurModifs++;
             //faut regenerer le code
-            contenu = GenererCodeComplet(sceneNodes);
+            contenu = GenererCodeComplet(La_scene.GetNodes());//on donne à manger tous les noeuds de la scene
             flag_changements = false; //faut penser à le rebaisser le flag hein
             //std::cout << "changement : " << compteurModifs << std::endl;
         }
