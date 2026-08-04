@@ -30,19 +30,19 @@ int main(void) {
     const int screenWidth = 1280;
     const int screenHeight = 720;
     InitWindow(screenWidth, screenHeight, "Rlender - Test ImGui");
-    SetTargetFPS(10);
+    SetTargetFPS(60);
 
     /*
     la camera 3D pour voir la scene
     ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
     */
     CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
-    Camera3D camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 10.0f, 10.0f };
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-    camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;//possibilité de changer ça apres
+    Camera3D cameraEditeur = { 0 };
+    cameraEditeur.position = (Vector3){ 0.0f, 10.0f, 10.0f };
+    cameraEditeur.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+    cameraEditeur.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+    cameraEditeur.fovy = 45.0f;
+    cameraEditeur.projection = CAMERA_PERSPECTIVE;//possibilité de changer ça apres
 
     //init rlImGui
     rlImGuiSetup(true);
@@ -51,13 +51,27 @@ int main(void) {
     float cubePosition[3] = { 0.0f, 0.0f, 0.0f };
 
     // Boucle principale
-    while (!WindowShouldClose()) {
-        
+        while (!WindowShouldClose()) {
+            //gestion de la camera de l'editeur
+            if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+                DisableCursor(); // Lock la souris une seule fois au début du drag
+            }
+
+            // 2. Tant que le clic droit est MAINTENU
+            if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+                UpdateCamera(&cameraEditeur, modeCameraActif);
+            }
+
+            // 3. Détection du moment où on RELÂCHE le clic droit
+            if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+                EnableCursor(); // Libère la souris une seule fois
+            }
+
         // DESSIN idée de base
         BeginDrawing();
             ClearBackground(DARKGRAY);
             //TODO faire un vrai truc ici
-            BeginMode3D(camera);
+            BeginMode3D(cameraEditeur);
             //cette ligne dessine tout
             La_scene.DrawScene();
             DrawGrid(10, 1.0f);
@@ -90,11 +104,10 @@ int main(void) {
                     ImGui::Text("Cliquez sur un objet dans la hierarchie.");
                 }
 
-                ImGui::Text("Bienvenue dans ton editeur !");
+                ImGui::Text("Salut !");
                 if(
-
                     //slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
-                    ImGui::DragFloat3("Position Cube", cubePosition, 0.1f)
+                    ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f)
                 ){
                     flag_changements = true;
                 }
@@ -115,8 +128,34 @@ int main(void) {
                     
                 }
                 ImGui::End();
+
+
+
+                //la partie caméra
+                ImGui::Begin("Contrôle Caméra");
+                ImGui::Text("Mode de déplacement :");
+                
+                if (ImGui::RadioButton("Première Personne (FPS)", modeCameraActif == CAMERA_FIRST_PERSON)) {
+                    modeCameraActif = CAMERA_FIRST_PERSON;
+                }
+                if (ImGui::RadioButton("Caméra Libre (Free)", modeCameraActif == CAMERA_FREE)) {
+                    modeCameraActif = CAMERA_FREE;
+                }
+                if (ImGui::RadioButton("Caméra Orbitale (Orbital)", modeCameraActif == CAMERA_ORBITAL)) {
+                    modeCameraActif = CAMERA_ORBITAL;
+                }
+                if (ImGui::RadioButton("Troisième Personne (TPS)", modeCameraActif == CAMERA_THIRD_PERSON)) {
+                    modeCameraActif = CAMERA_THIRD_PERSON;
+                }
+
+                ImGui::Separator();
+                ImGui::Text("Maintenez le Clic Droit pour naviguer !");
+                ImGui::End();
+
             rlImGuiEnd();
-        DrawFPS(10, 10);//pour debug si le logiciel tourne bien
+
+            DrawFPS(10, 10);//pour debug si le logiciel tourne bien
+
         EndDrawing();
         if(flag_changements){
             //si on a eu un changement on augmente le compteur
@@ -139,3 +178,5 @@ int main(void) {
 
     return 0;
 }
+
+
