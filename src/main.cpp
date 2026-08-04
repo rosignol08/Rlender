@@ -30,15 +30,19 @@ int main(void) {
     const int screenWidth = 1280;
     const int screenHeight = 720;
     InitWindow(screenWidth, screenHeight, "Rlender - Test ImGui");
-    SetTargetFPS(60);
+    SetTargetFPS(10);
 
-    //la camera 3D pour voir la scene
+    /*
+    la camera 3D pour voir la scene
+    ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
+    */
+    CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
     Camera3D camera = { 0 };
     camera.position = (Vector3){ 5.0f, 5.0f, 5.0f };
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     camera.fovy = 45.0f;
-    camera.projection = CAMERA_PERSPECTIVE;
+    camera.projection = CAMERA_PERSPECTIVE;//possibilité de changer ça apres
 
     //init rlImGui
     rlImGuiSetup(true);

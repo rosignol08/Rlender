@@ -113,7 +113,9 @@ class CameraNode : public SceneNode{
             DrawLine3D(position, target, YELLOW);
         }
     }
-    
+    std::string ToCode(){
+        return "";
+    }
 
     std::string GetDrawCode(){
         //faut ajouter cette ligne dans la boucle de rendu
@@ -160,6 +162,10 @@ class Camera2DNode : public SceneNode{
         DrawLine3D(p2, p3, couleurLigne); //droite
     }
 
+    std::string ToCode(){
+        return "";
+    }
+    
     std::string GetDrawCode(){
         return "";
     }
