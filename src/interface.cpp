@@ -1,6 +1,8 @@
 #include "interface.h"
 
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& ctx){
+    //recuperation des variables etc
+    SceneNode* noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
     ImGui::Begin("Inspecteur");
     if (noeuds_selectione != nullptr)
@@ -14,7 +16,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             // TODO ajouter les bouton pour ajouter des objetsg ici aussi
             ImGui::DragFloat3("Position", &noeuds_selectione->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione->taille.x, 0.1f))
         {
-            flag_changements = true;
+            ctx.flag_changements = true;
         }
 
         // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
@@ -30,30 +32,30 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         // slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
         ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
     {
-        flag_changements = true;
+        ctx.flag_changements = true;
     }
     ImGui::End();
     ImGui::Begin("Hierarchie");
-    for (size_t i = 0; i < La_scene.SceneManager::GetNodes().size(); i++)
+    for (size_t i = 0; i < La_scene.GetNodes().size(); i++)
     {
         // un label unique pour chaque objet
-        std::string label = La_scene.SceneManager::GetNodes()[i]->nom + "##" + std::to_string(i);
+        std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
 
         // faut mettre a jour le pointeur selectioneur
         if (ImGui::Selectable(label.c_str(), noeuds_selectione == La_scene.GetNodes()[i].get()))
         {
 
             // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
-            La_scene.SceneManager::SetSelection(La_scene.SceneManager::GetNodes()[i].get());
+            La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
 
-            flag_changements = true;
+            ctx.flag_changements = true;
         }
     }
     ImGui::End();
 
     // la partie caméra
     // la progress bar stylée qui apparait si on commence à maintenir le clic
-    if (!modeFlyActif && tempsMaintien > 0.0f)
+    if (!ctx.modeFlyActif && tempsMaintien > 0.0f)
     {
         // recup le centre de l'ecant
         float centreX = GetScreenWidth() / 2.0f;
@@ -74,7 +76,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     }
     ImGui::Begin("Contrôle Caméra");
     ImGui::Text("Mode de déplacement :");
-    if (modeFlyActif)
+    if (ctx.modeFlyActif)
     {
         UpdateCamera(&cameraEditeur, modeCameraActif);
     }

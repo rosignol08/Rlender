@@ -50,7 +50,7 @@ int main(void) {
     bool modeFlyActif = false;//pour savoir si on est en mode fly
     //init rlImGui
     rlImGuiSetup(true);
-
+    EditorContext ctx;
     // Variable pour la position de notre cube test
     float cubePosition[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -94,7 +94,7 @@ int main(void) {
             SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
             // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
-            gere_interface();
+            gere_interface(La_scene, cameraEditeur, ctx);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
 
