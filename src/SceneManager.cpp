@@ -114,9 +114,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
             if (cam != nullptr) {
                 //si c'est une camera faut enregistrer les autre valeurs spécifiques
                 //vu que c'est une camera faut aussi stoquer les info de la camera
-                noeud_json["target"][0] = cam->target.x;
-                noeud_json["target"][1] = cam->target.y;
-                noeud_json["target"][2] = cam->target.z;
+                noeud_json["target"] = { cam->target.x, cam->target.y, cam->target.z };
                 noeud_json["fovy"] = cam->fovy;
                 noeud_json["mode_camera"] = cam->mode_camera;
                 noeud_json["projetction_cam"] = cam->projetction_cam;
