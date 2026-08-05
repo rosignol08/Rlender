@@ -109,7 +109,25 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
 
         //idem pour la couleur
         noeud_json["couleur"]  = { actuel->couleur.r, actuel->couleur.g, actuel->couleur.b, actuel->couleur.a };
-
+        if(actuel->type == "camera3D"){
+            CameraNode* cam = dynamic_cast<CameraNode*>(actuel);//faut dire que le noeud peut etre une camera
+            if (cam != nullptr) {
+                //si c'est une camera faut enregistrer les autre valeurs spécifiques
+                //vu que c'est une camera faut aussi stoquer les info de la camera
+                noeud_json["target"][0] = cam->target.x;
+                noeud_json["target"][1] = cam->target.y;
+                noeud_json["target"][2] = cam->target.z;
+                noeud_json["fovy"] = cam->fovy;
+                noeud_json["mode_camera"] = cam->mode_camera;
+                noeud_json["projetction_cam"] = cam->projetction_cam;
+            }
+        }
+        if(actuel->type == "camera2D"){
+            Camera2DNode* cam = dynamic_cast<Camera2DNode*>(actuel);//faut dire que le noeud peut etre une camera
+            if (cam != nullptr) {
+                noeud_json["zoom_camera"] = cam->zoom_camera;
+            }
+        }
         //ajout du noeud à la sauvgarde du projet
         projet_json["noeuds"].push_back(noeud_json);
     }
@@ -207,6 +225,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
                 nouveau_noeud->taille.y = element_json["taille"][1];
                 nouveau_noeud->taille.z = element_json["taille"][2];
                 sceneNodes.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
+            }
         }
     }
     file.close();
