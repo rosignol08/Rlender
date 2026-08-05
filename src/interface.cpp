@@ -1,7 +1,6 @@
 #include "interface.h"
 
-void gere_interface()
-{
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& ctx){
     rlImGuiBegin();
     ImGui::Begin("Inspecteur");
     if (noeuds_selectione != nullptr)
