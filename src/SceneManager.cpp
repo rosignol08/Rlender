@@ -141,20 +141,146 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     nlohmann::json projet_json;
     file >> projet_json; //on met le fichier dans le json et on le parse
     //normalement file est une liste de liste donc on peut faire ça pour boucler sur tous les elements
-    std::unique_ptr<SceneNode> noeud = std::make_unique<SceneNode>();
+    //std::unique_ptr<SceneNode> noeud = std::make_unique<SceneNode>();
     if(projet_json.contains("noeuds")){
         //si on a un noeud
         for (auto& element_json : projet_json["noeuds"]) {
             //on cree un obj temporaire
-            noeud->couleur = element_json["couleur"];
-            noeud-> = element_json["couleur"];
-            noeud-> = element_json["couleur"];
-            noeud-> = element_json["couleur"];
-            sceneNodes.push_back(noeud);   
+            std::string le_type = element_json["type"].get<std::string>();
+            if(le_type == "cube"){
+                auto nouveau_noeud = std::make_unique<CubeNode>();
+                //faut remplir le nouveau noeud avec les info lue
+                nouveau_noeud->type = element_json["type"];
+                
+                nouveau_noeud->nom = element_json["nom"];
+
+                nouveau_noeud->isSelected = element_json["isSelected"];
+
+                //pour la couleur faut voir comment je fait passer ça on va dire un tableau de 4 float
+                nouveau_noeud->couleur.a = element_json["couleur"][0];
+                nouveau_noeud->couleur.r = element_json["couleur"][1];
+                nouveau_noeud->couleur.g = element_json["couleur"][2];
+                nouveau_noeud->couleur.b = element_json["couleur"][3];
+
+                //pour la position c'est un vecteur pareil
+                nouveau_noeud->position.x = element_json["position"][0];
+                nouveau_noeud->position.y = element_json["position"][1];
+                nouveau_noeud->position.z = element_json["position"][2];
+
+                nouveau_noeud->rotation.x = element_json["rotation"][0];
+                nouveau_noeud->rotation.y = element_json["rotation"][1];
+                nouveau_noeud->rotation.z = element_json["rotation"][2];
+
+                nouveau_noeud->taille.x = element_json["taille"][0];
+                nouveau_noeud->taille.y = element_json["taille"][1];
+                nouveau_noeud->taille.z = element_json["taille"][2];
+                sceneNodes.push_back(nouveau_noeud);
+            }
+            else if(le_type == "sphere"){
+                auto nouveau_noeud = std::make_unique<SphereNode>();
+                //faut remplir le nouveau noeud avec les info lue
+                nouveau_noeud->type = element_json["type"];
+                
+                nouveau_noeud->nom = element_json["nom"];
+
+                nouveau_noeud->isSelected = element_json["isSelected"];
+
+                nouveau_noeud->couleur.a = element_json["couleur"][0];
+                nouveau_noeud->couleur.r = element_json["couleur"][1];
+                nouveau_noeud->couleur.g = element_json["couleur"][2];
+                nouveau_noeud->couleur.b = element_json["couleur"][3];
+
+                nouveau_noeud->position.x = element_json["position"][0];
+                nouveau_noeud->position.y = element_json["position"][1];
+                nouveau_noeud->position.z = element_json["position"][2];
+
+                nouveau_noeud->rotation.x = element_json["rotation"][0];
+                nouveau_noeud->rotation.y = element_json["rotation"][1];
+                nouveau_noeud->rotation.z = element_json["rotation"][2];
+
+                nouveau_noeud->taille.x = element_json["taille"][0];
+                nouveau_noeud->taille.y = element_json["taille"][1];
+                nouveau_noeud->taille.z = element_json["taille"][2];
+                
+                sceneNodes.push_back(nouveau_noeud);
+
+            }
+            else if(le_type == "camera3D"){
+                auto nouveau_noeud = std::make_unique<CameraNode>();
+                //faut remplir le nouveau noeud avec les info lue
+                nouveau_noeud->type = element_json["type"];
+                
+                nouveau_noeud->nom = element_json["nom"];
+
+                nouveau_noeud->isSelected = element_json["isSelected"];
+
+                //pour la couleur faut voir comment je fait passer ça on va dire un tableau de 4 float
+                nouveau_noeud->couleur.a = element_json["couleur"][0];
+                nouveau_noeud->couleur.r = element_json["couleur"][1];
+                nouveau_noeud->couleur.g = element_json["couleur"][2];
+                nouveau_noeud->couleur.b = element_json["couleur"][3];
+
+                //pour la position c'est un vecteur pareil
+                nouveau_noeud->position.x = element_json["position"][0];
+                nouveau_noeud->position.y = element_json["position"][1];
+                nouveau_noeud->position.z = element_json["position"][2];
+
+                nouveau_noeud->rotation.x = element_json["rotation"][0];
+                nouveau_noeud->rotation.y = element_json["rotation"][1];
+                nouveau_noeud->rotation.z = element_json["rotation"][2];
+
+                nouveau_noeud->taille.x = element_json["taille"][0];
+                nouveau_noeud->taille.y = element_json["taille"][1];
+                nouveau_noeud->taille.z = element_json["taille"][2];
+                
+                //vu que c'est une camera faut aussi stoquer les info de la camera
+                nouveau_noeud->target.x = element_json["target"][0];
+                nouveau_noeud->target.y = element_json["target"][1];
+                nouveau_noeud->target.z = element_json["target"][2];
+
+                nouveau_noeud->fovy = element_json["fovy"];
+                nouveau_noeud->mode_camera = element_json["mode_camera"];
+                nouveau_noeud->projetction_cam = element_json["projetction_cam"];
+                sceneNodes.push_back(nouveau_noeud);
+            }
+            else if(le_type == "camera2D"){
+                auto nouveau_noeud = std::make_unique<Camera2DNode>();
+                //faut remplir le nouveau noeud avec les info lue
+                nouveau_noeud->type = element_json["type"];
+                
+                nouveau_noeud->nom = element_json["nom"];
+
+                nouveau_noeud->isSelected = element_json["isSelected"];
+
+                //pour la couleur faut voir comment je fait passer ça on va dire un tableau de 4 float
+                nouveau_noeud->couleur.a = element_json["couleur"][0];
+                nouveau_noeud->couleur.r = element_json["couleur"][1];
+                nouveau_noeud->couleur.g = element_json["couleur"][2];
+                nouveau_noeud->couleur.b = element_json["couleur"][3];
+
+                //pour la position c'est un vecteur pareil
+                nouveau_noeud->position.x = element_json["position"][0];
+                nouveau_noeud->position.y = element_json["position"][1];
+                nouveau_noeud->position.z = element_json["position"][2];
+
+                nouveau_noeud->rotation.x = element_json["rotation"][0];
+                nouveau_noeud->rotation.y = element_json["rotation"][1];
+                nouveau_noeud->rotation.z = element_json["rotation"][2];
+
+                nouveau_noeud->taille.x = element_json["taille"][0];
+                nouveau_noeud->taille.y = element_json["taille"][1];
+                nouveau_noeud->taille.z = element_json["taille"][2];
+                
+                //vu que c'est une camera faut aussi stoquer les info de la camera
+                nouveau_noeud->zoom_camera = element_json["zoom_camera"];
+                
+                sceneNodes.push_back(nouveau_noeud);
+            }
+            else{
+                //par défaut si c'est rien de tout ça je skip ce noeud
+                continue;
+            }
         }
     }
-
-    //std::setw(4) pour l'indentations. 
-    //file << std::setw(4) << projet_json << std::endl;
     file.close();
 }
