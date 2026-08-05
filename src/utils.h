@@ -1,0 +1,1 @@
+//fichier avec toutes les variables pour les rendre accessibles entre les fichier ?
