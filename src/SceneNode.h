@@ -16,6 +16,7 @@ class SceneNode {
         Vector3 taille;
         Color couleur;
         bool isSelected;
+        std::string type; //pour pouvoir savoir à quoi on a affaire pour la sauvgarde
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
@@ -47,6 +48,7 @@ class CubeNode : public SceneNode{
     CubeNode() { 
         nom = "Cube"; 
         taille = {2.0f, 2.0f, 2.0f}; // Petite taille par défaut pour le voir
+        type = "cube";
     }
 
     void Draw() override {
@@ -74,6 +76,7 @@ class SphereNode : public SceneNode{
     SphereNode(){
         nom = "Sphere";
         taille = {2.0f,2.0f,2.0f};
+        type = "sphere";
     }
     void Draw() override {
         //les variables héritées de SceneNode
@@ -103,6 +106,7 @@ class CameraNode : public SceneNode{
         CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
         CameraNode(){
         nom = "camera3D";
+        type = "camera3D";
     }
 
     void Draw() override {  
@@ -141,12 +145,17 @@ class CameraNode : public SceneNode{
 };
 
 class Camera2DNode : public SceneNode{
-    int screenWidth = 1280.0f;
-    int screenHeight = 720.0f;
-    Vector2 offset_camera = {screenWidth/2.0f,screenHeight/2.0f}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
-    //Vector2 target_camera = {position.x,position.y};//par exemple
-    //float rotation_camera = rotation.x;
-    float     zoom_camera = 1.0f;
+    public :
+        int screenWidth = 1280.0f;
+        int screenHeight = 720.0f;
+        Vector2 offset_camera = {screenWidth/2.0f,screenHeight/2.0f}; // si je veut faire {screenWidth/2, screenHeight/2}; faut les definir en globales dans le projet
+        //Vector2 target_camera = {position.x,position.y};//par exemple
+        //float rotation_camera = rotation.x;
+        float zoom_camera = 1.0f;
+        Camera2DNode(){
+            nom = "camera2D";
+            type = "camera2D";
+        }
 
     void Draw() override {
         Color couleurLigne = isSelected ? YELLOW : PURPLE;
@@ -186,4 +195,5 @@ class Camera2DNode : public SceneNode{
         return code.str();
     }
 };
+
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);

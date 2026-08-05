@@ -98,7 +98,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
 
         //objet JSON temporaire pour ce noeud là
         nlohmann::json noeud_json;
-        
+        noeud_json["type"] = actuel->type;
         noeud_json["nom"] = actuel->nom;
         noeud_json["isSelected"] = actuel->isSelected;
 
@@ -128,6 +128,8 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
 }
 
 
+//fini la fonction bien frero
+
 //vide la scene actuelle et remplis avec le json lu
 void SceneManager::ChargerProjet(std::string cheminFichier){
     sceneNodes.clear();//on vide les noeuds d'avant
@@ -139,14 +141,17 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     nlohmann::json projet_json;
     file >> projet_json; //on met le fichier dans le json et on le parse
     //normalement file est une liste de liste donc on peut faire ça pour boucler sur tous les elements
-    for(int i = 0 ; i < projet_json.size() ; i++){
-        //on cree un obj temporaire
-        SceneNode *noeud;
-        noeud->couleur = projet_json["noeuds"]["couleur"];
-        noeud-> = projet_json["noeuds"]["couleur"];
-        noeud-> = projet_json["noeuds"]["couleur"];
-        noeud-> = projet_json["noeuds"]["couleur"];
-        sceneNodes.push_back(noeud);
+    std::unique_ptr<SceneNode> noeud = std::make_unique<SceneNode>();
+    if(projet_json.contains("noeuds")){
+        //si on a un noeud
+        for (auto& element_json : projet_json["noeuds"]) {
+            //on cree un obj temporaire
+            noeud->couleur = element_json["couleur"];
+            noeud-> = element_json["couleur"];
+            noeud-> = element_json["couleur"];
+            noeud-> = element_json["couleur"];
+            sceneNodes.push_back(noeud);   
+        }
     }
 
     //std::setw(4) pour l'indentations. 
