@@ -43,11 +43,11 @@ int main(void) {
     cameraEditeur.fovy = 45.0f;
     cameraEditeur.projection = type_projection_camera;//possibilité de changer ça apres
 
-    bool perspect = true;
-    bool orto = false;
-    float tempsMaintien = 0.0f;//le temps actuel accumulé
-    float tempsExige = 0.5f;//TODO issue #7
-    bool modeFlyActif = false;//pour savoir si on est en mode fly
+    //bool perspect = true;
+    //bool orto = false;
+    //float tempsMaintien = 0.0f;//le temps actuel accumulé
+    //float tempsExige = 0.5f;//TODO issue #7
+    //bool modeFlyActif = false;//pour savoir si on est en mode fly
     //init rlImGui
     rlImGuiSetup(true);
     EditorContext ctx;
@@ -60,23 +60,23 @@ int main(void) {
             //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 //on compte le temps
-                tempsMaintien += GetFrameTime();
+                ctx.tempsMaintien += GetFrameTime();
                 //si on a appuié assez de temps et qu'on est pas déjà entrain de voler
-                if(tempsMaintien >= tempsExige && !modeFlyActif){
-                    modeFlyActif = true;
+                if(ctx.tempsMaintien >= ctx.tempsExige && !ctx.modeFlyActif){
+                    ctx.modeFlyActif = true;
                     DisableCursor();
                 }
-                if(modeFlyActif){
+                if(ctx.modeFlyActif){
                     UpdateCamera(&cameraEditeur, modeCameraActif);
                 }
             }
 
             //detec du moment où on relache le clic droit
             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                tempsMaintien = 0.0f;//on reset le temps
-                if(modeFlyActif){
+                ctx.tempsMaintien = 0.0f;//on reset le temps
+                if(ctx.modeFlyActif){
                     EnableCursor(); //ça libere la souris une seule fois
-                    modeFlyActif = false;
+                    ctx.modeFlyActif = false;
                 }
             }
 

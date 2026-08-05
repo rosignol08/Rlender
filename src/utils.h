@@ -8,14 +8,13 @@ struct EditorContext {
     
     //la camera
     bool modeFlyActif = false;
-    float tempsMaintien = 0.0f;
-    float tempsExige = 1.5f;
+    float tempsMaintien = 0.0f;//le temps actuel accumulé
+    float tempsExige = 0.5f;//TODO issue #7
+    
     CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
     bool perspect = true;
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
 
     //les paramètres
-    float tempsMaintien = 0.0f;//le temps actuel accumulé
-    float tempsExige = 0.5f;//TODO issue #7
 };
