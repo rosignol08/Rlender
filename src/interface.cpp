@@ -27,13 +27,13 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         ImGui::Text("Cliquez sur un objet dans la hierarchie.");
     }
 
-    ImGui::Text("Salut !");
-    if (
-        // slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
-        ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
-    {
-        ctx.flag_changements = true;
-    }
+    //ImGui::Text("Salut !");
+    //if (
+    //    // slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
+    //    ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
+    //{
+    //    ctx.flag_changements = true;
+    //}
     ImGui::End();
     ImGui::Begin("Hierarchie");
     for (size_t i = 0; i < La_scene.GetNodes().size(); i++)
@@ -55,7 +55,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 
     // la partie caméra
     // la progress bar stylée qui apparait si on commence à maintenir le clic
-    if (!ctx.modeFlyActif && tempsMaintien > 0.0f)
+    if (!ctx.modeFlyActif && ctx.tempsMaintien > 0.0f)
     {
         // recup le centre de l'ecant
         float centreX = GetScreenWidth() / 2.0f;
@@ -71,32 +71,32 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         ImGui::Begin("BarreChargement", nullptr, flagsFlottant);
 
         // dessin de la barre issue #4
-        ImGui::ProgressBar(tempsMaintien / tempsExige, {150.0f, 15.0f});
+        ImGui::ProgressBar(ctx.tempsMaintien / ctx.tempsExige, {150.0f, 15.0f});
         ImGui::End();
     }
     ImGui::Begin("Contrôle Caméra");
     ImGui::Text("Mode de déplacement :");
     if (ctx.modeFlyActif)
     {
-        UpdateCamera(&cameraEditeur, modeCameraActif);
+        UpdateCamera(&cameraEditeur, ctx.modeCameraActif);
     }
     else
     {
-        if (ImGui::RadioButton("Première Personne (FPS)", modeCameraActif == CAMERA_FIRST_PERSON))
+        if (ImGui::RadioButton("Première Personne (FPS)", ctx.modeCameraActif == CAMERA_FIRST_PERSON))
         {
-            modeCameraActif = CAMERA_FIRST_PERSON;
+            ctx.modeCameraActif = CAMERA_FIRST_PERSON;
         }
-        if (ImGui::RadioButton("Caméra Libre (Free)", modeCameraActif == CAMERA_FREE))
+        if (ImGui::RadioButton("Caméra Libre (Free)", ctx.modeCameraActif == CAMERA_FREE))
         {
-            modeCameraActif = CAMERA_FREE;
+            ctx.modeCameraActif = CAMERA_FREE;
         }
-        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", modeCameraActif == CAMERA_ORBITAL))
+        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", ctx.modeCameraActif == CAMERA_ORBITAL))
         {
-            modeCameraActif = CAMERA_ORBITAL;
+            ctx.modeCameraActif = CAMERA_ORBITAL;
         }
-        if (ImGui::RadioButton("Troisième Personne (TPS)", modeCameraActif == CAMERA_THIRD_PERSON))
+        if (ImGui::RadioButton("Troisième Personne (TPS)", ctx.modeCameraActif == CAMERA_THIRD_PERSON))
         {
-            modeCameraActif = CAMERA_THIRD_PERSON;
+            ctx.modeCameraActif = CAMERA_THIRD_PERSON;
         }
     }
 
@@ -109,25 +109,25 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     if (ImGui::Button("Perspective", {30.0f, 30.0f}))
     {
         // si on clique sur ce bouton ça change le mode
-        if (!perspect)
+        if (!ctx.perspect)
         {
-            perspect = true;
-            orto = false;
-            type_projection_camera = CAMERA_PERSPECTIVE;
+            ctx.perspect = true;
+            ctx.orto = false;
+            ctx.type_projection_camera = CAMERA_PERSPECTIVE;
             // on met a jour la perspective
-            cameraEditeur.projection = type_projection_camera;
+            cameraEditeur.projection = ctx.type_projection_camera;
         }
     }
     if (ImGui::Button("Ortogonal", {30.0f, 30.0f}))
     { // TODO issue #6
         // idem ici
-        if (!orto)
+        if (!ctx.orto)
         {
-            orto = true;
-            perspect = false;
-            type_projection_camera = CAMERA_ORTHOGRAPHIC;
+            ctx.orto = true;
+            ctx.perspect = false;
+            ctx.type_projection_camera = CAMERA_ORTHOGRAPHIC;
             // on met a jour la perspective
-            cameraEditeur.projection = type_projection_camera;
+            cameraEditeur.projection = ctx.type_projection_camera;
         }
     }
 

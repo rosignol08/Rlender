@@ -14,4 +14,8 @@ struct EditorContext {
     bool perspect = true;
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
+
+    //les paramètres
+    float tempsMaintien = 0.0f;//le temps actuel accumulé
+    float tempsExige = 0.5f;//TODO issue #7
 };
