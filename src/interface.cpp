@@ -154,12 +154,11 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             }
             if (ImGui::MenuItem("Enregistrer")) {
                 const char* filtres[1] = { "*.json" };
-                const char* cheminChoisi = tinyfd_openFileDialog(
+                const char* cheminChoisi = tinyfd_saveFileDialog(
                     "Choisir un nom de projet", //titre
-                    "",                 //chemin par défaut
+                    "projet.json",                 //chemin par défaut
                     1, filtres,        //filtres d'extension (*.json)
-                    "Fichiers JSON",   //fescription
-                    0                  //sélection multiple désactivée
+                    "Fichiers JSON"   //fescription
                 );
             
                 if (cheminChoisi != NULL) {
@@ -168,12 +167,11 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             }
             if (ImGui::MenuItem("Exporter")) {
                 const char* filtres[1] = { "*.cpp" };
-                const char* cheminChoisi = tinyfd_openFileDialog(
+                const char* cheminChoisi = tinyfd_saveFileDialog(
                     "Choisir un nom de fichier", //titre
-                    "",                 //chemin par défaut
+                    "exporte.cpp",                 //chemin par défaut
                     1, filtres,        //filtres d'extension (*.json)
-                    "Fichiers CPP",   //fescription
-                    0                  //sélection multiple désactivée
+                    "Fichiers CPP"
                 );
             
                 if (cheminChoisi != NULL) {
