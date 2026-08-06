@@ -132,5 +132,68 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     }
 
     ImGui::End();
+
+    //la barre d'en haut
+    if(ImGui::BeginMainMenuBar()){
+
+        if(ImGui::BeginMenu("Fichier")){
+            //si c'est true c'est qu'on a cliqué dessus
+            if (ImGui::MenuItem("Ouvrir...")) {
+                const char* filtres[1] = { "*.json" };
+                const char* cheminChoisi = tinyfd_openFileDialog(
+                    "Ouvrir un projet", //titre
+                    "",                 //chemin par défaut
+                    1, filtres,        //filtres d'extension (*.json)
+                    "Fichiers JSON",   //fescription
+                    0                  //sélection multiple désactivée
+                );
+            
+                if (cheminChoisi != NULL) {
+                    ChargerProjet(cheminChoisi);
+                }
+            }
+            if (ImGui::MenuItem("Enregistrer")) {
+                const char* filtres[1] = { "*.json" };
+                const char* cheminChoisi = tinyfd_openFileDialog(
+                    "Choisir un nom de projet", //titre
+                    "",                 //chemin par défaut
+                    1, filtres,        //filtres d'extension (*.json)
+                    "Fichiers JSON",   //fescription
+                    0                  //sélection multiple désactivée
+                );
+            
+                if (cheminChoisi != NULL) {
+                    SauvegarderProjet(cheminChoisi);
+                }
+            }
+            if (ImGui::MenuItem("Exporter")) {
+                const char* filtres[1] = { "*.cpp" };
+                const char* cheminChoisi = tinyfd_openFileDialog(
+                    "Choisir un nom de fichier", //titre
+                    "",                 //chemin par défaut
+                    1, filtres,        //filtres d'extension (*.json)
+                    "Fichiers CPP",   //fescription
+                    0                  //sélection multiple désactivée
+                );
+            
+                if (cheminChoisi != NULL) {
+                    std::string contenu = GenererCodeComplet(La_scene.GetNodes());
+                    Sauvgarde(cheminChoisi, contenu);
+                }
+            }
+            //if(ImGui::MenuItem("Exporter","ctrl+e")){    
+            //    std::string cheminFichier; //fonction pour selectioner un fichier ou un emplacement depuis l'editeur externe
+            //    ChargerProjet(cheminFichier);
+            //}
+            ImGui::EndMenu();
+        }
+        if(ImGui::BeginMenu("Paramètres")){
+            //ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
+            //ImGui::InputFloat();
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+        
     rlImGuiEnd();
 }

@@ -10,6 +10,7 @@ set(SRCS
     src/Sauvgarde.cpp
     src/SceneManager.cpp
     src/interface.cpp
+    src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp
     lib/imgui/imgui.cpp
     lib/imgui/imgui_demo.cpp
