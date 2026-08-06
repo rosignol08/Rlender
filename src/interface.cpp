@@ -149,7 +149,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
                 );
             
                 if (cheminChoisi != NULL) {
-                    ChargerProjet(cheminChoisi);
+                    La_scene.ChargerProjet(cheminChoisi);
                 }
             }
             if (ImGui::MenuItem("Enregistrer")) {
@@ -162,7 +162,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
                 );
             
                 if (cheminChoisi != NULL) {
-                    SauvegarderProjet(cheminChoisi);
+                    La_scene.SauvegarderProjet(cheminChoisi);
                 }
             }
             if (ImGui::MenuItem("Exporter")) {
