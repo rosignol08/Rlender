@@ -16,7 +16,7 @@ int main(void) {
     limiteSauvgarde c'est la limite dynamique du compteur c'est ça que faut changer pour reduite au augmenter le nombre de sauvgardes etc
     */
     int compteurModifs = 0; //un compteur pour dire que
-    int limiteSauvgarde = 50;
+    //int limiteSauvgarde = 50;
     bool flag_changements = false;//le flag pour dire si un changement a été fait
     std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
 
@@ -25,9 +25,11 @@ int main(void) {
     SceneManager La_scene;
 
     //la fenêtre Raylib pour voir le rendu
-    const int screenWidth = 1280;
-    const int screenHeight = 720;
-    InitWindow(screenWidth, screenHeight, "Rlender - Test ImGui");
+    //const int screenWidth = 1280;
+    //const int screenHeight = 720;
+    Parametres Les_parametres;
+    ChargerConfig(Les_parametres);//au debut du programme on met a jour les parametres
+    InitWindow(Les_parametres.screenWidth, Les_parametres.screenHeight, "Rlender - Test ImGui");
     SetTargetFPS(60);
 
     /*

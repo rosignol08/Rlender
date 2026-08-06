@@ -22,3 +22,12 @@ void Sauvgarde(std::string nom_fichier,std::string contenu){
     }
     mon_fichier.close();
 }
+
+
+//ça remplis les variables parametre par les info du fichier config.json
+void ChargerConfig(Parametres& config){
+
+}
+void SauvegarderConfig(const Parametres& config){
+    
+}
