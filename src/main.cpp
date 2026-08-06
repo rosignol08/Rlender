@@ -50,7 +50,7 @@ int main(void) {
     //bool modeFlyActif = false;//pour savoir si on est en mode fly
     //init rlImGui
     rlImGuiSetup(true);
-    EditorContext ctx;
+    EditorContext les_parametres;
     // Variable pour la position de notre cube test
     float cubePosition[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -60,23 +60,23 @@ int main(void) {
             //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 //on compte le temps
-                ctx.tempsMaintien += GetFrameTime();
+                les_parametres.tempsMaintien += GetFrameTime();
                 //si on a appuié assez de temps et qu'on est pas déjà entrain de voler
-                if(ctx.tempsMaintien >= ctx.tempsExige && !ctx.modeFlyActif){
-                    ctx.modeFlyActif = true;
+                if(les_parametres.tempsMaintien >= les_parametres.tempsExige && !les_parametres.modeFlyActif){
+                    les_parametres.modeFlyActif = true;
                     DisableCursor();
                 }
-                if(ctx.modeFlyActif){
+                if(les_parametres.modeFlyActif){
                     UpdateCamera(&cameraEditeur, modeCameraActif);
                 }
             }
 
             //detec du moment où on relache le clic droit
             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                ctx.tempsMaintien = 0.0f;//on reset le temps
-                if(ctx.modeFlyActif){
+                les_parametres.tempsMaintien = 0.0f;//on reset le temps
+                if(les_parametres.modeFlyActif){
                     EnableCursor(); //ça libere la souris une seule fois
-                    ctx.modeFlyActif = false;
+                    les_parametres.modeFlyActif = false;
                 }
             }
 
@@ -94,7 +94,7 @@ int main(void) {
             SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
             // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
-            gere_interface(La_scene, cameraEditeur, ctx);
+            gere_interface(La_scene, cameraEditeur, les_parametres);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
 
