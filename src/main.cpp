@@ -109,7 +109,7 @@ int main(void) {
             flag_changements = false; //faut penser à le rebaisser le flag hein
             //std::cout << "changement : " << compteurModifs << std::endl;
         }
-        if(compteurModifs >= limiteSauvgarde){
+        if(compteurModifs >= Les_parametres.limiteSauvgarde){
             //la je peut lancer la sauvgarde
             Sauvgarde("projet_exemple.cpp",contenu);
             compteurModifs = 0;

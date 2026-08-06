@@ -1,5 +1,7 @@
 {
   "seuil_sauvegarde": 1.5,
   "sensibilite_souris": 0.1,
-  "sauvegarde_auto": true
+  "sauvegarde_auto": true,
+  "hauteur": 720,
+  "largeur": 1280
 }

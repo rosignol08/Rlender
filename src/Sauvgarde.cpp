@@ -26,7 +26,22 @@ void Sauvgarde(std::string nom_fichier,std::string contenu){
 
 //ça remplis les variables parametre par les info du fichier config.json
 void ChargerConfig(Parametres& config){
-
+    std::ifstream file("config.json");
+    if (!file) {
+        std::cerr << "Erreur : problème à l'ouverture du fichier config.json" << std::endl;
+        return;
+    }
+    nlohmann::json config_json;
+    file >> config_json; //on met le fichier dans le json et on le parse
+    if (config_json.contains("seuil_sauvegarde")) {
+        config.limiteSauvgarde = config_json["seuil_sauvegarde"].get<float>();
+    }
+    if (config_json.contains("largeur")) {
+        config.screenWidth = config_json["largeur"].get<int>();
+    }
+    if (config_json.contains("hauteur")) {
+        config.screenHeight = config_json["hauteur"].get<int>();
+    }
 }
 void SauvegarderConfig(const Parametres& config){
     
