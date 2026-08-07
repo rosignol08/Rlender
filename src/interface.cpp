@@ -1,6 +1,6 @@
 #include "interface.h"
 
-void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& les_parametres){
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres &Les_parametres){
     //recuperation des variables etc
     SceneNode* noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
@@ -16,7 +16,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             // TODO ajouter les bouton pour ajouter des objetsg ici aussi
             ImGui::DragFloat3("Position", &noeuds_selectione->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione->taille.x, 0.1f))
         {
-            les_parametres.flag_changements = true;
+            Les_variables.flag_changements = true;
         }
 
         // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
@@ -48,14 +48,14 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
             La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
 
-            les_parametres.flag_changements = true;
+            Les_variables.flag_changements = true;
         }
     }
     ImGui::End();
 
     // la partie caméra
     // la progress bar stylée qui apparait si on commence à maintenir le clic
-    if (!les_parametres.modeFlyActif && les_parametres.tempsMaintien > 0.0f)
+    if (!Les_variables.modeFlyActif && Les_variables.tempsMaintien > 0.0f)
     {
         // recup le centre de l'ecant
         float centreX = GetScreenWidth() / 2.0f;
@@ -71,37 +71,37 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         ImGui::Begin("BarreChargement", nullptr, flagsFlottant);
 
         // dessin de la barre issue #4
-        ImGui::ProgressBar(les_parametres.tempsMaintien / les_parametres.tempsExige, {150.0f, 15.0f});
+        ImGui::ProgressBar(Les_variables.tempsMaintien / Les_variables.tempsExige, {150.0f, 15.0f});
         ImGui::End();
     }
     ImGui::Begin("Contrôle Caméra");
     ImGui::Text("Mode de déplacement :");
-    if (les_parametres.modeFlyActif)
+    if (Les_variables.modeFlyActif)
     {
-        UpdateCamera(&cameraEditeur, les_parametres.modeCameraActif);
+        UpdateCamera(&cameraEditeur, Les_variables.modeCameraActif);
     }
     else
     {
-        if (ImGui::RadioButton("Première Personne (FPS)", les_parametres.modeCameraActif == CAMERA_FIRST_PERSON))
+        if (ImGui::RadioButton("Première Personne (FPS)", Les_variables.modeCameraActif == CAMERA_FIRST_PERSON))
         {
-            les_parametres.modeCameraActif = CAMERA_FIRST_PERSON;
+            Les_variables.modeCameraActif = CAMERA_FIRST_PERSON;
         }
-        if (ImGui::RadioButton("Caméra Libre (Free)", les_parametres.modeCameraActif == CAMERA_FREE))
+        if (ImGui::RadioButton("Caméra Libre (Free)", Les_variables.modeCameraActif == CAMERA_FREE))
         {
-            les_parametres.modeCameraActif = CAMERA_FREE;
+            Les_variables.modeCameraActif = CAMERA_FREE;
         }
-        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", les_parametres.modeCameraActif == CAMERA_ORBITAL))
+        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", Les_variables.modeCameraActif == CAMERA_ORBITAL))
         {
-            les_parametres.modeCameraActif = CAMERA_ORBITAL;
+            Les_variables.modeCameraActif = CAMERA_ORBITAL;
         }
-        if (ImGui::RadioButton("Troisième Personne (TPS)", les_parametres.modeCameraActif == CAMERA_THIRD_PERSON))
+        if (ImGui::RadioButton("Troisième Personne (TPS)", Les_variables.modeCameraActif == CAMERA_THIRD_PERSON))
         {
-            les_parametres.modeCameraActif = CAMERA_THIRD_PERSON;
+            Les_variables.modeCameraActif = CAMERA_THIRD_PERSON;
         }
     }
 
     ImGui::Separator();
-    ImGui::Text("Maintenez le Clic Droit pour naviguer !");
+    ImGui::Text("Maintiens le Clic Droit pour bouger");
     ImGui::End();
 
     // pour changer le type de la caméra
@@ -109,25 +109,25 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     if (ImGui::Button("Perspective", {30.0f, 30.0f}))
     {
         // si on clique sur ce bouton ça change le mode
-        if (!les_parametres.perspect)
+        if (!Les_variables.perspect)
         {
-            les_parametres.perspect = true;
-            les_parametres.orto = false;
-            les_parametres.type_projection_camera = CAMERA_PERSPECTIVE;
+            Les_variables.perspect = true;
+            Les_variables.orto = false;
+            Les_variables.type_projection_camera = CAMERA_PERSPECTIVE;
             // on met a jour la perspective
-            cameraEditeur.projection = les_parametres.type_projection_camera;
+            cameraEditeur.projection = Les_variables.type_projection_camera;
         }
     }
     if (ImGui::Button("Ortogonal", {30.0f, 30.0f}))
     { // TODO issue #6
         // idem ici
-        if (!les_parametres.orto)
+        if (!Les_variables.orto)
         {
-            les_parametres.orto = true;
-            les_parametres.perspect = false;
-            les_parametres.type_projection_camera = CAMERA_ORTHOGRAPHIC;
+            Les_variables.orto = true;
+            Les_variables.perspect = false;
+            Les_variables.type_projection_camera = CAMERA_ORTHOGRAPHIC;
             // on met a jour la perspective
-            cameraEditeur.projection = les_parametres.type_projection_camera;
+            cameraEditeur.projection = Les_variables.type_projection_camera;
         }
     }
 
@@ -189,6 +189,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             //ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
             //ImGui::InputFloat();
             ImGui::EndMenu();
+            SauvegarderConfig(Les_parametres);
         }
         ImGui::EndMainMenuBar();
     }

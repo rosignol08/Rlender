@@ -15,8 +15,6 @@ struct EditorContext {
     bool perspect = true;
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
-
-    //les paramètres
 };
 
 struct Parametres {

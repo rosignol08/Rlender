@@ -52,7 +52,7 @@ int main(void) {
     //bool modeFlyActif = false;//pour savoir si on est en mode fly
     //init rlImGui
     rlImGuiSetup(true);
-    EditorContext les_parametres;
+    EditorContext Les_variables;
     // Variable pour la position de notre cube test
     float cubePosition[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -62,23 +62,23 @@ int main(void) {
             //si le clic droit est maintenu
             if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
                 //on compte le temps
-                les_parametres.tempsMaintien += GetFrameTime();
+                Les_variables.tempsMaintien += GetFrameTime();
                 //si on a appuié assez de temps et qu'on est pas déjà entrain de voler
-                if(les_parametres.tempsMaintien >= les_parametres.tempsExige && !les_parametres.modeFlyActif){
-                    les_parametres.modeFlyActif = true;
+                if(Les_variables.tempsMaintien >= Les_variables.tempsExige && !Les_variables.modeFlyActif){
+                    Les_variables.modeFlyActif = true;
                     DisableCursor();
                 }
-                if(les_parametres.modeFlyActif){
+                if(Les_variables.modeFlyActif){
                     UpdateCamera(&cameraEditeur, modeCameraActif);
                 }
             }
 
             //detec du moment où on relache le clic droit
             if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
-                les_parametres.tempsMaintien = 0.0f;//on reset le temps
-                if(les_parametres.modeFlyActif){
+                Les_variables.tempsMaintien = 0.0f;//on reset le temps
+                if(Les_variables.modeFlyActif){
                     EnableCursor(); //ça libere la souris une seule fois
-                    les_parametres.modeFlyActif = false;
+                    Les_variables.modeFlyActif = false;
                 }
             }
 
@@ -95,8 +95,8 @@ int main(void) {
             //variable temporaire pour les acces repeté du pointeur pour pas réécrire "La_scene.GetSelection()->" à chaque fois
             SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
-            // B. Dessin de l'interface graphique (Toujours APRÈS la 3D)
-            gere_interface(La_scene, cameraEditeur, les_parametres);
+            // B. Dessin de l'interface graphique (apres la 3D)
+            gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
 
