@@ -185,6 +185,28 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             //}
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Paramètres")) {
+            bool Changement = false;//c'est remis à false à chaque fois
+    
+            if (ImGui::SliderInt("Seuil de Sauvegarde", &Les_parametres.limiteSauvgarde, 10, 200)) {
+                Changement = true;
+            }
+        
+            if (ImGui::InputInt("Largeur", &Les_parametres.screenWidth)) {
+                Changement = true;
+            }
+        
+            // Si l'utilisateur tape un nouveau chiffre pour la hauteur
+            if (ImGui::InputInt("Hauteur", &Les_parametres.screenHeight)) {
+                Changement = true;
+            }
+            if(Changement){
+                //enregistre que quand la valeur change
+                SauvegarderConfig(Les_parametres);
+            }
+        
+            ImGui::EndMenu();
+        }
         
         ImGui::EndMainMenuBar();
     }
