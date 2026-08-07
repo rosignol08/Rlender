@@ -22,4 +22,6 @@ struct Parametres {
     int Plein_ecran = 0;
     int screenWidth = 1280; //c'est la taille de la fenetre
     int screenHeight = 720; //c'est la taille de la fenetre
+    float Chronos_sauvegarde = 0.0f; //on attend ce temps avant d'ecrire sur le json (pour épargner le disque dur)
+    bool attente_sauvegarde; //flag
 };

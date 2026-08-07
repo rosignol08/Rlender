@@ -102,8 +102,19 @@ int main(void) {
                 //si la fenetre a ete changé de taille faut enregistrer les valeurs
                 Les_parametres.screenWidth = GetScreenWidth();
                 Les_parametres.screenHeight = GetScreenHeight();
-                SauvegarderConfig(Les_parametres);
+                Les_parametres.Chronos_sauvegarde = 0.5f;// le temps avant de sauvgarder
+                Les_parametres.attente_sauvegarde = true; //tant qu'on change la taille de la fenetre on enregistre pas
             }
+            if (Les_parametres.attente_sauvegarde) {
+                Les_parametres.Chronos_sauvegarde -= GetFrameTime();
+            }
+            if (Les_parametres.attente_sauvegarde && Les_parametres.Chronos_sauvegarde <= 0.0f) {
+                //enregistrement
+                SauvegarderConfig(Les_parametres);
+                //reset du flag
+                Les_parametres.attente_sauvegarde = false;
+            }
+            
             //l'interface graphique (apres la 3D)
             gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres);
 
