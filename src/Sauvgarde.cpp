@@ -39,14 +39,11 @@ void ChargerConfig(Parametres& config){
     if (config_json.contains("ecran")){
         config.Plein_ecran = config_json["ecran"].get<int>();
     }
-    if(config.Plein_ecran == 0){
-        //si on est en fenetre on enregistre la taille sinon nan
-        if (config_json.contains("largeur")) {
-            config.screenWidth = config_json["largeur"].get<int>();
-        }
-        if (config_json.contains("hauteur")) {
-            config.screenHeight = config_json["hauteur"].get<int>();
-        }
+    if (config_json.contains("largeur")) {
+        config.screenWidth = config_json["largeur"].get<int>();
+    }
+    if (config_json.contains("hauteur")) {
+        config.screenHeight = config_json["hauteur"].get<int>();
     }
 }
 
