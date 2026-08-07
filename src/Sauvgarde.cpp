@@ -61,10 +61,17 @@ void SauvegarderConfig(const Parametres& config){
     std::ifstream file("config.json");
     if (!file) {
         //faut crée le fichier la comme ça c'est nikel
-        std::fstream 
         std::cerr << "Erreur : problème à l'ouverture du fichier config.json" << std::endl;
-        return;
+        if(!Cree_Fichier("config.json")){//!1 c'est considéré comme false
+            //le fichier a pas ete cree là on a déjà le msg de la fonction utilitaire
+            return;
+        }
     }
+    //si on a le fichier nikel on ecrit dedans
     nlohmann::json config_json;
     file >> config_json; //on met le fichier dans le json et on le parse
+        config_json["seuil_sauvegarde"] = config.limiteSauvgarde;
+        config_json["largeur"] = config.screenWidth;
+        config_json["hauteur"] = config.screenHeight;
+
 }
