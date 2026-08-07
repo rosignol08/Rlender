@@ -222,6 +222,9 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             if(Changement){
                 //enregistre que quand la valeur change
                 SauvegarderConfig(Les_parametres);
+                //pour appliquer les changements
+                //ChargerConfig(Les_parametres);
+                SetWindowSize(Les_parametres.screenWidth, Les_parametres.screenHeight);
             }
             ImGui::EndMenu();
         }

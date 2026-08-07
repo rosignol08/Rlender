@@ -98,7 +98,13 @@ int main(void) {
             //variable temporaire pour les acces repeté du pointeur pour pas réécrire "La_scene.GetSelection()->" à chaque fois
             SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
-            // B. Dessin de l'interface graphique (apres la 3D)
+            if(IsWindowResized()&& !IsWindowState(FLAG_WINDOW_MAXIMIZED)){
+                //si la fenetre a ete changé de taille faut enregistrer les valeurs
+                Les_parametres.screenWidth = GetScreenWidth();
+                Les_parametres.screenHeight = GetScreenHeight();
+                SauvegarderConfig(Les_parametres);
+            }
+            //l'interface graphique (apres la 3D)
             gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
