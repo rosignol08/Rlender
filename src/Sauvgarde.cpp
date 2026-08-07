@@ -36,11 +36,17 @@ void ChargerConfig(Parametres& config){
     if (config_json.contains("seuil_sauvegarde")) {
         config.limiteSauvgarde = config_json["seuil_sauvegarde"].get<float>();
     }
-    if (config_json.contains("largeur")) {
-        config.screenWidth = config_json["largeur"].get<int>();
+    if (config_json.contains("ecran")){
+        config.Plein_ecran = config_json["ecran"].get<int>();
     }
-    if (config_json.contains("hauteur")) {
-        config.screenHeight = config_json["hauteur"].get<int>();
+    if(config.Plein_ecran == 0){
+        //si on est en fenetre on enregistre la taille sinon nan
+        if (config_json.contains("largeur")) {
+            config.screenWidth = config_json["largeur"].get<int>();
+        }
+        if (config_json.contains("hauteur")) {
+            config.screenHeight = config_json["hauteur"].get<int>();
+        }
     }
 }
 
@@ -66,6 +72,7 @@ void SauvegarderConfig(const Parametres& config){
     //si on a le fichier nikel on ecrit dedans
     nlohmann::json config_json;
     config_json["seuil_sauvegarde"] = config.limiteSauvgarde;
+    config_json["ecran"] = config.Plein_ecran;
     config_json["largeur"] = config.screenWidth;
     config_json["hauteur"] = config.screenHeight;
     file << std::setw(4) << config_json;

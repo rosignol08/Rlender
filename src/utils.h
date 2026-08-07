@@ -19,6 +19,7 @@ struct EditorContext {
 
 struct Parametres {
     int limiteSauvgarde = 50;
+    int Plein_ecran = 0;
     int screenWidth = 1280; //c'est la taille de la fenetre
     int screenHeight = 720; //c'est la taille de la fenetre
 };
