@@ -44,5 +44,12 @@ void ChargerConfig(Parametres& config){
     }
 }
 void SauvegarderConfig(const Parametres& config){
-    
+    std::ifstream file("config.json");
+    if (!file) {
+        //faut crée le fichier la comme ça c'est nikel
+        std::cerr << "Erreur : problème à l'ouverture du fichier config.json" << std::endl;
+        return;
+    }
+    nlohmann::json config_json;
+    file >> config_json; //on met le fichier dans le json et on le parse
 }
