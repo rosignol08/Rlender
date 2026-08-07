@@ -202,17 +202,18 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             }
             if(ImGui::Button("Plein ecran",{50.0f,50.0f})){
                 //on met le mode plein ecrant ou on le desactive
-                if (IsWindowState(FLAG_WINDOW_RESIZABLE)) {
-                    ClearWindowState(FLAG_WINDOW_RESIZABLE);
+                if (IsWindowFullscreen()){
+
+                    int taille_ecrant = GetCurrentMonitor();
                     ToggleFullscreen();
-                } else {
-                    SetWindowState(FLAG_WINDOW_RESIZABLE);
+                    SetWindowSize(GetMonitorWidth(taille_ecrant),GetMonitorHeight(taille_ecrant));
+                    Changement = true;
+                }else{
                     ToggleFullscreen();
+                    SetWindowSize(Les_parametres.screenWidth,Les_parametres.screenHeight);
+                    Changement = true;
                 }
-                Changement = true;
-                //si on met en plein ecrant on change les taille en meme temps
-                Les_parametres.screenWidth = GetScreenWidth();
-                Les_parametres.screenHeight = GetScreenHeight();
+                std::cout << "largeur : " << Les_parametres.screenWidth << " hauteur : " << Les_parametres.screenHeight << std::endl;
             }
 
             if(Changement){
