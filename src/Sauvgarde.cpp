@@ -41,9 +41,11 @@ void ChargerConfig(Parametres& config){
     }
     if (config_json.contains("largeur")) {
         config.screenWidth = config_json["largeur"].get<int>();
+        std::cout << "enregistrement taille :" << config.screenWidth << std::endl;
     }
     if (config_json.contains("hauteur")) {
         config.screenHeight = config_json["hauteur"].get<int>();
+        std::cout << "enregistrement hauteur :" << config.screenHeight << std::endl;
     }
 }
 

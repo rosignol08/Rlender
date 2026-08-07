@@ -30,6 +30,9 @@ int main(void) {
     ChargerConfig(Les_parametres);//au debut du programme on met a jour les parametres
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);//pour pouvoir changer la taille
     InitWindow(Les_parametres.screenWidth, Les_parametres.screenHeight, "Rlender - Test ImGui");
+    if (Les_parametres.Plein_ecran == 1) {
+        MaximizeWindow();//si on a le plein ecran a mettre au demarage
+    }
     SetTargetFPS(60);
 
     /*
