@@ -190,6 +190,8 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             //ImGui::InputFloat();
             ImGui::EndMenu();
             SauvegarderConfig(Les_parametres);
+            //faut charger apres qu'on ai modifié les parametres
+            ChargerConfig(Les_parametres);
         }
         ImGui::EndMainMenuBar();
     }
