@@ -43,10 +43,25 @@ void ChargerConfig(Parametres& config){
         config.screenHeight = config_json["hauteur"].get<int>();
     }
 }
+
+int Cree_Fichier(std::string nom_fichier){
+    std::fstream my_file;
+	my_file.open(nom_fichier, std::ios::out);
+	if (!my_file) {
+		std::cout << "DEBUG : fichier pas cree";
+	}
+	else {
+		std::cout << "DEBUG : fichier cree";
+		my_file.close(); 
+	}
+	return 0;
+}
+
 void SauvegarderConfig(const Parametres& config){
     std::ifstream file("config.json");
     if (!file) {
         //faut crée le fichier la comme ça c'est nikel
+        std::fstream 
         std::cerr << "Erreur : problème à l'ouverture du fichier config.json" << std::endl;
         return;
     }
