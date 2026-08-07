@@ -25,10 +25,10 @@ int main(void) {
     SceneManager La_scene;
 
     //la fenêtre Raylib pour voir le rendu
-    //const int screenWidth = 1280;
-    //const int screenHeight = 720;
+    
     Parametres Les_parametres;
     ChargerConfig(Les_parametres);//au debut du programme on met a jour les parametres
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);//pour pouvoir changer la taille
     InitWindow(Les_parametres.screenWidth, Les_parametres.screenHeight, "Rlender - Test ImGui");
     SetTargetFPS(60);
 

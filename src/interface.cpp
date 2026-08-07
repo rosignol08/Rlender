@@ -200,11 +200,25 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             if (ImGui::InputInt("Hauteur", &Les_parametres.screenHeight)) {
                 Changement = true;
             }
+            if(ImGui::Button("Plein ecran",{50.0f,50.0f})){
+                //on met le mode plein ecrant ou on le desactive
+                if (IsWindowState(FLAG_WINDOW_RESIZABLE)) {
+                    ClearWindowState(FLAG_WINDOW_RESIZABLE);
+                    ToggleFullscreen();
+                } else {
+                    SetWindowState(FLAG_WINDOW_RESIZABLE);
+                    ToggleFullscreen();
+                }
+                Changement = true;
+                //si on met en plein ecrant on change les taille en meme temps
+                Les_parametres.screenWidth = GetScreenWidth();
+                Les_parametres.screenHeight = GetScreenHeight();
+            }
+
             if(Changement){
                 //enregistre que quand la valeur change
                 SauvegarderConfig(Les_parametres);
             }
-        
             ImGui::EndMenu();
         }
         
