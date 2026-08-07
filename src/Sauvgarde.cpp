@@ -58,20 +58,16 @@ int Cree_Fichier(std::string nom_fichier){
 }
 
 void SauvegarderConfig(const Parametres& config){
-    std::ifstream file("config.json");
+    std::ofstream file("config.json");
     if (!file) {
-        //faut crée le fichier la comme ça c'est nikel
-        std::cerr << "Erreur : problème à l'ouverture du fichier config.json" << std::endl;
-        if(!Cree_Fichier("config.json")){//!1 c'est considéré comme false
-            //le fichier a pas ete cree là on a déjà le msg de la fonction utilitaire
-            return;
-        }
+        std::cerr << "Erreur : impossible de créer config.json" << std::endl;
+        return; //return pour stop si erreur
     }
     //si on a le fichier nikel on ecrit dedans
     nlohmann::json config_json;
-    file >> config_json; //on met le fichier dans le json et on le parse
-        config_json["seuil_sauvegarde"] = config.limiteSauvgarde;
-        config_json["largeur"] = config.screenWidth;
-        config_json["hauteur"] = config.screenHeight;
-
+    config_json["seuil_sauvegarde"] = config.limiteSauvgarde;
+    config_json["largeur"] = config.screenWidth;
+    config_json["hauteur"] = config.screenHeight;
+    file << std::setw(4) << config_json;
+    file.close();
 }

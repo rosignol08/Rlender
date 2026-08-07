@@ -185,14 +185,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             //}
             ImGui::EndMenu();
         }
-        if(ImGui::BeginMenu("Paramètres")){
-            //ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
-            //ImGui::InputFloat();
-            ImGui::EndMenu();
-            SauvegarderConfig(Les_parametres);
-            //faut charger apres qu'on ai modifié les parametres
-            ChargerConfig(Les_parametres);
-        }
+        
         ImGui::EndMainMenuBar();
     }
         
