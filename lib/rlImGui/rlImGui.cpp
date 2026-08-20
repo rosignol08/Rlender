@@ -39,7 +39,7 @@
 #ifndef NO_FONT_AWESOME
 #include "extras/FA6FreeSolidFontData.h"
 #endif
-
+#define IsTextureValid(tex) ((tex).id > 0)
 static ImGuiMouseCursor CurrentMouseCursor = ImGuiMouseCursor_COUNT;
 static MouseCursor MouseCursorMap[ImGuiMouseCursor_COUNT];
 

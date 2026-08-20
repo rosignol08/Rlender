@@ -11,6 +11,9 @@ cd build
 cmake ..
 
 make
+
+#si make marche pas :
+cmake --build .
 ```
 
 

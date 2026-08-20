@@ -12,7 +12,7 @@ void SceneManager::DrawScene(){
 
 //ça ajoute un cube simplement
 void SceneManager::AjouterCube(){
-    static u_int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
+    static unsigned int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     // on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.push_back(std::make_unique<CubeNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
@@ -24,7 +24,7 @@ void SceneManager::AjouterCube(){
 
 //idem pour une caméra3D
 void SceneManager::AjouterCamera3D(){
-    static u_int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
+    static unsigned int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     sceneNodes.push_back(std::make_unique<CameraNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
     std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
@@ -35,7 +35,7 @@ void SceneManager::AjouterCamera3D(){
 
 //idem pour une caméra2D
 void SceneManager::AjouterCamera2D(){
-    static u_int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
+    static unsigned int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     sceneNodes.push_back(std::make_unique<Camera2DNode>());
     std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
     std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
