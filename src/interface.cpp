@@ -227,6 +227,11 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
                 SetWindowSize(Les_parametres.screenWidth, Les_parametres.screenHeight);
             }
             ImGui::EndMenu();
+
+        }
+        //exemple d'ajout de bouton
+        if(ImGui::Button("cube",{50.0f,50.0f})){
+            La_scene.AjouterCube();
         }
         
         ImGui::EndMainMenuBar();
