@@ -17,6 +17,7 @@ class SceneNode {
         Color couleur;
         bool isSelected;
         std::string type; //pour pouvoir savoir à quoi on a affaire pour la sauvgarde
+        virtual BoundingBox GetBoiteCollision();//pour la selectioner avec la souris l'objet a une bounding box
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
@@ -68,6 +69,21 @@ class CubeNode : public SceneNode{
     std::string GetInitCode(){
         return "";
     }
+    BoundingBox GetBoiteCollision() override {
+        Vector3 min, max;
+        BoundingBox ma_bounding_box;
+
+        min.x = position.x - taille.x/2.0f;
+        min.y = position.y - taille.y/2.0f;
+        min.z = position.z - taille.z/2.0f;
+
+        max.x = position.x + taille.x/2.0f;
+        max.y = position.y + taille.y/2.0f;
+        max.z = position.z + taille.z/2.0f;
+        ma_bounding_box.max = max;
+        ma_bounding_box.min = min;
+        return ma_bounding_box;
+    }
 };
 
 //pour representer une sphere
@@ -95,6 +111,22 @@ class SphereNode : public SceneNode{
     }
     std::string GetInitCode(){
         return "";
+    }
+
+    BoundingBox GetBoiteCollision() override {
+        Vector3 min, max;
+        BoundingBox ma_bounding_box;
+
+        min.x = position.x - taille.x;
+        min.y = position.y - taille.x;
+        min.z = position.z - taille.x;
+        max.x = position.x + taille.x;
+        max.y = position.y + taille.x;
+        max.z = position.z + taille.x;
+
+        ma_bounding_box.min = min;
+        ma_bounding_box.max = max;
+        return ma_bounding_box;
     }
 };
 
@@ -142,6 +174,21 @@ class CameraNode : public SceneNode{
         return code.str();
     }
 
+    BoundingBox GetBoiteCollision(){
+        Vector3 min, max;
+        BoundingBox ma_bounding_box;
+
+        min.x = position.x - taille.x/2.0f;
+        min.y = position.y - taille.y/2.0f;
+        min.z = position.z - taille.z/2.0f;
+
+        max.x = position.x + taille.x/2.0f;
+        max.y = position.y + taille.y/2.0f;
+        max.z = position.z + taille.z/2.0f;
+        ma_bounding_box.max = max;
+        ma_bounding_box.min = min;
+        return ma_bounding_box;
+    }
 };
 
 class Camera2DNode : public SceneNode{

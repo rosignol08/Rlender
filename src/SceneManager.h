@@ -1,5 +1,6 @@
 #include "SceneNode.h"
 #include "json.hpp"
+#include"imgui.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -26,4 +27,5 @@ class SceneManager{
         //pour la sauvgarde
         void SauvegarderProjet(std::string cheminFichier);//parcour le vecteur d'objets et remplis le json
         void ChargerProjet(std::string cheminFichier);//vide la scene actuelle et remplis avec le json lu
+        void Gerer_pointeur(Camera3D camera_editeur);
 };

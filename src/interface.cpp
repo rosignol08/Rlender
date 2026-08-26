@@ -4,6 +4,8 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     //recuperation des variables etc
     SceneNode* noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
+    //raycasting
+    
     ImGui::Begin("Inspecteur");
     if (noeuds_selectione != nullptr){
         // affiche le nom de l'objet tout en haut
@@ -54,8 +56,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 
     // la partie caméra
     // la progress bar stylée qui apparait si on commence à maintenir le clic
-    if (!Les_variables.modeFlyActif && Les_variables.tempsMaintien > 0.0f)
-    {
+    if (!Les_variables.modeFlyActif && Les_variables.tempsMaintien > 0.0f){
         // recup le centre de l'ecant
         float centreX = GetScreenWidth() / 2.0f;
         float centreY = GetScreenHeight() / 2.0f;
@@ -75,12 +76,10 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     }
     ImGui::Begin("Contrôle Caméra");
     ImGui::Text("Mode de déplacement :");
-    if (Les_variables.modeFlyActif)
-    {
+    if (Les_variables.modeFlyActif){
         UpdateCamera(&cameraEditeur, Les_variables.modeCameraActif);
     }
-    else
-    {
+    else{
         if (ImGui::RadioButton("Première Personne (FPS)", Les_variables.modeCameraActif == CAMERA_FIRST_PERSON))
         {
             Les_variables.modeCameraActif = CAMERA_FIRST_PERSON;

@@ -250,3 +250,19 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     }
     file.close();
 }
+void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
+    //raycasting
+    if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
+        Ray rayon = GetMouseRay(GetMousePosition(), camera_editeur);
+        SceneNode* objetTouche = nullptr;
+        float distanceMin = 999999.0f;
+        //recherche de qui collisionne sa bounding box avec le rayon de la souris
+        for(auto & element : GetNodes()){
+            //localité spatiale normalement ça devrait etre optimisé par le compilo donc pas besoin de initialiser avant la boucle
+            RayCollision collision = GetRayCollisionBox(rayon,element->GetBoiteCollision());
+            if(collision.hit && collision.distance < distanceMin){
+                //si c'est bon on met à jour
+            }
+        }
+    }
+}
