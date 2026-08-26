@@ -12,14 +12,32 @@ void SceneManager::DrawScene(){
 
 //ça ajoute un cube simplement
 void SceneManager::AjouterCube(){
-    static unsigned int compteur = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
-    // on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    //static unsigned int compteur_cube = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
+    unsigned int compteur_cube = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Cube_" + std::to_string(compteur_cube);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_cube++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.push_back(std::make_unique<CubeNode>());
-    std::string nom_ancien = sceneNodes.back()->nom; //pour eviter les appels recurent chiant
-    std::string identifiant = "_" + std::to_string(compteur);//un numéro de compteur
-    sceneNodes.back()->nom = nom_ancien + identifiant; //nouveau nom c'est une concaténation des 2 chaines
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+
+    for(auto & element : sceneNodes){
+        if(element->isSelected){
+            element->isSelected = false; //deselectionne
+        }
+    }
     sceneNodes.back()->isSelected = true;
-    compteur++;
 }
 
 //idem pour une caméra3D
@@ -49,8 +67,8 @@ void SceneManager::SupprimerSelection(){
     //on doit utiliser le pointeur
     for (auto it = sceneNodes.begin(); it != sceneNodes.end(); ) {
         if ((*it)->isSelected) {
-            if (noeudSelectionne == it->get()) {
-                noeudSelectionne = nullptr;
+            if (noeudSelectionne[0] == it->get()) {
+                noeudSelectionne[0] = nullptr;
             }
             it = sceneNodes.erase(it); //delete et récupère le nouvel itérateur valide
         } else {
@@ -60,17 +78,21 @@ void SceneManager::SupprimerSelection(){
 }
 
 SceneNode* SceneManager::GetSelection(){
-    return noeudSelectionne;
+    if (noeudSelectionne.empty()) {
+        return nullptr; //rien selectionne
+    }
+    return noeudSelectionne[0];
 }
 
 void SceneManager::Deselectionne(){
+    //ça vide touts les noeuds selectioné
     for(auto & noeud : sceneNodes){
         if(noeud->isSelected){
             //on déséléctionne
             noeud->isSelected = false;
-            return;
         }
     }
+    noeudSelectionne.clear();
 }
 
 void SceneManager::SetSelection(SceneNode* noeud){
@@ -79,7 +101,7 @@ void SceneManager::SetSelection(SceneNode* noeud){
     //ensuite on selectione le nouveau
     if (noeud != nullptr) {//check de securite
         noeud->isSelected = true;
-        noeudSelectionne = noeud;
+        noeudSelectionne.push_back(noeud);
     }
 }
 

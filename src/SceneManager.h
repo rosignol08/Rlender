@@ -10,7 +10,7 @@ class SceneManager{
         //pour stoquer les noeuds
         std::vector<std::unique_ptr<SceneNode>> sceneNodes;
         //le pointeur pour choisir un noeuds specifique
-        SceneNode* noeudSelectionne = nullptr;
+        std::vector<SceneNode*> noeudSelectionne{nullptr};
     public:
         void       DrawScene(); //une boucle qui parcours les noeuds et les dessines chacuns
         void       AjouterCube(); //ça ajoute un cube simplement

@@ -5,8 +5,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     SceneNode* noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
     ImGui::Begin("Inspecteur");
-    if (noeuds_selectione != nullptr)
-    {
+    if (noeuds_selectione != nullptr){
         // affiche le nom de l'objet tout en haut
         ImGui::Text("Modification de : %s", noeuds_selectione->nom.c_str());
         ImGui::Separator();
