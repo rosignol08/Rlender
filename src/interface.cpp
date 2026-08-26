@@ -5,7 +5,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     SceneNode* noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
     //raycasting
-    
+    La_scene.Gerer_pointeur(cameraEditeur);
     ImGui::Begin("Inspecteur");
     if (noeuds_selectione != nullptr){
         // affiche le nom de l'objet tout en haut

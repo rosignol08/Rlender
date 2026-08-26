@@ -17,7 +17,10 @@ class SceneNode {
         Color couleur;
         bool isSelected;
         std::string type; //pour pouvoir savoir à quoi on a affaire pour la sauvgarde
-        virtual BoundingBox GetBoiteCollision();//pour la selectioner avec la souris l'objet a une bounding box
+        virtual BoundingBox GetBoiteCollision(){
+            //pour la selectioner avec la souris l'objet a une bounding box
+            return BoundingBox{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
+        }
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;

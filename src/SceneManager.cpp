@@ -262,7 +262,15 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
             RayCollision collision = GetRayCollisionBox(rayon,element->GetBoiteCollision());
             if(collision.hit && collision.distance < distanceMin){
                 //si c'est bon on met à jour
+                objetTouche = element.get();
+                distanceMin = collision.distance;
             }
+        }
+        if(objetTouche != nullptr){
+            SetSelection(objetTouche);
+            //faut ajouter ici pour ctrl avec plusieurs objets
+        }else{
+            Deselectionne();//si on clique dans le vide on déséléctionne
         }
     }
 }
