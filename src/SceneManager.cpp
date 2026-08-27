@@ -113,7 +113,13 @@ void SceneManager::ToggleSelection(SceneNode* noeud){
     if(noeud == nullptr){
         return;
     }
-    
+    for(const auto & element : noeudSelectionne ){
+        if(noeud == element){
+            noeud->isSelected = false;//pour deselectionner le noeud
+            //faut que je le retire du vecteur des objets aussi avec remove et erase 
+
+        }
+    }
 
 }
 
