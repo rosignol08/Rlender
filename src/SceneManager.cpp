@@ -6,6 +6,10 @@ void SceneManager::DrawScene(){
     for(auto& noeud : sceneNodes){
         noeud->Draw();//->parce que faut aller acceder à la fonction de l'objet pointée par noeud
     }
+    SceneNode* selection = GetSelection();
+    if(selection != nullptr){
+        DrawBoundingBox(selection->GetBoiteCollision(), GREEN);
+    }
     return;
 }
 
@@ -103,6 +107,14 @@ void SceneManager::SetSelection(SceneNode* noeud){
         noeud->isSelected = true;
         noeudSelectionne.push_back(noeud);
     }
+}
+
+void SceneManager::ToggleSelection(SceneNode* noeud){
+    if(noeud == nullptr){
+        return;
+    }
+    
+
 }
 
 const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
@@ -267,6 +279,9 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
             }
         }
         if(objetTouche != nullptr){
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    
+                
+            }
             SetSelection(objetTouche);
             //faut ajouter ici pour ctrl avec plusieurs objets
         }else{

@@ -22,6 +22,7 @@ class SceneManager{
         //des getters pour que l'interface graphique accede aux bon noeuds etc
         SceneNode* GetSelection();
         void       SetSelection(SceneNode* noeud); //Permet à ImGui de dire "l'utilisateur a cliqué sur cet objet"
+        void       ToggleSelection(SceneNode* noeud); //Permet de selectionner plusieurs elements avec ctrl + clic
         void       Deselectionne();//pour déséléctionner l'element courrant dans le vecteur
         const std::vector<std::unique_ptr<SceneNode>>& GetNodes() const;//renvoie une reference const vers le vecteur pour eviter que generercodecomplet copie tout
         //pour la sauvgarde
