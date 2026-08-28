@@ -6,9 +6,11 @@ void SceneManager::DrawScene(){
     for(auto& noeud : sceneNodes){
         noeud->Draw();//->parce que faut aller acceder à la fonction de l'objet pointée par noeud
     }
-    SceneNode* selection = GetSelection();
-    if(selection != nullptr){
-        DrawBoundingBox(selection->GetBoiteCollision(), GREEN);
+    std::vector<SceneNode*> selection = GetSelection();
+    if(!selection.empty()){
+        for(const auto & elements : selection){//const parce qu'on le change pas
+            DrawBoundingBox(elements->GetBoiteCollision(), GREEN);
+        }
     }
     return;
 }
@@ -81,11 +83,8 @@ void SceneManager::SupprimerSelection(){
     }
 }
 
-SceneNode* SceneManager::GetSelection(){
-    if (noeudSelectionne.empty()) {
-        return nullptr; //rien selectionne
-    }
-    return noeudSelectionne[0];
+std::vector<SceneNode*> SceneManager::GetSelection(){
+    return noeudSelectionne;
 }
 
 void SceneManager::Deselectionne(){
@@ -113,14 +112,18 @@ void SceneManager::ToggleSelection(SceneNode* noeud){
     if(noeud == nullptr){
         return;
     }
-    for(const auto & element : noeudSelectionne ){
-        if(noeud == element){
-            noeud->isSelected = false;//pour deselectionner le noeud
-            //faut que je le retire du vecteur des objets aussi avec remove et erase 
+    //cherche dans le vecteur si le noeud y es
+    auto it = std::find(noeudSelectionne.begin(), noeudSelectionne.end(), noeud);
 
-        }
+    //si trouvé
+    if (it != noeudSelectionne.end()){
+        noeud->isSelected = false; //eteint
+        noeudSelectionne.erase(it); //delete çe noeud
+    }else{
+        //sinon on l'as pas trouve donc il etait pas selectione
+        noeud->isSelected = true; //allume
+        noeudSelectionne.push_back(noeud); //ajoute à la liste
     }
-
 }
 
 const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
@@ -285,13 +288,16 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
             }
         }
         if(objetTouche != nullptr){
-            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    
-                
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
+                //ctrl avec plusieurs objets
+                ToggleSelection(objetTouche);
+            }else{
+                SetSelection(objetTouche);
             }
-            SetSelection(objetTouche);
-            //faut ajouter ici pour ctrl avec plusieurs objets
         }else{
-            Deselectionne();//si on clique dans le vide on déséléctionne
+            if (!IsKeyDown(KEY_LEFT_CONTROL) && !IsKeyDown(KEY_RIGHT_CONTROL)){
+                Deselectionne();//si on clique dans le vide on déséléctionne
+            }
         }
     }
 }

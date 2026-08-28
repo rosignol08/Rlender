@@ -1,6 +1,7 @@
 #include "SceneNode.h"
 #include "json.hpp"
 #include"imgui.h"
+#include <algorithm>//pour les operation sur le vecteur
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -20,7 +21,7 @@ class SceneManager{
         void       SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         
         //des getters pour que l'interface graphique accede aux bon noeuds etc
-        SceneNode* GetSelection();
+        std::vector<SceneNode*> GetSelection();
         void       SetSelection(SceneNode* noeud); //Permet à ImGui de dire "l'utilisateur a cliqué sur cet objet"
         void       ToggleSelection(SceneNode* noeud); //Permet de selectionner plusieurs elements avec ctrl + clic
         void       Deselectionne();//pour déséléctionner l'element courrant dans le vecteur

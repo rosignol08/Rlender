@@ -2,30 +2,37 @@
 
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres &Les_parametres){
     //recuperation des variables etc
-    SceneNode* noeuds_selectione = La_scene.GetSelection();
+    std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur);
     ImGui::Begin("Inspecteur");
-    if (noeuds_selectione != nullptr){
-        // affiche le nom de l'objet tout en haut
-        ImGui::Text("Modification de : %s", noeuds_selectione->nom.c_str());
-        ImGui::Separator();
-
-        // sliders pour modifier dynamiquement les variables
-        if (
-            // TODO ajouter les bouton pour ajouter des objetsg ici aussi
-            ImGui::DragFloat3("Position", &noeuds_selectione->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione->taille.x, 0.1f))
-        {
-            Les_variables.flag_changements = true;
-        }
+    if (!noeuds_selectione.empty()){
+        //affiche le ou les noms des objets tout en haut
+        //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
+        if(noeuds_selectione.size() > 1){
+            //si on a plus d'un element alors faut faire le cas N elements
+            ImGui::Text("%d éléments Selectionné", noeuds_selectione.size());
+            ImGui::Separator();    
+        }else{
+            ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
+            ImGui::Separator();
+            
+            // sliders pour modifier dynamiquement les variables
+            if (
+                // TODO ajouter les bouton pour ajouter des objetsg ici aussi
+                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
+                {
+                    Les_variables.flag_changements = true;
+                }
+            }
 
         // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
         // et Raylib des unsigned char (0 à 255), on fera ça plus tard si tu veux.
     }
     else
     {
-        ImGui::Text("Cliquez sur un objet dans la hierarchie.");
+        ImGui::Text("Aucun objet selectionné");
     }
 
     //ImGui::Text("Salut !");
@@ -37,19 +44,23 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     //}
     ImGui::End();
     ImGui::Begin("Hierarchie");
-    for (size_t i = 0; i < La_scene.GetNodes().size(); i++)
-    {
+    bool est_selectione = false;
+    for (size_t i = 0; i < La_scene.GetNodes().size(); i++){
         // un label unique pour chaque objet
         std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
 
+        auto it = std::find(La_scene.GetNodes().begin(), La_scene.GetNodes().end(), La_scene.GetNodes()[i]);
+
+        est_selectione = (it != La_scene.GetNodes().end()) ? true : false;//TODO check si c'est plus optimisé qu'un if else
         // faut mettre a jour le pointeur selectioneur
-        if (ImGui::Selectable(label.c_str(), noeuds_selectione == La_scene.GetNodes()[i].get()))
-        {
-
-            // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
-            La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
-
-            Les_variables.flag_changements = true;
+        if (ImGui::Selectable(label.c_str(), est_selectione)){
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
+                La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[0].get());
+            }else{
+                // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
+                La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
+                Les_variables.flag_changements = true;
+            }
         }
     }
     ImGui::End();
