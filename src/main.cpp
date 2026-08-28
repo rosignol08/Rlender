@@ -94,9 +94,6 @@ int main(void) {
             La_scene.DrawScene();
             DrawGrid(10, 1.0f);
             EndMode3D();
-            
-            //variable temporaire pour les acces repeté du pointeur pour pas réécrire "La_scene.GetSelection()->" à chaque fois
-            SceneNode* noeuds_selectione = La_scene.SceneManager::GetSelection();
 
             if(IsWindowResized()&& !IsWindowState(FLAG_WINDOW_MAXIMIZED)){
                 //si la fenetre a ete changé de taille faut enregistrer les valeurs

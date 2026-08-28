@@ -9,6 +9,7 @@ void SceneManager::DrawScene(){
     std::vector<SceneNode*> selection = GetSelection();
     if(!selection.empty()){
         for(const auto & elements : selection){//const parce qu'on le change pas
+            if (elements == nullptr) continue;
             DrawBoundingBox(elements->GetBoiteCollision(), GREEN);
         }
     }
@@ -288,7 +289,7 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
             }
         }
         if(objetTouche != nullptr){
-            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    
                 //ctrl avec plusieurs objets
                 ToggleSelection(objetTouche);
             }else{

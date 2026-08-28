@@ -6,26 +6,32 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur);
+    
     ImGui::Begin("Inspecteur");
     if (!noeuds_selectione.empty()){
         //affiche le ou les noms des objets tout en haut
         //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
         if(noeuds_selectione.size() > 1){
             //si on a plus d'un element alors faut faire le cas N elements
-            ImGui::Text("%d éléments Selectionné", noeuds_selectione.size());
+            ImGui::Text("%ld éléments Selectionné", noeuds_selectione.size());
             ImGui::Separator();    
         }else{
-            ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
-            ImGui::Separator();
-            
-            // sliders pour modifier dynamiquement les variables
+            if(noeuds_selectione[0] != nullptr){
+
+                ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
+                ImGui::Separator();
+                
+                // sliders pour modifier dynamiquement les variables
             if (
                 // TODO ajouter les bouton pour ajouter des objetsg ici aussi
                 ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
                 {
                     Les_variables.flag_changements = true;
                 }
+            }else{
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");
             }
+        }
 
         // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
         // et Raylib des unsigned char (0 à 255), on fera ça plus tard si tu veux.
@@ -34,28 +40,21 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     {
         ImGui::Text("Aucun objet selectionné");
     }
-
-    //ImGui::Text("Salut !");
-    //if (
-    //    // slider qui modifie directement les coordonnées du cube j'utilise les effets de bords
-    //    ImGui::DragFloat3("TEST Position Cube", cubePosition, 0.1f))
-    //{
-    //    les_parametres.flag_changements = true;
-    //}
     ImGui::End();
+    
     ImGui::Begin("Hierarchie");
     bool est_selectione = false;
+    std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
     for (size_t i = 0; i < La_scene.GetNodes().size(); i++){
         // un label unique pour chaque objet
         std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
+        auto it = std::find(selection.begin(), selection.end(), La_scene.GetNodes()[i].get());
 
-        auto it = std::find(La_scene.GetNodes().begin(), La_scene.GetNodes().end(), La_scene.GetNodes()[i]);
-
-        est_selectione = (it != La_scene.GetNodes().end()) ? true : false;//TODO check si c'est plus optimisé qu'un if else
+        est_selectione = (it != selection.end());
         // faut mettre a jour le pointeur selectioneur
         if (ImGui::Selectable(label.c_str(), est_selectione)){
             if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
-                La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[0].get());
+                La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[i].get());
             }else{
                 // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
                 La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
