@@ -109,13 +109,12 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     }
 
     ImGui::Separator();
-    ImGui::Text("Maintiens le Clic Droit pour bouger");
+    //ImGui::Text("Maintiens le Clic Droit pour bouger"); plus besoin
     ImGui::End();
 
     // pour changer le type de la caméra
     ImGui::Begin("Type de caméra");
-    if (ImGui::Button("Perspective", {30.0f, 30.0f}))
-    {
+    if (ImGui::Button("Perspective", {30.0f, 30.0f})){
         // si on clique sur ce bouton ça change le mode
         if (!Les_variables.perspect)
         {
@@ -126,8 +125,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             cameraEditeur.projection = Les_variables.type_projection_camera;
         }
     }
-    if (ImGui::Button("Ortogonal", {30.0f, 30.0f}))
-    { // TODO issue #6
+    if (ImGui::Button("Ortogonal", {30.0f, 30.0f})){ // TODO issue #6
         // idem ici
         if (!Les_variables.orto)
         {
@@ -141,6 +139,19 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 
     ImGui::End();
 
+    //pour le menu de modification quand on selectionne un objets
+    if(!selection.empty()){
+        ImGui::BeginPopupContextVoid("MenuActions", ImGuiPopupFlags_MouseButtonRight);
+        if(ImGui::MenuItem("Supprimer")){
+            for (auto & element : noeuds_selectione){
+                auto it = std::find(La_scene.GetSelection().begin(), La_scene.GetSelection().end(), element);
+                La_scene.GetSelection().erase(it);
+            }
+            La_scene.Deselectionne();
+        }
+        ImGui::MenuItem("Dupliquer");
+        ImGui::EndPopup();
+    }
     //la barre d'en haut
     if(ImGui::BeginMainMenuBar()){
 

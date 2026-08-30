@@ -272,7 +272,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     }
     file.close();
 }
-void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
+void SceneManager::Gerer_pointeur(Camera3D camera_editeur){    
     //raycasting
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
         Ray rayon = GetMouseRay(GetMousePosition(), camera_editeur);
@@ -302,3 +302,4 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
         }
     }
 }
+
