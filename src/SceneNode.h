@@ -30,7 +30,10 @@ class SceneNode {
     virtual std::string GetInitCode() { return ""; }//par défaut TODO à changer
 
     //dans le BeginMode3D
-    virtual std::string GetDrawCode() = 0; 
+    virtual std::string GetDrawCode() = 0;
+
+    //pour dupliquer
+    virtual std::unique_ptr<SceneNode> Cloner() = 0;
 
     //la boucle les unloads
     virtual std::string GetCleanupCode() { return "";}
@@ -86,6 +89,14 @@ class CubeNode : public SceneNode{
         ma_bounding_box.max = max;
         ma_bounding_box.min = min;
         return ma_bounding_box;
+    }
+
+    std::unique_ptr<SceneNode> Cloner() override{
+        auto clone = std::make_unique<CubeNode>(*this);
+        clone->isSelected = true;
+        unsigned int compteur_cube_clones = 0;//logiquement on a un compteur pour les clones
+        clone->nom = nom = "_" + std::to_string(compteur_cube_clones); //nouveau nom
+        return clone;
     }
 };
 

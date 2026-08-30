@@ -149,7 +149,13 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
             }
             La_scene.Deselectionne();
         }
-        ImGui::MenuItem("Dupliquer");
+        if(ImGui::MenuItem("Dupliquer")){
+            for (auto & element : noeuds_selectione){
+                //faut dupliquer tout les elements selectionnées
+                element->Cloner();
+            }
+        }
+
         ImGui::EndPopup();
     }
     //la barre d'en haut
