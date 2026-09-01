@@ -188,6 +188,15 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
 }
 
 
+void SceneManager::AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud) {
+    sceneNodes.push_back(std::move(nouveau_noeud));
+}
+
+void SceneManager::SupprimerNoeud(SceneNode* cible){
+    auto efface = std::remove_if(sceneNodes.begin(), sceneNodes.end(), [cible](const std::unique_ptr<SceneNode>& noeud){ return noeud.get() == cible; });
+    sceneNodes.erase(efface, sceneNodes.end());
+}
+
 //fini la fonction bien frero
 
 //vide la scene actuelle et remplis avec le json lu
@@ -272,7 +281,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     }
     file.close();
 }
-void SceneManager::Gerer_pointeur(Camera3D camera_editeur){    
+void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
     //raycasting
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
         Ray rayon = GetMouseRay(GetMousePosition(), camera_editeur);

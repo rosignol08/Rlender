@@ -141,22 +141,27 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 
     //pour le menu de modification quand on selectionne un objets
     if(!selection.empty()){
-        ImGui::BeginPopupContextVoid("MenuActions", ImGuiPopupFlags_MouseButtonRight);
-        if(ImGui::MenuItem("Supprimer")){
-            for (auto & element : noeuds_selectione){
-                auto it = std::find(La_scene.GetSelection().begin(), La_scene.GetSelection().end(), element);
-                La_scene.GetSelection().erase(it);
-            }
-            La_scene.Deselectionne();
-        }
-        if(ImGui::MenuItem("Dupliquer")){
-            for (auto & element : noeuds_selectione){
-                //faut dupliquer tout les elements selectionnées
-                element->Cloner();
-            }
-        }
+        if(ImGui::BeginPopupContextVoid("MenuActions", ImGuiPopupFlags_MouseButtonRight)){
 
-        ImGui::EndPopup();
+            if(ImGui::MenuItem("Supprimer")){
+                std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
+                for (auto & element : noeuds_selectione){
+                    //std::cout << " element " << element << "supprimé " << std::endl;
+                    //auto it = std::find(selection.begin(), selection.end(), element);
+                    //La_scene.GetSelection().erase(it);
+                    La_scene.SupprimerNoeud(element);
+                }
+                La_scene.Deselectionne();
+            }
+            if(ImGui::MenuItem("Dupliquer")){
+                for (auto & element : noeuds_selectione){
+                    //faut dupliquer tout les elements selectionnées
+                    La_scene.AjouterNoeud(element->Cloner());
+                }
+            }
+            
+            ImGui::EndPopup();
+        }
     }
     //la barre d'en haut
     if(ImGui::BeginMainMenuBar()){

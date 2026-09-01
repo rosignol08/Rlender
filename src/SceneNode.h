@@ -94,8 +94,8 @@ class CubeNode : public SceneNode{
     std::unique_ptr<SceneNode> Cloner() override{
         auto clone = std::make_unique<CubeNode>(*this);
         clone->isSelected = true;
-        unsigned int compteur_cube_clones = 0;//logiquement on a un compteur pour les clones
-        clone->nom = nom = "_" + std::to_string(compteur_cube_clones); //nouveau nom
+        static unsigned int compteur_cube_clones = 0;//logiquement on a un compteur pour les clones
+        clone->nom = this->nom + "_" + std::to_string(compteur_cube_clones); //nouveau nom
         return clone;
     }
 };
@@ -141,6 +141,13 @@ class SphereNode : public SceneNode{
         ma_bounding_box.min = min;
         ma_bounding_box.max = max;
         return ma_bounding_box;
+    }
+    std::unique_ptr<SceneNode> Cloner() override{
+        auto clone = std::make_unique<SphereNode>(*this);
+        clone->isSelected = true;
+        static unsigned int compteur_sphere_clones = 0;//logiquement on a un compteur pour les clones
+        clone->nom = this->nom + "_" + std::to_string(compteur_sphere_clones); //nouveau nom
+        return clone;
     }
 };
 
@@ -203,6 +210,13 @@ class CameraNode : public SceneNode{
         ma_bounding_box.min = min;
         return ma_bounding_box;
     }
+    std::unique_ptr<SceneNode> Cloner() override{
+        auto clone = std::make_unique<CameraNode>(*this);
+        clone->isSelected = true;
+        static unsigned int compteur_camera_clones = 0;//logiquement on a un compteur pour les clones
+        clone->nom = this->nom + "_" + std::to_string(compteur_camera_clones); //nouveau nom
+        return clone;
+    }
 };
 
 class Camera2DNode : public SceneNode{
@@ -254,6 +268,13 @@ class Camera2DNode : public SceneNode{
         code << nom << ".rotation = " << rotation.x << ";\n";
         code << nom << ".zoom = " << zoom_camera << ";\n";
         return code.str();
+    }
+    std::unique_ptr<SceneNode> Cloner() override{
+        auto clone = std::make_unique<Camera2DNode>(*this);
+        clone->isSelected = true;
+        static unsigned int compteur_camera2D_clones = 0;//logiquement on a un compteur pour les clones
+        clone->nom = this->nom + "_" + std::to_string(compteur_camera2D_clones); //nouveau nom
+        return clone;
     }
 };
 
