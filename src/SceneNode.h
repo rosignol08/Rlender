@@ -70,11 +70,17 @@ class CubeNode : public SceneNode{
         return "";
     }
     std::string GetDrawCode(){
-        return "";
+        std::stringstream code;
+        code << "DrawCube(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " <<std::to_string(this->couleur.b) << "}" << ");";
+        return code.str();
     }
+    
     std::string GetInitCode(){
-        return "";
+        std::stringstream code;
+        code << "Vector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " <<std::to_string(this->position.z) << "};";
+        return code.str();
     }
+    
     BoundingBox GetBoiteCollision() override {
         Vector3 min, max;
         BoundingBox ma_bounding_box;
@@ -279,3 +285,4 @@ class Camera2DNode : public SceneNode{
 };
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
+
