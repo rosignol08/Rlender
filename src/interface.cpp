@@ -266,6 +266,14 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         
         ImGui::EndMainMenuBar();
     }
-        
+
+    //le code genere
+    if(Les_variables.flag_changements){
+        Les_variables.code_preview = GenererCodeComplet(La_scene.GetNodes());
+        Les_variables.flag_changements = false;
+    }
+    std::string code_buf = Les_variables.code_preview;
+    if(code_buf.empty()) code_buf = "";//le buffer pour l'api
+    ImGui::InputTextMultiline("##code_preview", &code_buf[0], code_buf.size()+1, ImVec2(GetScreenWidth()/5.0f,GetScreenHeight()/5.0f), ImGuiInputTextFlags_ReadOnly);
     rlImGuiEnd();
 }

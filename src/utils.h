@@ -15,6 +15,7 @@ struct EditorContext {
     bool perspect = true;
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
+    std::string code_preview;
 };
 
 struct Parametres {
