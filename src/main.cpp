@@ -90,7 +90,7 @@ int main(void) {
             BeginMode3D(cameraEditeur);
             //cette ligne dessine tout
             La_scene.DrawScene();
-            DrawGrid(10, 1.0f);
+            DrawGrid(1000, 1.0f);
             EndMode3D();
 
             if(IsWindowResized()&& !IsWindowState(FLAG_WINDOW_MAXIMIZED)){

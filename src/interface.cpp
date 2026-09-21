@@ -270,6 +270,7 @@ void Dessiner_ControlesCamera(Camera3D& cameraEditeur, EditorContext& Les_variab
 }
 
 void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
+    ImGui::Begin("Appercu code");
     //le code genere
     if(Les_variables.flag_changements){
         //si on a eu un changement on augmente le compteur
@@ -286,8 +287,8 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
     std::string code_buf = Les_variables.code_preview;
     if(code_buf.empty()) code_buf = "";//le buffer pour l'api
     //TODO faut agrandire ça pour avoir le preview plus grands mais en ratio de la fenetre
-    ImGui::InputTextMultiline("##code_preview", &code_buf[0], code_buf.size()+1, ImVec2(GetScreenWidth()/5.0f,GetScreenHeight()/5.0f), ImGuiInputTextFlags_ReadOnly);
-    rlImGuiEnd();
+    ImGui::InputTextMultiline(" ", &code_buf[0], code_buf.size()+1, ImVec2(GetScreenWidth()/5.0f,GetScreenHeight()/5.0f), ImGuiInputTextFlags_ReadOnly);
+    ImGui::End();
 }
 
 
