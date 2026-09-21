@@ -10,7 +10,8 @@ struct EditorContext {
     bool modeFlyActif = false;
     float tempsMaintien = 0.0f;//le temps actuel accumulé
     float tempsExige = 0.5f;//TODO issue #7
-    
+    char axe_en_cours = '0';
+
     CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
     bool perspect = true;
     bool orto = false;

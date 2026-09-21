@@ -1,6 +1,7 @@
 #include "SceneNode.h"
 #include "json.hpp"
 #include"imgui.h"
+#include "utils.h"
 #include <algorithm>//pour les operation sur le vecteur
 #pragma once
 /*
@@ -29,7 +30,8 @@ class SceneManager{
         //pour la sauvgarde
         void SauvegarderProjet(std::string cheminFichier);//parcour le vecteur d'objets et remplis le json
         void ChargerProjet(std::string cheminFichier);//vide la scene actuelle et remplis avec le json lu
-        void Gerer_pointeur(Camera3D camera_editeur);
+        void Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables);
         void AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud);
         void SupprimerNoeud(SceneNode* cible);
+
 };
