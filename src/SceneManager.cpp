@@ -137,6 +137,10 @@ const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
 }
 
 void SceneManager::SauvegarderProjet(std::string cheminFichier) {
+    //check si on a l'extention json ou pas dans le nom
+    if (cheminFichier.length() < 5 || cheminFichier.substr(cheminFichier.length() - 5) != ".json") {
+        cheminFichier += ".json";
+    }
     nlohmann::json projet_json;
     
     // On crée un tableau JSON pour stocker notre liste de noeuds
@@ -286,6 +290,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     }
     file.close();
 }
+
 void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){
     //raycasting
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
