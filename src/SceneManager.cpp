@@ -306,20 +306,37 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & varia
         //check si on a une selection
         if(!GetSelection().empty()){
 
-            Vector3 position_base = objetTouche[0].position; //pour eviter les acces mémoire répétés
-            BoundingBox box_x = {position_base,(Vector3){position_base.x+4,position_base.y+1,position_base.z+1}};
-                BoundingBox box_y = {position_base,(Vector3){position_base.x+1,position_base.y+4,position_base.z+1}};
-                BoundingBox box_z = {position_base,(Vector3){position_base.x+1,position_base.y+1,position_base.z+4}};
+            Vector3 position_base = GetSelection()[0]->position; //pour eviter les acces mémoire répétés
+            BoundingBox box_x = { 
+                (Vector3){position_base.x, position_base.y - 0.5f, position_base.z - 0.5f},
+                (Vector3){position_base.x + 4.0f, position_base.y + 0.5f, position_base.z + 0.5f}
+            };
+            BoundingBox box_y = { 
+                (Vector3){position_base.x - 0.5f, position_base.y, position_base.z - 0.5f},
+                (Vector3){position_base.x + 0.5f, position_base.y + 4.0f, position_base.z + 0.5f}
+            };
+            BoundingBox box_z = { 
+                (Vector3){position_base.x - 0.5f, position_base.y - 0.5f, position_base.z},
+                (Vector3){position_base.x + 0.5f, position_base.y + 0.5f, position_base.z + 4.0f}
+            };  
+            RayCollision collisionx = GetRayCollisionBox(rayon,box_x);
+            RayCollision collisiony = GetRayCollisionBox(rayon,box_y);
+            RayCollision collisionz = GetRayCollisionBox(rayon,box_z);
                 
-                RayCollision collisionx = GetRayCollisionBox(rayon,box_x);
-                RayCollision collisiony = GetRayCollisionBox(rayon,box_y);
-                RayCollision collisionz = GetRayCollisionBox(rayon,box_z);
-                
-                if (collisionx.hit) { variables.axe_en_cours = 'X'; return; }
-                if (collisiony.hit) { variables.axe_en_cours = 'Y'; return; }
-                if (collisionz.hit) { variables.axe_en_cours = 'Z'; return; }    
+            if (collisionx.hit) { variables.axe_en_cours = 'X'; 
+                std::cout << "X touche" << std::endl;
+                return;
             }
-            variables.axe_en_cours = '0';
+            if (collisiony.hit) { variables.axe_en_cours = 'Y';
+                std::cout << "Y touche" << std::endl;
+                return;
+            }
+            if (collisionz.hit) { variables.axe_en_cours = 'Z'; 
+                std::cout << "Z touche" << std::endl;
+                return;
+            }   
+        }
+        variables.axe_en_cours = '0';
 
         if(objetTouche != nullptr){
             if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    

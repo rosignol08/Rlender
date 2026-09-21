@@ -5,7 +5,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
     rlImGuiBegin();
     //raycasting
-    La_scene.Gerer_pointeur(cameraEditeur);
+    La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
     
     ImGui::Begin("Inspecteur");
     if (!noeuds_selectione.empty()){
