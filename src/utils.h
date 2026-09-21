@@ -3,6 +3,7 @@
 
 //structure qui regroupe toutes les variables volantes de l'éditeur
 struct EditorContext {
+    int compteurModifs = 0; //un compteur pour dire que
     bool flag_changements = false;
     float cubePosition[3] = {0.0f, 0.0f, 0.0f};
     

@@ -1,154 +1,14 @@
 #include "interface.h"
 
-void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres &Les_parametres){
+void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
-    rlImGuiBegin();
-    //raycasting
-    La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
-    
-    ImGui::Begin("Inspecteur");
-    if (!noeuds_selectione.empty()){
-        //affiche le ou les noms des objets tout en haut
-        //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
-        if(noeuds_selectione.size() > 1){
-            //si on a plus d'un element alors faut faire le cas N elements
-            ImGui::Text("%ld éléments Selectionné", noeuds_selectione.size());
-            ImGui::Separator();    
-        }else{
-            if(noeuds_selectione[0] != nullptr){
-
-                ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
-                ImGui::Separator();
-                
-                // sliders pour modifier dynamiquement les variables
-            if (
-                // TODO ajouter les bouton pour ajouter des objetsg ici aussi
-                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
-                {
-                    Les_variables.flag_changements = true;
-                }
-            }else{
-                ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");
-            }
-        }
-
-        // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
-        // et Raylib des unsigned char (0 à 255), on fera ça plus tard si tu veux.
-    }
-    else
-    {
-        ImGui::Text("Aucun objet selectionné");
-    }
-    ImGui::End();
-    
-    ImGui::Begin("Hierarchie");
-    bool est_selectione = false;
-    std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
-    for (size_t i = 0; i < La_scene.GetNodes().size(); i++){
-        // un label unique pour chaque objet
-        std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
-        auto it = std::find(selection.begin(), selection.end(), La_scene.GetNodes()[i].get());
-
-        est_selectione = (it != selection.end());
-        // faut mettre a jour le pointeur selectioneur
-        if (ImGui::Selectable(label.c_str(), est_selectione)){
-            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
-                La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[i].get());
-            }else{
-                // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
-                La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
-                Les_variables.flag_changements = true;
-            }
-        }
-    }
-    ImGui::End();
-
-    // la partie caméra
-    // la progress bar stylée qui apparait si on commence à maintenir le clic
-    if (!Les_variables.modeFlyActif && Les_variables.tempsMaintien > 0.0f){
-        // recup le centre de l'ecant
-        float centreX = GetScreenWidth() / 2.0f;
-        float centreY = GetScreenHeight() / 2.0f;
-
-        // ImGui place la prochaine fenêtre au centre
-        ImGui::SetNextWindowPos({centreX, centreY}, ImGuiCond_Always, {0.5f, 0.5f});
-
-        // desactivation de tous
-        ImGuiWindowFlags flagsFlottant = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar;
-
-        // ouvre la fenêtre fantôme
-        ImGui::Begin("BarreChargement", nullptr, flagsFlottant);
-
-        // dessin de la barre issue #4
-        ImGui::ProgressBar(Les_variables.tempsMaintien / Les_variables.tempsExige, {150.0f, 15.0f});
-        ImGui::End();
-    }
-    ImGui::Begin("Contrôle Caméra");
-    ImGui::Text("Mode de déplacement :");
-    if (Les_variables.modeFlyActif){
-        UpdateCamera(&cameraEditeur, Les_variables.modeCameraActif);
-    }
-    else{
-        if (ImGui::RadioButton("Première Personne (FPS)", Les_variables.modeCameraActif == CAMERA_FIRST_PERSON))
-        {
-            Les_variables.modeCameraActif = CAMERA_FIRST_PERSON;
-        }
-        if (ImGui::RadioButton("Caméra Libre (Free)", Les_variables.modeCameraActif == CAMERA_FREE))
-        {
-            Les_variables.modeCameraActif = CAMERA_FREE;
-        }
-        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", Les_variables.modeCameraActif == CAMERA_ORBITAL))
-        {
-            Les_variables.modeCameraActif = CAMERA_ORBITAL;
-        }
-        if (ImGui::RadioButton("Troisième Personne (TPS)", Les_variables.modeCameraActif == CAMERA_THIRD_PERSON))
-        {
-            Les_variables.modeCameraActif = CAMERA_THIRD_PERSON;
-        }
-    }
-
-    ImGui::Separator();
-    //ImGui::Text("Maintiens le Clic Droit pour bouger"); plus besoin
-    ImGui::End();
-
-    // pour changer le type de la caméra
-    ImGui::Begin("Type de caméra");
-    if (ImGui::Button("Perspective", {30.0f, 30.0f})){
-        // si on clique sur ce bouton ça change le mode
-        if (!Les_variables.perspect)
-        {
-            Les_variables.perspect = true;
-            Les_variables.orto = false;
-            Les_variables.type_projection_camera = CAMERA_PERSPECTIVE;
-            // on met a jour la perspective
-            cameraEditeur.projection = Les_variables.type_projection_camera;
-        }
-    }
-    if (ImGui::Button("Ortogonal", {30.0f, 30.0f})){ // TODO issue #6
-        // idem ici
-        if (!Les_variables.orto)
-        {
-            Les_variables.orto = true;
-            Les_variables.perspect = false;
-            Les_variables.type_projection_camera = CAMERA_ORTHOGRAPHIC;
-            // on met a jour la perspective
-            cameraEditeur.projection = Les_variables.type_projection_camera;
-        }
-    }
-
-    ImGui::End();
-
     //pour le menu de modification quand on selectionne un objets
-    if(!selection.empty()){
+    if(!noeuds_selectione.empty()){
         if(ImGui::BeginPopupContextVoid("MenuActions", ImGuiPopupFlags_MouseButtonRight)){
 
             if(ImGui::MenuItem("Supprimer")){
-                std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
                 for (auto & element : noeuds_selectione){
-                    //std::cout << " element " << element << "supprimé " << std::endl;
-                    //auto it = std::find(selection.begin(), selection.end(), element);
-                    //La_scene.GetSelection().erase(it);
                     La_scene.SupprimerNoeud(element);
                 }
                 La_scene.Deselectionne();
@@ -267,14 +127,181 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         
         ImGui::EndMainMenuBar();
     }
+}
 
+void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
+    ImGui::Begin("Hierarchie");
+        bool est_selectione = false;
+        std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
+        for (size_t i = 0; i < La_scene.GetNodes().size(); i++){
+            // un label unique pour chaque objet
+            std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
+            auto it = std::find(selection.begin(), selection.end(), La_scene.GetNodes()[i].get());
+
+            est_selectione = (it != selection.end());
+            // faut mettre a jour le pointeur selectioneur
+            if (ImGui::Selectable(label.c_str(), est_selectione)){
+                if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
+                    La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[i].get());
+                }else{
+                    // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
+                    La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
+                    Les_variables.flag_changements = true;
+                }
+            }
+        }
+    ImGui::End();
+}
+
+void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
+    //recuperation des variables etc
+    std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
+    ImGui::Begin("Inspecteur");
+    if (!noeuds_selectione.empty()){
+        //affiche le ou les noms des objets tout en haut
+        //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
+        if(noeuds_selectione.size() > 1){
+            //si on a plus d'un element alors faut faire le cas N elements
+            ImGui::Text("%ld éléments Selectionné", noeuds_selectione.size());
+            ImGui::Separator();    
+        }else{
+            if(noeuds_selectione[0] != nullptr){
+
+                ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
+                ImGui::Separator();
+                
+                // sliders pour modifier dynamiquement les variables
+            if (
+                // TODO ajouter les bouton pour ajouter des objetsg ici aussi
+                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
+                {
+                    Les_variables.flag_changements = true;
+                }
+            }else{
+                ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");
+            }
+        }
+
+        // Pour la couleur, c'est un peu plus complexe car ImGui utilise des floats (0.0 à 1.0)
+        // et Raylib des unsigned char (0 à 255), on fera ça plus tard si tu veux.
+    }
+    else
+    {
+        ImGui::Text("Aucun objet selectionné");
+    }
+    ImGui::End();
+}
+
+void Dessiner_ControlesCamera(Camera3D& cameraEditeur, EditorContext& Les_variables){
+    //la partie caméra
+    // la progress bar stylée qui apparait si on commence à maintenir le clic faut la changer ?
+    if (!Les_variables.modeFlyActif && Les_variables.tempsMaintien > 0.0f){
+        // recup le centre de l'ecant
+        float centreX = GetScreenWidth() / 2.0f;
+        float centreY = GetScreenHeight() / 2.0f;
+
+        // ImGui place la prochaine fenêtre au centre
+        ImGui::SetNextWindowPos({centreX, centreY}, ImGuiCond_Always, {0.5f, 0.5f});
+
+        // desactivation de tous
+        ImGuiWindowFlags flagsFlottant = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar;
+
+        // ouvre la fenêtre fantôme
+        ImGui::Begin("BarreChargement", nullptr, flagsFlottant);
+
+        // dessin de la barre issue #4
+        ImGui::ProgressBar(Les_variables.tempsMaintien / Les_variables.tempsExige, {150.0f, 15.0f});
+        ImGui::End();
+    }
+    ImGui::Begin("Contrôle Caméra");
+    ImGui::Text("Mode de déplacement :");
+    if (Les_variables.modeFlyActif){
+        UpdateCamera(&cameraEditeur, Les_variables.modeCameraActif);
+    }
+    else{
+        if (ImGui::RadioButton("Première Personne (FPS)", Les_variables.modeCameraActif == CAMERA_FIRST_PERSON))
+        {
+            Les_variables.modeCameraActif = CAMERA_FIRST_PERSON;
+        }
+        if (ImGui::RadioButton("Caméra Libre (Free)", Les_variables.modeCameraActif == CAMERA_FREE))
+        {
+            Les_variables.modeCameraActif = CAMERA_FREE;
+        }
+        if (ImGui::RadioButton("Caméra Orbitale (Orbital)", Les_variables.modeCameraActif == CAMERA_ORBITAL))
+        {
+            Les_variables.modeCameraActif = CAMERA_ORBITAL;
+        }
+        if (ImGui::RadioButton("Troisième Personne (TPS)", Les_variables.modeCameraActif == CAMERA_THIRD_PERSON))
+        {
+            Les_variables.modeCameraActif = CAMERA_THIRD_PERSON;
+        }
+    }
+
+    ImGui::Separator();
+    //ImGui::Text("Maintiens le Clic Droit pour bouger"); plus besoin
+    ImGui::End();
+
+    // pour changer le type de la caméra
+    ImGui::Begin("Type de caméra");
+    if (ImGui::Button("Perspective", {30.0f, 30.0f})){
+        // si on clique sur ce bouton ça change le mode
+        if (!Les_variables.perspect)
+        {
+            Les_variables.perspect = true;
+            Les_variables.orto = false;
+            Les_variables.type_projection_camera = CAMERA_PERSPECTIVE;
+            // on met a jour la perspective
+            cameraEditeur.projection = Les_variables.type_projection_camera;
+        }
+    }
+    if (ImGui::Button("Ortogonal", {30.0f, 30.0f})){ // TODO issue #6
+        // idem ici
+        if (!Les_variables.orto)
+        {
+            Les_variables.orto = true;
+            Les_variables.perspect = false;
+            Les_variables.type_projection_camera = CAMERA_ORTHOGRAPHIC;
+            // on met a jour la perspective
+            cameraEditeur.projection = Les_variables.type_projection_camera;
+        }
+    }
+
+    ImGui::End();
+}
+
+void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //le code genere
     if(Les_variables.flag_changements){
-        Les_variables.code_preview = GenererCodeComplet(La_scene.GetNodes());
-        Les_variables.flag_changements = false;
+        //si on a eu un changement on augmente le compteur
+        Les_variables.compteurModifs++;
+        std::cout << "Modifications : " << Les_variables.compteurModifs << "/" << Les_parametres.limiteSauvgarde << std::endl;    //faut regenerer le code
+        Les_variables.code_preview = GenererCodeComplet(La_scene.SceneManager::GetNodes());//on donne à manger tous les noeuds de la scene
+        Les_variables.flag_changements = false; //faut penser à le rebaisser le flag hein
+    }
+    if(Les_variables.compteurModifs >= Les_parametres.limiteSauvgarde){
+        //la je peut lancer la sauvgarde
+        La_scene.SauvegarderProjet("autosave.json");
+        Les_variables.compteurModifs = 0;
     }
     std::string code_buf = Les_variables.code_preview;
     if(code_buf.empty()) code_buf = "";//le buffer pour l'api
+    //TODO faut agrandire ça pour avoir le preview plus grands mais en ratio de la fenetre
     ImGui::InputTextMultiline("##code_preview", &code_buf[0], code_buf.size()+1, ImVec2(GetScreenWidth()/5.0f,GetScreenHeight()/5.0f), ImGuiInputTextFlags_ReadOnly);
+    rlImGuiEnd();
+}
+
+
+
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres){
+    
+    rlImGuiBegin();
+    //raycasting
+    La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
+    
+    Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
+    Dessiner_Hierarchie(La_scene, Les_variables);
+    Dessiner_Inspecteur(La_scene, Les_variables);
+    Dessiner_ControlesCamera(cameraEditeur, Les_variables);
+    Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
     rlImGuiEnd();
 }

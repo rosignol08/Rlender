@@ -15,9 +15,7 @@ int main(void) {
     ça doit etre modifiable dans les parametres du logiciel plus tard
     limiteSauvgarde c'est la limite dynamique du compteur c'est ça que faut changer pour reduite au augmenter le nombre de sauvgardes etc
     */
-    int compteurModifs = 0; //un compteur pour dire que
-    //int limiteSauvgarde = 50;
-    bool flag_changements = false;//le flag pour dire si un changement a été fait
+    
     std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
 
     //pour gerer les objets de la scene:
@@ -118,19 +116,7 @@ int main(void) {
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
 
         EndDrawing();
-        if(flag_changements){
-            //si on a eu un changement on augmente le compteur
-            compteurModifs++;
-            //faut regenerer le code
-            contenu = GenererCodeComplet(La_scene.SceneManager::GetNodes());//on donne à manger tous les noeuds de la scene
-            flag_changements = false; //faut penser à le rebaisser le flag hein
-            //std::cout << "changement : " << compteurModifs << std::endl;
-        }
-        if(compteurModifs >= Les_parametres.limiteSauvgarde){
-            //la je peut lancer la sauvgarde
-            Sauvgarde("projet_exemple.cpp",contenu);
-            compteurModifs = 0;
-        }
+        
     }
 
     // Nettoyage
