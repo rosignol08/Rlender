@@ -210,6 +210,7 @@ void SceneManager::SupprimerNoeud(SceneNode* cible){
 
 //vide la scene actuelle et remplis avec le json lu
 void SceneManager::ChargerProjet(std::string cheminFichier){
+    Deselectionne();
     sceneNodes.clear();//on vide les noeuds d'avant
     std::ifstream file(cheminFichier);
     if (!file) {
