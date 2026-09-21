@@ -262,6 +262,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
         //exemple d'ajout de bouton
         if(ImGui::Button("cube",{50.0f,50.0f})){
             La_scene.AjouterCube();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         
         ImGui::EndMainMenuBar();

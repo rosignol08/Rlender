@@ -351,5 +351,29 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & varia
             }
         }
     }
-}
+    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && variables.axe_en_cours != '0'){
+        //si on maintient le clic et qu'on touche a un axe
+        if (!GetSelection().empty()) {
+            Vector2 pos_souris = GetMouseDelta();
+            switch (variables.axe_en_cours){
+                case 'X':
+                    GetSelection()[0]->position.x += pos_souris.x*0.02f; //psk en 2d la souris va vite TODO etaloner la valeurs
+                    variables.flag_changements = true;
+                    break;
 
+                case 'Y':
+                    GetSelection()[0]->position.y -= pos_souris.y*0.02f;//sur l'ecrant y descend et en 3D il monte c'est inversé donc -
+                    variables.flag_changements = true;
+                break;
+
+                case 'Z':
+                    GetSelection()[0]->position.z += pos_souris.x*0.01f + (pos_souris.y*0.01f);//les deux ? jsp au choix
+                    variables.flag_changements = true;
+                break;
+            }
+        }
+    }
+    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
+        variables.axe_en_cours = '0';
+    }
+}
