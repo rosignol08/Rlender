@@ -121,16 +121,26 @@ class CubeNode : public SceneNode{
 
 //pour representer une sphere
 class SphereNode : public SceneNode{
+    private:
+        Model modele;
     public :
     SphereNode(){
         nom = "Sphere";
         taille = {2.0f,2.0f,2.0f};
         type = "sphere";
+        //un maillage de base
+        Mesh maillage = GenMeshSphere(1.0f, 5.0f, 5.0f);
+        //ça contient automatiquement un Material par défaut
+        modele = LoadModelFromMesh(maillage);
     }
+    ~SphereNode() override {
+        //faut decharger le modele
+        UnloadModel(modele);
+    }
+
     void Draw() override {
         //les variables héritées de SceneNode
-        DrawSphere(position, taille.x,couleur);//je prend taille.x par exemple
-        
+        DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
         if (isSelected) {
             DrawSphereWires(position, taille.x,10,10, YELLOW);//10 par defaut TODO a changer
         }
@@ -162,7 +172,10 @@ class SphereNode : public SceneNode{
         return ma_bounding_box;
     }
     std::unique_ptr<SceneNode> Cloner() override{
-        auto clone = std::make_unique<SphereNode>(*this);
+        auto clone = std::make_unique<SphereNode>();
+        clone->position = this->position;
+        clone->taille = this->taille;
+        clone->couleur = this->couleur;
         clone->isSelected = true;
         static unsigned int compteur_sphere_clones = 0;//logiquement on a un compteur pour les clones
         clone->nom = this->nom + "_" + std::to_string(compteur_sphere_clones); //nouveau nom
