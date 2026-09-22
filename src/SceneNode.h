@@ -51,17 +51,27 @@ class SceneNode {
 
 //pour representer un cube
 class CubeNode : public SceneNode{
+    private:
+        Model modele;
     public :
     CubeNode() { 
         nom = "Cube"; 
         taille = {2.0f, 2.0f, 2.0f}; // Petite taille par défaut pour le voir
         type = "cube";
+        //un maillage de base
+        Mesh maillage = GenMeshCube(1.0f, 1.0f, 1.0f);
+        //ça contient automatiquement un Material par défaut
+        modele = LoadModelFromMesh(maillage);
+    }
+
+    ~CubeNode() override {
+        //faut decharger le modele
+        UnloadModel(modele);
     }
 
     void Draw() override {
         //les variables héritées de SceneNode
-        DrawCubeV(position, taille, couleur);
-        
+        DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
         if (isSelected) {
             DrawCubeWiresV(position, taille, YELLOW);
         }
@@ -98,7 +108,10 @@ class CubeNode : public SceneNode{
     }
 
     std::unique_ptr<SceneNode> Cloner() override{
-        auto clone = std::make_unique<CubeNode>(*this);
+        auto clone = std::make_unique<CubeNode>(); //faut en cree un autre pour eviter les crash de mémoire
+        clone->position = this->position;
+        clone->taille = this->taille;
+        clone->couleur = this->couleur;
         clone->isSelected = true;
         static unsigned int compteur_cube_clones = 0;//logiquement on a un compteur pour les clones
         clone->nom = this->nom + "_" + std::to_string(compteur_cube_clones); //nouveau nom
