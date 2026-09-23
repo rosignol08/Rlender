@@ -136,6 +136,17 @@ const std::vector<std::unique_ptr<SceneNode>>& SceneManager::GetNodes() const{
     return sceneNodes;
 }
 
+
+void SceneManager::AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud) {
+    sceneNodes.push_back(std::move(nouveau_noeud));
+}
+
+void SceneManager::SupprimerNoeud(SceneNode* cible){
+    auto efface = std::remove_if(sceneNodes.begin(), sceneNodes.end(), [cible](const std::unique_ptr<SceneNode>& noeud){ return noeud.get() == cible; });
+    sceneNodes.erase(efface, sceneNodes.end());
+}
+
+
 void SceneManager::SauvegarderProjet(std::string cheminFichier) {
     //check si on a l'extention json ou pas dans le nom
     if (cheminFichier.length() < 5 || cheminFichier.substr(cheminFichier.length() - 5) != ".json") {
@@ -195,18 +206,6 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
     
     std::cout << "Projet sauvegarde avec succes dans : " << cheminFichier << std::endl;
 }
-
-
-void SceneManager::AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud) {
-    sceneNodes.push_back(std::move(nouveau_noeud));
-}
-
-void SceneManager::SupprimerNoeud(SceneNode* cible){
-    auto efface = std::remove_if(sceneNodes.begin(), sceneNodes.end(), [cible](const std::unique_ptr<SceneNode>& noeud){ return noeud.get() == cible; });
-    sceneNodes.erase(efface, sceneNodes.end());
-}
-
-//fini la fonction bien frero
 
 //vide la scene actuelle et remplis avec le json lu
 void SceneManager::ChargerProjet(std::string cheminFichier){

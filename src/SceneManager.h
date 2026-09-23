@@ -3,6 +3,7 @@
 #include"imgui.h"
 #include "utils.h"
 #include <algorithm>//pour les operation sur le vecteur
+#include <unordered_map>
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -14,6 +15,7 @@ class SceneManager{
         std::vector<std::unique_ptr<SceneNode>> sceneNodes;
         //le pointeur pour choisir un noeuds specifique
         std::vector<SceneNode*> noeudSelectionne;
+        std::unordered_map<std::string, Material> materiaux;//la banque des materiaux
     public:
         void       DrawScene(); //une boucle qui parcours les noeuds et les dessines chacuns
         void       AjouterCube(); //ça ajoute un cube simplement
