@@ -171,6 +171,7 @@ class SphereNode : public SceneNode{
         ma_bounding_box.max = max;
         return ma_bounding_box;
     }
+    
     std::unique_ptr<SceneNode> Cloner() override{
         auto clone = std::make_unique<SphereNode>();
         clone->position = this->position;
@@ -181,6 +182,97 @@ class SphereNode : public SceneNode{
         clone->nom = this->nom + "_" + std::to_string(compteur_sphere_clones); //nouveau nom
         return clone;
     }
+};
+
+
+//pour representer un plan (sol)
+class PlaneNode : public SceneNode {
+private:
+    Model modele;
+public:
+    PlaneNode() { 
+        nom = "Plane";
+        type = "plane";
+        taille = {5.0f, 1.0f, 5.0f};
+        modele = LoadModelFromMesh(GenMeshPlane(1.0f, 1.0f, 10, 10)); //resolution 10x10
+    }
+    ~PlaneNode() override { UnloadModel(modele); }
+
+    void Draw() override {
+        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
+        if (isSelected){
+            DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
+        }
+    }
+    
+    BoundingBox GetBoiteCollision() override {
+        return {
+            {position.x - taille.x/2, position.y - 0.01f, position.z - taille.z/2},
+            {position.x + taille.x/2, position.y + 0.01f, position.z + taille.z/2}
+        };
+    }
+    std::unique_ptr<SceneNode> Cloner() override {
+        auto clone = std::make_unique<PlaneNode>();
+        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
+        clone->isSelected = true; clone->nom = this->nom + "_clone";
+        return clone;
+    }
+    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
+};
+
+//pour representer un cylindre
+class CylinderNode : public SceneNode {
+private:
+    Model modele;
+public:
+    CylinderNode() { 
+        nom = "Cylinder"; type = "cylinder"; taille = {1.0f, 2.0f, 1.0f};
+        modele = LoadModelFromMesh(GenMeshCylinder(1.0f, 1.0f, 16));
+    }
+    ~CylinderNode() override { UnloadModel(modele); }
+
+    void Draw() override {
+        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
+        if (isSelected) DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
+    }
+    
+    BoundingBox GetBoiteCollision() override {
+        return {{position.x - taille.x, position.y - taille.y/2, position.z - taille.z},
+                {position.x + taille.x, position.y + taille.y/2, position.z + taille.z} };
+    }
+    std::unique_ptr<SceneNode> Cloner() override {
+        auto clone = std::make_unique<CylinderNode>();
+        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
+        clone->isSelected = true; clone->nom = this->nom + "_clone";
+        return clone;
+    }
+    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
+};
+
+//pour representer un cone
+class ConeNode : public SceneNode {
+private:
+    Model modele;
+public:
+    ConeNode() { 
+        nom = "Cone"; type = "cone"; taille = {1.0f, 2.0f, 1.0f};
+        modele = LoadModelFromMesh(GenMeshCone(1.0f, 1.0f, 16));
+    }
+    ~ConeNode() override { UnloadModel(modele); }
+    void Draw() override {
+        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
+        if (isSelected) DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
+    }
+    BoundingBox GetBoiteCollision() override {
+        return { {position.x - taille.x, position.y - 0.0f, position.z - taille.z}, // Base au sol
+                 {position.x + taille.x, position.y + taille.y, position.z + taille.z} };
+    }
+    std::unique_ptr<SceneNode> Cloner() override {
+        auto clone = std::make_unique<ConeNode>();
+        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
+        clone->isSelected = true; clone->nom = this->nom + "_clone"; return clone;
+    }
+    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
 };
 
 class CameraNode : public SceneNode{
