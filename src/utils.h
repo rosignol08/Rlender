@@ -18,6 +18,9 @@ struct EditorContext {
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
     std::string code_preview;
+
+    //Shaders
+    std::string codeFragmentShader = "void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }"; //shader rouge par défaut
 };
 
 struct Parametres {

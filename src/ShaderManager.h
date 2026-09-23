@@ -12,4 +12,6 @@ public:
     
     //clean la VRAM à la fermeture de l'application
     void Nettoyer();
+    //load et compile un shader directement avec code (Live Coding)
+void ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS);
 };

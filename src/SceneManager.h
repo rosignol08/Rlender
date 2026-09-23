@@ -2,6 +2,7 @@
 #include "json.hpp"
 #include"imgui.h"
 #include "utils.h"
+#include "ShaderManager.h"
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
 #pragma once
@@ -16,7 +17,8 @@ class SceneManager{
         //le pointeur pour choisir un noeuds specifique
         std::vector<SceneNode*> noeudSelectionne;
         std::unordered_map<std::string, Material> materiaux;//la banque des materiaux
-    public:
+        public:
+        ShaderManager shaderManager;//les shaders
         void       DrawScene(); //une boucle qui parcours les noeuds et les dessines chacuns
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterCamera3D(); //idem pour une caméra3D

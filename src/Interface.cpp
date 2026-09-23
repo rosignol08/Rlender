@@ -1,4 +1,4 @@
-#include "interface.h"
+#include "Interface.h"
 
 void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //recuperation des variables etc
@@ -291,7 +291,16 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
     ImGui::End();
 }
 
-
+void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables){
+    ImGui::Begin("Shader");
+    ImGui::Text("Fragment shader :");//TODO voir si on peut pas augmenter la limite
+    ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200));
+    if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
+        const char * defaultVS = 0;//c'est le shader vs de base de raylib
+        La_scene.shaderManager.ChargerShaderDepuisTexte(defaultVS,Les_variables.codeFragmentShader);
+    }
+    ImGui::End();
+}
 
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres){
     

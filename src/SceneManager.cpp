@@ -294,7 +294,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
 void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){
     //raycasting
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
-        Ray rayon = GetMouseRay(GetMousePosition(), camera_editeur);
+        Ray rayon = GetScreenToWorldRay(GetMousePosition(), camera_editeur);
         SceneNode* objetTouche = nullptr;
         float distanceMin = 999999.0f;
         //recherche de qui collisionne sa bounding box avec le rayon de la souris

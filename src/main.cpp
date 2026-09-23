@@ -4,7 +4,7 @@
 #include "SceneNode.h"
 #include "Sauvgarde.h"
 #include "SceneManager.h"
-#include "interface.h"
+#include "Interface.h"
 
 int main(void) {
 

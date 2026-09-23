@@ -20,3 +20,20 @@ void ShaderManager::Nettoyer() {
         UnloadShader(shaderEclairage);
     }
 }
+
+void ShaderManager::ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS) {
+    //si déjà un shader : unload pour eviter fuites de VRAM
+    if (shaderEclairage.id != 0) {
+        UnloadShader(shaderEclairage);
+    }
+
+    //compilation depuis string
+    shaderEclairage = LoadShaderFromMemory(codeVS.c_str(), codeFS.c_str());
+
+    if (shaderEclairage.id != 0) {
+        std::cout << "SUCCES : Shader compile" << std::endl;
+        shaderEclairage.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shaderEclairage, "viewPos");
+    } else {
+        std::cerr << "ERREUR : La compilation du shader echoue" << std::endl;
+    }
+}
