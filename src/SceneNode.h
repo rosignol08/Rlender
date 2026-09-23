@@ -129,7 +129,7 @@ class SphereNode : public SceneNode{
         taille = {2.0f,2.0f,2.0f};
         type = "sphere";
         //un maillage de base
-        Mesh maillage = GenMeshSphere(1.0f, 5.0f, 5.0f);
+        Mesh maillage = GenMeshSphere(1.0f, 16.0f, 16.0f);
         //ça contient automatiquement un Material par défaut
         modele = LoadModelFromMesh(maillage);
     }
@@ -142,7 +142,7 @@ class SphereNode : public SceneNode{
         //les variables héritées de SceneNode
         DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
         if (isSelected) {
-            DrawSphereWires(position, taille.x,10,10, YELLOW);//10 par defaut TODO a changer
+            DrawSphereWires(position, taille.x,16,16, YELLOW);//10 par defaut TODO a changer
         }
     }
 
