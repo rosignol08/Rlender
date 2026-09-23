@@ -53,9 +53,6 @@ elseif(APPLE)
  
     find_package(raylib REQUIRED)
  
-    # The imported target already carries raylib's include path and its
-    # frameworks (OpenGL, Cocoa, IOKit...), so nothing else is needed here.
-    # GL / rt / X11 do not exist on macOS.
     target_link_libraries(application PRIVATE raylib)
 else()
     #conf LINUX (dynamique)

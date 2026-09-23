@@ -1,5 +1,5 @@
 ## Compilation sous Windows
-
+(faut Raylib >= 5.0)
 Installer CMake et MinGW, puis verifier que `g++` et `mingw32-make` sont disponibles dans le `PATH` :
 
 ```powershell
