@@ -9,7 +9,8 @@ set(SRCS
     src/CodeGenerator.cpp
     src/Sauvgarde.cpp
     src/SceneManager.cpp
-    src/interface.cpp
+    src/SceneNode.cpp
+    src/Interface.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp
     lib/imgui/imgui.cpp

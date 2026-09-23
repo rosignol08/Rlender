@@ -54,42 +54,17 @@ class CubeNode : public SceneNode{
     private:
         Model modele;
     public :
-    CubeNode() { 
-        nom = "Cube"; 
-        taille = {2.0f, 2.0f, 2.0f}; // Petite taille par défaut pour le voir
-        type = "cube";
-        //un maillage de base
-        Mesh maillage = GenMeshCube(1.0f, 1.0f, 1.0f);
-        //ça contient automatiquement un Material par défaut
-        modele = LoadModelFromMesh(maillage);
-    }
+    CubeNode();
 
-    ~CubeNode() override {
-        //faut decharger le modele
-        UnloadModel(modele);
-    }
+    ~CubeNode() override;
 
-    void Draw() override {
-        //les variables héritées de SceneNode
-        DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
-        if (isSelected) {
-            DrawCubeWiresV(position, taille, YELLOW);
-        }
-    }
+    void Draw() override;
     std::string ToCode(){
         return "";
     }
-    std::string GetDrawCode(){
-        std::stringstream code;
-        code << "\t\t\t\t\t\t\t\tDrawCube(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " <<std::to_string(this->couleur.b) << ", 255" <<"}" << ");\n";
-        return code.str();
-    }
+    std::string GetDrawCode() override;
     
-    std::string GetInitCode(){
-        std::stringstream code;
-        code << "\t\t\t\tVector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " <<std::to_string(this->position.z) << "};\n";
-        return code.str();
-    }
+    std::string GetInitCode() override;
     
     BoundingBox GetBoiteCollision() override {
         Vector3 min, max;
@@ -107,16 +82,7 @@ class CubeNode : public SceneNode{
         return ma_bounding_box;
     }
 
-    std::unique_ptr<SceneNode> Cloner() override{
-        auto clone = std::make_unique<CubeNode>(); //faut en cree un autre pour eviter les crash de mémoire
-        clone->position = this->position;
-        clone->taille = this->taille;
-        clone->couleur = this->couleur;
-        clone->isSelected = true;
-        static unsigned int compteur_cube_clones = 0;//logiquement on a un compteur pour les clones
-        clone->nom = this->nom + "_" + std::to_string(compteur_cube_clones); //nouveau nom
-        return clone;
-    }
+    std::unique_ptr<SceneNode> Cloner() override;
 };
 
 //pour representer une sphere
