@@ -1,5 +1,7 @@
 #include "ShaderManager.h"
 
+
+//faut changer la fonction pour charger plein de shaders différents pas que la lumière
 void ShaderManager::ChargerShaders(const std::string& cheminVS, const std::string& cheminFS) {
     //loadShader compile les fichiers texte (.vs et .fs) directement sur la carte graphique
     shaderEclairage = LoadShader(cheminVS.c_str(), cheminFS.c_str());
