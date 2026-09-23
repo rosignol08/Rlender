@@ -11,6 +11,7 @@ set(SRCS
     src/SceneManager.cpp
     src/SceneNode.cpp
     src/Interface.cpp
+    src/ShaderManager.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp
     lib/imgui/imgui.cpp
