@@ -110,63 +110,33 @@ class PlaneNode : public SceneNode {
 private:
     Model modele;
 public:
-    PlaneNode() { 
-        nom = "Plane";
-        type = "plane";
-        taille = {5.0f, 1.0f, 5.0f};
-        modele = LoadModelFromMesh(GenMeshPlane(1.0f, 1.0f, 10, 10)); //resolution 10x10
-    }
-    ~PlaneNode() override { UnloadModel(modele); }
+    PlaneNode();
+    ~PlaneNode() override ;
 
-    void Draw() override {
-        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
-        if (isSelected){
-            DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
-        }
-    }
+    void Draw() override;
     
-    BoundingBox GetBoiteCollision() override {
-        return {
-            {position.x - taille.x/2, position.y - 0.01f, position.z - taille.z/2},
-            {position.x + taille.x/2, position.y + 0.01f, position.z + taille.z/2}
-        };
-    }
-    std::unique_ptr<SceneNode> Cloner() override {
-        auto clone = std::make_unique<PlaneNode>();
-        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
-        clone->isSelected = true; clone->nom = this->nom + "_clone";
-        return clone;
-    }
-    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
+    BoundingBox GetBoiteCollision() override;
+    std::unique_ptr<SceneNode> Cloner() override;
+    std::string ToCode() override;
+    std::string GetDrawCode() override;
+    std::string GetInitCode() override;
 };
 
 //pour representer un cylindre
 class CylinderNode : public SceneNode {
-private:
-    Model modele;
-public:
-    CylinderNode() { 
-        nom = "Cylinder"; type = "cylinder"; taille = {1.0f, 2.0f, 1.0f};
-        modele = LoadModelFromMesh(GenMeshCylinder(1.0f, 1.0f, 16));
-    }
-    ~CylinderNode() override { UnloadModel(modele); }
+    private:
+        Model modele;
+    public:
+        CylinderNode();
+        ~CylinderNode() override;
 
-    void Draw() override {
-        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
-        if (isSelected) DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
-    }
-    
-    BoundingBox GetBoiteCollision() override {
-        return {{position.x - taille.x, position.y - taille.y/2, position.z - taille.z},
-                {position.x + taille.x, position.y + taille.y/2, position.z + taille.z} };
-    }
-    std::unique_ptr<SceneNode> Cloner() override {
-        auto clone = std::make_unique<CylinderNode>();
-        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
-        clone->isSelected = true; clone->nom = this->nom + "_clone";
-        return clone;
-    }
-    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
+        void Draw() override ;
+
+        BoundingBox GetBoiteCollision() override;
+        std::unique_ptr<SceneNode> Cloner() override;
+        std::string ToCode() override;
+        std::string GetDrawCode() override;
+        std::string GetInitCode() override;
 };
 
 //pour representer un cone
@@ -174,25 +144,14 @@ class ConeNode : public SceneNode {
 private:
     Model modele;
 public:
-    ConeNode() { 
-        nom = "Cone"; type = "cone"; taille = {1.0f, 2.0f, 1.0f};
-        modele = LoadModelFromMesh(GenMeshCone(1.0f, 1.0f, 16));
-    }
-    ~ConeNode() override { UnloadModel(modele); }
-    void Draw() override {
-        DrawModelEx(modele, position, {0,1,0}, 0.0f, taille, couleur);
-        if (isSelected) DrawModelWiresEx(modele, position, {0,1,0}, 0.0f, taille, YELLOW);
-    }
-    BoundingBox GetBoiteCollision() override {
-        return { {position.x - taille.x, position.y - 0.0f, position.z - taille.z}, // Base au sol
-                 {position.x + taille.x, position.y + taille.y, position.z + taille.z} };
-    }
-    std::unique_ptr<SceneNode> Cloner() override {
-        auto clone = std::make_unique<ConeNode>();
-        clone->position = this->position; clone->taille = this->taille; clone->couleur = this->couleur;
-        clone->isSelected = true; clone->nom = this->nom + "_clone"; return clone;
-    }
-    std::string ToCode() { return ""; } std::string GetDrawCode() { return ""; } std::string GetInitCode() { return ""; }
+    ConeNode();
+    ~ConeNode() override;
+    void Draw() override;
+    BoundingBox GetBoiteCollision() override;
+    std::unique_ptr<SceneNode> Cloner() override;
+    std::string ToCode()override;
+    std::string GetDrawCode()override;
+    std::string GetInitCode()override;
 };
 
 class CameraNode : public SceneNode{
@@ -201,66 +160,17 @@ class CameraNode : public SceneNode{
         float fovy = 45.0f;//par defaut
         CameraMode mode_camera = CAMERA_FREE;//par defaut
         CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
-        CameraNode(){
-        nom = "camera3D";
-        type = "camera3D";
-    }
+    CameraNode();
+    void Draw() override;
+    std::string ToCode()override;
 
-    void Draw() override {  
-        //on dessine la camera en wireframe comme godot etc
-        DrawCubeWires(position, 1.0f, 1.0f, 1.0f, PURPLE);
-        DrawLine3D(position, target, PURPLE);
-        
-        if (isSelected) {
-            DrawCubeWires(position, 1.0f, 1.0f, 1.0f, YELLOW);
-            DrawLine3D(position, target, YELLOW);
-        }
-    }
-    std::string ToCode(){
-        return "";
-    }
-
-    std::string GetDrawCode(){
-        //faut ajouter cette ligne dans la boucle de rendu
-        std::stringstream code;
-        code << "     UpdateCamera(&" << nom << " , " << mode_camera << ");\n";
-        return code.str();
-    }
+    std::string GetDrawCode()override;
     
 
-    std::string GetInitCode(){
-        std::stringstream code;
-        code << " Camera3D " << nom << " = { 0 };\n";
-        code << nom << ".position = {" << position.x << "f, " << position.y << "f, " << position.z << "f};\n";
-        code << nom << ".target = {" << target.x << "f, " << target.y << "f, " << target.z << "f};\n";
-        code << nom << ".up = { 0.0f, 1.0f, 0.0f };\n";
-        code << nom << ".fovy = " << fovy << ";\n";
-        code << nom << ".projection = " << projetction_cam << ";\n";
-        return code.str();
-    }
+    std::string GetInitCode()override;
 
-    BoundingBox GetBoiteCollision(){
-        Vector3 min, max;
-        BoundingBox ma_bounding_box;
-
-        min.x = position.x - taille.x/2.0f;
-        min.y = position.y - taille.y/2.0f;
-        min.z = position.z - taille.z/2.0f;
-
-        max.x = position.x + taille.x/2.0f;
-        max.y = position.y + taille.y/2.0f;
-        max.z = position.z + taille.z/2.0f;
-        ma_bounding_box.max = max;
-        ma_bounding_box.min = min;
-        return ma_bounding_box;
-    }
-    std::unique_ptr<SceneNode> Cloner() override{
-        auto clone = std::make_unique<CameraNode>(*this);
-        clone->isSelected = true;
-        static unsigned int compteur_camera_clones = 0;//logiquement on a un compteur pour les clones
-        clone->nom = this->nom + "_" + std::to_string(compteur_camera_clones); //nouveau nom
-        return clone;
-    }
+    BoundingBox GetBoiteCollision()override;
+    std::unique_ptr<SceneNode> Cloner() override;
 };
 
 class Camera2DNode : public SceneNode{
@@ -271,55 +181,18 @@ class Camera2DNode : public SceneNode{
         //Vector2 target_camera = {position.x,position.y};//par exemple
         //float rotation_camera = rotation.x;
         float zoom_camera = 1.0f;
-        Camera2DNode(){
-            nom = "camera2D";
-            type = "camera2D";
-        }
+        Camera2DNode();
 
-    void Draw() override {
-        Color couleurLigne = isSelected ? YELLOW : PURPLE;
+    void Draw()override;
 
-        //les 4 coins du cadre autour de la pos 3D du noeud
-        Vector3 p1 = {position.x - taille.x, position.y, position.z - taille.y};
-        Vector3 p2 = {position.x + taille.x, position.y, position.z - taille.y};
-        Vector3 p3 = {position.x + taille.x, position.y, position.z + taille.y};
-        Vector3 p4 = {position.x - taille.x, position.y, position.z + taille.y};
+    std::string ToCode()override;
 
-        //le rectangle
-        DrawLine3D(p1, p2, couleurLigne); //haut
-        DrawLine3D(p3, p4, couleurLigne); //bas
-        DrawLine3D(p4, p1, couleurLigne); //gauche
-        DrawLine3D(p2, p3, couleurLigne); //droite
-    }
-
-    std::string ToCode(){
-        return "";
-    }
-
-    std::string GetDrawCode(){
-        return "";
-    }
+    std::string GetDrawCode()override;
     
-    std::string GetCleanupCode(){
-        return "";
-    }
+    std::string GetCleanupCode()override;
 
-    std::string GetInitCode(){
-        std::stringstream code;
-        code << " Camera2D " << nom << " = { 0 };\n";
-        code << nom << ".target = {" << position.x << "f, " << position.y << "f};\n";
-        code << nom << ".offset = {" << offset_camera.x << "f, " << offset_camera.y << "f};\n";
-        code << nom << ".rotation = " << rotation.x << ";\n";
-        code << nom << ".zoom = " << zoom_camera << ";\n";
-        return code.str();
-    }
-    std::unique_ptr<SceneNode> Cloner() override{
-        auto clone = std::make_unique<Camera2DNode>(*this);
-        clone->isSelected = true;
-        static unsigned int compteur_camera2D_clones = 0;//logiquement on a un compteur pour les clones
-        clone->nom = this->nom + "_" + std::to_string(compteur_camera2D_clones); //nouveau nom
-        return clone;
-    }
+    std::string GetInitCode()override;
+    std::unique_ptr<SceneNode> Cloner()override;
 };
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
