@@ -177,6 +177,24 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 {
                     Les_variables.flag_changements = true;
                 }
+            ImGui::Separator();
+            ImGui::Text("Materiau");
+
+            SceneNode* objet = noeuds_selectione[0];
+            if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
+                for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
+                    bool est_selectione = (objet->nom_shader_actuel == nom);
+                    if(ImGui::Selectable(nom.c_str(),est_selectione)){
+                        //si on clique ça applique
+                        objet->AppliquerShader(nom,shader_obj);
+                        Les_variables.flag_changements = true;//pour l'autosave
+                    }
+                    if(est_selectione){
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+            }
             }else{
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");
             }
@@ -335,7 +353,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     ImGui::Text("Fragment shader :");//TODO voir si on peut pas augmenter la limite
     ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200));
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
-        const char * defaultVS = 0;//c'est le shader vs de base de raylib
+        const char * defaultVS = "";//c'est le shader vs de base de raylib
         La_scene.shaderManager.ChargerShaderDepuisTexte(defaultVS,Les_variables.codeFragmentShader);
     }
     ImGui::End();
@@ -352,5 +370,6 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     Dessiner_Inspecteur(La_scene, Les_variables);
     Dessiner_ControlesCamera(cameraEditeur, Les_variables);
     Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
+    Dessiner_EditeurShader(La_scene,Les_variables);
     rlImGuiEnd();
 }

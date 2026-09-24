@@ -52,6 +52,13 @@ std::unique_ptr<SceneNode> CubeNode::Cloner()
     return clone;
 }
 
+//TODO le faire pour les autres
+void CubeNode::AppliquerShader(const std::string& nom_shader, Shader le_shader) {
+    nom_shader_actuel = nom_shader;
+    //assigne le shader à la carte graphique pour ce modèle précis
+    modele.materials[0].shader = le_shader; 
+}
+
 // Sphere
 
 SphereNode::SphereNode()

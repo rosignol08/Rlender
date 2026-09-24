@@ -21,6 +21,7 @@ class SceneNode {
             //pour la selectioner avec la souris l'objet a une bounding box
             return BoundingBox{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
         }
+        std::string nom_shader_actuel = "Defaut";
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
@@ -37,7 +38,10 @@ class SceneNode {
 
     //la boucle les unloads
     virtual std::string GetCleanupCode() { return "";}
-
+    //le shader
+    virtual void AppliquerShader(const std::string& nom_shader, Shader le_shader) {
+        nom_shader_actuel = nom_shader;
+    }
     //faut faire un constructeur par défaut au cas où
     SceneNode(){
         nom = "";
@@ -83,6 +87,7 @@ class CubeNode : public SceneNode{
     }
 
     std::unique_ptr<SceneNode> Cloner() override;
+    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
 };
 
 //pour representer une sphere

@@ -43,10 +43,17 @@ void ShaderManager::ChargerShaders(const std::string& cheminVS, const std::strin
     }
 }
 
-void ShaderManager::Nettoyer() {
-    if (shaderEclairage.id != 0) {
-        UnloadShader(shaderEclairage);
+void ShaderManager::Nettoyer_tout() {
+    for (auto& [cle, valeur] : dictionnaire_shaders) {
+        UnloadShader(valeur);
     }
+    dictionnaire_shaders.clear();
+}
+
+//pour enlever qu'un seule shader
+void ShaderManager::Nettoyer_un(const std::string& nom) {
+    UnloadShader(dictionnaire_shaders[nom]);
+    dictionnaire_shaders.erase(nom);
 }
 
 void ShaderManager::ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS) {
