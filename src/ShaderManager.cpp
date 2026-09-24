@@ -1,18 +1,44 @@
 #include "ShaderManager.h"
 
-
 //faut changer la fonction pour charger plein de shaders différents pas que la lumière
 void ShaderManager::ChargerShaders(const std::string& cheminVS, const std::string& cheminFS) {
     //loadShader compile les fichiers texte (.vs et .fs) directement sur la carte graphique
-    shaderEclairage = LoadShader(cheminVS.c_str(), cheminFS.c_str());
-
-    //check si le chargement a réussi (si ID valide)
-    if (shaderEclairage.id != 0) {
-        std::cout << "SUCCES : Shader d'eclairage charge" << std::endl;
-        
-        //configuration de base : on dit au shader où se trouve la caméra
-        shaderEclairage.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shaderEclairage, "viewPos");
+    if (cheminVS.empty() && cheminFS.empty()) {
+        std::cerr << "ERREUR : Aucun chemin fourni" << std::endl;
+        return;
+    }
+    //le nom
+    std::string nom = "";
+    if (!cheminVS.empty()) {
+        nom = std::filesystem::path(cheminVS).stem().string(); 
     } else {
+        nom = std::filesystem::path(cheminFS).stem().string();
+    }
+    //chargement du shader
+    Shader le_shader = { 0 };
+    if (!cheminVS.empty() && !cheminFS.empty()) {
+        
+        le_shader = LoadShader(cheminVS.c_str(), cheminFS.c_str());
+    
+    }else if (!cheminVS.empty()) {
+
+        le_shader = LoadShader(cheminVS.c_str(), 0);//0 pour shader par défaut
+    
+    }else if (!cheminFS.empty()) {
+        
+        le_shader = LoadShader(0, cheminFS.c_str());
+    
+    }
+    //sauvgarde dans le dico
+    if (le_shader.id != 0){//check si c'est bon
+        //si il existe déjà on le décharge du gpu pour l'update
+        if(dictionnaire_shaders.count(nom) > 0){
+            UnloadShader(dictionnaire_shaders[nom]);
+        }
+        dictionnaire_shaders.insert_or_assign(nom,le_shader);
+        std::cout<< "SUCCES : Shader '" << nom << "' ajoute au dictionaire" << std::endl;
+    }
+    else {
         std::cerr << "ERREUR : Impossible de charger les shaders depuis " << cheminVS << " et " << cheminFS << std::endl;
     }
 }

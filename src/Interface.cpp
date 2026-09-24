@@ -293,6 +293,45 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
 
 void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::Begin("Shader");
+    
+    if (ImGui::Button("ouvrir dossier shader",ImVec2(-1,20))) {
+        const char* filtres[2] = { "*.fs","*.vs" };//voir pour envoyer 2 fichier en meme temps ou 1 si besoin
+        const char* cheminChoisi = tinyfd_openFileDialog(
+            "ouvrir un shader", //titre
+            "",                 //chemin par défaut
+            2, filtres,        //filtres d'extension
+            "ShadeFichiers Shader (.fs, .vs)r",   //fescription
+            1                  //sélection multiple activéé
+        );
+        if (cheminChoisi != NULL) {
+            std::string chemins(cheminChoisi);
+            size_t position_separateur = chemins.find('|');//le separateur c'est | en cas de plusieurs fichiers
+            if (position_separateur != std::string::npos) {
+            //si un '|', on a plusieurs fichiers
+            std::string fichier1 = chemins.substr(0, position_separateur);
+            std::string fichier2 = chemins.substr(position_separateur + 1);
+                    
+            //tinyfd garantit pas l'ordre des fichiers fonc faut check lequel est le .vs et lequel est le .fs
+            std::string cheminVS = (fichier1.find(".vs") != std::string::npos) ? fichier1 : fichier2;//un ternaire pour voir si il est dedans
+            std::string cheminFS = (fichier1.find(".fs") != std::string::npos) ? fichier1 : fichier2;
+                    
+            La_scene.shaderManager.ChargerShaders(cheminVS, cheminFS);
+            std::cout << "Shaders charges : " << cheminVS << " et " << cheminFS << std::endl;//debut pour moi
+        } 
+        else {
+            //si pas de '|', l'utilisateur a choisi qu'un seul fichier donc l'ature c'est un shader pas dafaut
+            if (chemins.find(".fs") != std::string::npos) {
+                std::cout << "Fragment Shader seul charge : " << chemins << std::endl;
+                //le Vertex par défaut de Raylib
+                La_scene.shaderManager.ChargerShaders("", chemins); 
+            } 
+            else if (chemins.find(".vs") != std::string::npos) {
+                std::cout << "Vertex Shader seul charge : " << chemins << std::endl;
+                La_scene.shaderManager.ChargerShaders(chemins, "");
+            }
+        }
+    }
+    }
     ImGui::Text("Fragment shader :");//TODO voir si on peut pas augmenter la limite
     ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200));
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
