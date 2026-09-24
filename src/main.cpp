@@ -46,12 +46,6 @@ int main(void) {
     cameraEditeur.fovy = 45.0f;
     cameraEditeur.projection = type_projection_camera;//possibilité de changer ça apres
 
-    //bool perspect = true;
-    //bool orto = false;
-    //float tempsMaintien = 0.0f;//le temps actuel accumulé
-    //float tempsExige = 0.5f;//TODO issue #7
-    //bool modeFlyActif = false;//pour savoir si on est en mode fly
-    //init rlImGui
     rlImGuiSetup(true);
     EditorContext Les_variables;
     // Variable pour la position de notre cube test

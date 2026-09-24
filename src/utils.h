@@ -21,6 +21,7 @@ struct EditorContext {
 
     //Shaders
     std::string codeFragmentShader = "void main() { gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); }"; //shader rouge par défaut
+    std::string nom_nouveau_shader = "ShaderLive";
 };
 
 struct Parametres {

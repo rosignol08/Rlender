@@ -57,20 +57,32 @@ void ShaderManager::Nettoyer_un(const std::string& nom) {
         dictionnaire_shaders.erase(nom);
     }
 }
+void ShaderManager::ChargerShaderDepuisTexte(const std::string& nom, const std::string& codeVS, const std::string& codeFS){
+    //chargement du shader
+    Shader le_shader = { 0 };
+    if (!codeVS.empty() && !codeFS.empty()) {
+        
+        le_shader = LoadShaderFromMemory(codeVS.c_str(), codeFS.c_str());
+    
+    }else if (!codeVS.empty()) {
 
-void ShaderManager::ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS) {
-    //si déjà un shader : unload pour eviter fuites de VRAM
-    if (shaderEclairage.id != 0) {
-        UnloadShader(shaderEclairage);
+        le_shader = LoadShaderFromMemory(codeVS.c_str(), 0);//0 pour shader par défaut
+    
+    }else if (!codeFS.empty()) {
+        
+        le_shader = LoadShaderFromMemory(0, codeFS.c_str());
+    
     }
-
-    //compilation depuis string
-    shaderEclairage = LoadShaderFromMemory(codeVS.c_str(), codeFS.c_str());
-
-    if (shaderEclairage.id != 0) {
-        std::cout << "SUCCES : Shader compile" << std::endl;
-        shaderEclairage.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shaderEclairage, "viewPos");
-    } else {
-        std::cerr << "ERREUR : La compilation du shader echoue" << std::endl;
+    //sauvgarde dans le dico
+    if (le_shader.id != 0){//check si c'est bon
+        //si il existe déjà on le décharge du gpu pour l'update
+        if(dictionnaire_shaders.count(nom) > 0){
+            UnloadShader(dictionnaire_shaders[nom]);
+        }
+        dictionnaire_shaders.insert_or_assign(nom,le_shader);
+        std::cout<< "SUCCES : Shader '" << nom << "' ajoute au dictionaire" << std::endl;
+    }
+    else {
+        std::cerr << "ERREUR : Impossible de charger le shader" << std::endl;
     }
 }

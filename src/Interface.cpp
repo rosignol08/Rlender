@@ -318,7 +318,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
             "ouvrir un shader", //titre
             "",                 //chemin par défaut
             2, filtres,        //filtres d'extension
-            "ShadeFichiers Shader (.fs, .vs)r",   //fescription
+            "ShadeFichiers Shader (.fs, .vs)",   //fescription
             1                  //sélection multiple activéé
         );
         if (cheminChoisi != NULL) {
@@ -350,12 +350,18 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
         }
     }
     }
-    ImGui::Text("Fragment shader :");//TODO voir si on peut pas augmenter la limite
-    ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200));
+    ImGui::Text("Fragment shader :");
+    
+    ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200)); //TODO voir si on peut pas augmenter la limite
+    
+    //rendu du champ de text
+    ImGui::InputText("Nom du shader", &Les_variables.nom_nouveau_shader[0], 64);
+    //si on clique sur le bouton :
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
         const char * defaultVS = "";//c'est le shader vs de base de raylib
-        La_scene.shaderManager.ChargerShaderDepuisTexte(defaultVS,Les_variables.codeFragmentShader);
+        La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, "", Les_variables.codeFragmentShader);
     }
+    
     ImGui::End();
 }
 

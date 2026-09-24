@@ -15,5 +15,5 @@ public:
     void Nettoyer_tout();
     void Nettoyer_un(const std::string& nom);
     //load et compile un shader directement avec code (Live Coding)
-    void ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS);
+    void ChargerShaderDepuisTexte(const std::string& nom, const std::string& codeVS, const std::string& codeFS);
 };
