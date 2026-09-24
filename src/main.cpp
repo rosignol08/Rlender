@@ -113,8 +113,11 @@ int main(void) {
         
     }
 
-    // Nettoyage
+    //nettoyage
     rlImGuiShutdown();
+    La_scene.shaderManager.Nettoyer_tout();
+    La_scene.ViderScene();
+    
     CloseWindow();
 
     return 0;

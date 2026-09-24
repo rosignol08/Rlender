@@ -37,5 +37,5 @@ class SceneManager{
         void Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables);
         void AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud);
         void SupprimerNoeud(SceneNode* cible);
-
+        void ViderScene();
 };

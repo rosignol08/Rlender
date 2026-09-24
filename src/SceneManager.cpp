@@ -382,3 +382,9 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & varia
         variables.axe_en_cours = '0';
     }
 }
+
+
+void SceneManager::ViderScene() {
+    Deselectionne(); //clear la sélection avant
+    sceneNodes.clear();
+}
