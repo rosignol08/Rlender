@@ -52,8 +52,10 @@ void ShaderManager::Nettoyer_tout() {
 
 //pour enlever qu'un seule shader
 void ShaderManager::Nettoyer_un(const std::string& nom) {
-    UnloadShader(dictionnaire_shaders[nom]);
-    dictionnaire_shaders.erase(nom);
+    if (dictionnaire_shaders.count(nom) > 0){//verification
+        UnloadShader(dictionnaire_shaders[nom]);
+        dictionnaire_shaders.erase(nom);
+    }
 }
 
 void ShaderManager::ChargerShaderDepuisTexte(const std::string& codeVS, const std::string& codeFS) {
