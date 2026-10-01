@@ -86,7 +86,7 @@ int main(void) {
             //TODO faire un vrai truc ici
             BeginMode3D(cameraEditeur);
             //cette ligne dessine tout
-            La_scene.DrawScene();
+            La_scene.DrawScene(Les_variables);
             DrawGrid(1000, 1.0f);
             EndMode3D();
 

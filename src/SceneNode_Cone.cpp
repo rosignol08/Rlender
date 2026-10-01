@@ -13,7 +13,7 @@ ConeNode::~ConeNode(){
     UnloadModel(modele);
 }
 
-void ConeNode::Draw(){
+void ConeNode::Draw(EditorContext& variables){
     DrawModelEx(modele, position, {0, 1, 0}, 0.0f, taille, couleur);
     if (isSelected)
         DrawModelWiresEx(modele, position, {0, 1, 0}, 0.0f, taille, YELLOW);
@@ -45,3 +45,5 @@ std::string ConeNode::GetDrawCode(){
 std::string ConeNode::GetInitCode(){
     return "";
 }
+
+std::string GetType() { return "Camera"; }

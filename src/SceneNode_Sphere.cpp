@@ -16,7 +16,7 @@ SphereNode::~SphereNode(){
     UnloadModel(modele);
 }
 
-void SphereNode::Draw(){
+void SphereNode::Draw(EditorContext& variables){
     // les variables héritées de SceneNode
     DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
     if (isSelected)
@@ -65,3 +65,5 @@ std::unique_ptr<SceneNode> SphereNode::Cloner(){
     clone->nom = this->nom + "_" + std::to_string(compteur_sphere_clones); // nouveau nom
     return clone;
 }
+
+std::string GetType() { return "Sphere"; }

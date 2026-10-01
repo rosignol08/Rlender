@@ -180,27 +180,43 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 // sliders pour modifier dynamiquement les variables
             if (
                 // TODO ajouter les bouton pour ajouter des objetsg ici aussi
-                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
-                {
+                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f)){
                     Les_variables.flag_changements = true;
                 }
             ImGui::Separator();
-            ImGui::Text("Materiau");
-
-            SceneNode* objet = noeuds_selectione[0];
-            if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
-                for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
-                    bool est_selectione = (objet->nom_shader_actuel == nom);
-                    if(ImGui::Selectable(nom.c_str(),est_selectione)){
-                        //si on clique ça applique
-                        objet->AppliquerShader(nom,shader_obj);
-                        Les_variables.flag_changements = true;//pour l'autosave
-                    }
-                    if(est_selectione){
-                        ImGui::SetItemDefaultFocus();
-                    }
+            if(noeuds_selectione[0]->GetType() == "LightNode"){
+                //on a une lumière
+                LightNode* objet = static_cast<LightNode*>(noeuds_selectione[0]);
+                bool modifie = false;
+                ImGui::Text("Propriétés de la Lumière");
+                // Le selecteur de couleur (renvoie vrai si l'utilisateur change la couleur)
+                if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
+                    Les_variables.flag_changements = true;
                 }
-                ImGui::EndCombo();
+
+                // Le slider d'intensité
+                if (ImGui::DragFloat("Intensité", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
+                    Les_variables.flag_changements = true;
+                }
+            }else{
+
+                ImGui::Text("Materiau");
+                
+                SceneNode* objet = noeuds_selectione[0];
+                if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
+                    for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
+                        bool est_selectione = (objet->nom_shader_actuel == nom);
+                        if(ImGui::Selectable(nom.c_str(),est_selectione)){
+                            //si on clique ça applique
+                            objet->AppliquerShader(nom,shader_obj);
+                            Les_variables.flag_changements = true;//pour l'autosave
+                        }
+                        if(est_selectione){
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
             }
             }else{
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");

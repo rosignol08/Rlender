@@ -6,7 +6,7 @@ CameraNode::CameraNode(){
     type = "camera3D";
 }
 
-void CameraNode::Draw(){
+void CameraNode::Draw(EditorContext& variables){
     // on dessine la camera en wireframe comme godot etc
     DrawCubeWires(position, 1.0f, 1.0f, 1.0f, PURPLE);
     DrawLine3D(position, target, PURPLE);
@@ -63,3 +63,5 @@ std::unique_ptr<SceneNode> CameraNode::Cloner(){
     clone->nom = this->nom + "_" + std::to_string(compteur_camera_clones); // nouveau nom
     return clone;
 }
+
+std::string GetType() { return "Camera"; }

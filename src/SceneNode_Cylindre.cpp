@@ -12,7 +12,7 @@ CylinderNode::~CylinderNode(){
     UnloadModel(modele);
 }
 
-void CylinderNode::Draw(){
+void CylinderNode::Draw(EditorContext& variables){
     DrawModelEx(modele, position, {0, 1, 0}, 0.0f, taille, couleur);
     if (isSelected)
     {
@@ -47,3 +47,5 @@ std::string CylinderNode::GetDrawCode(){
 std::string CylinderNode::GetInitCode(){
     return "";
 }
+
+std::string GetType() { return "Cylindre"; }

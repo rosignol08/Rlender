@@ -42,6 +42,14 @@ class SceneNode {
 
     //la boucle les unloads
     virtual std::string GetCleanupCode() { return "";}
+
+    //update
+    virtual void Update(EditorContext& variables) {}
+
+    //pour l'ui
+    virtual std::string GetType() const = 0; //les enfants disent qui ils sont
+
+    
     //le shader
     virtual void AppliquerShader(const std::string& nom_shader, Shader le_shader) {
         nom_shader_actuel = nom_shader;
@@ -102,7 +110,7 @@ class SphereNode : public SceneNode{
     SphereNode();
     ~SphereNode() override;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
 
     std::string ToCode()override;
     std::string GetDrawCode()override;
@@ -122,7 +130,7 @@ public:
     PlaneNode();
     ~PlaneNode() override ;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     
     BoundingBox GetBoiteCollision() override;
     std::unique_ptr<SceneNode> Cloner() override;
@@ -139,7 +147,7 @@ class CylinderNode : public SceneNode {
         CylinderNode();
         ~CylinderNode() override;
 
-        void Draw() override ;
+        void Draw(EditorContext& variables) override ;
 
         BoundingBox GetBoiteCollision() override;
         std::unique_ptr<SceneNode> Cloner() override;
@@ -155,7 +163,7 @@ private:
 public:
     ConeNode();
     ~ConeNode() override;
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     BoundingBox GetBoiteCollision() override;
     std::unique_ptr<SceneNode> Cloner() override;
     std::string ToCode()override;
@@ -170,7 +178,7 @@ class CameraNode : public SceneNode{
         CameraMode mode_camera = CAMERA_FREE;//par defaut
         CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
     CameraNode();
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     std::string ToCode()override;
 
     std::string GetDrawCode()override;
@@ -192,7 +200,7 @@ class Camera2DNode : public SceneNode{
         float zoom_camera = 1.0f;
         Camera2DNode();
 
-    void Draw()override;
+    void Draw(EditorContext& variables)override;
 
     std::string ToCode()override;
 

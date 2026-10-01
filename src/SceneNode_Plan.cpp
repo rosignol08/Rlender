@@ -12,7 +12,7 @@ PlaneNode::~PlaneNode(){
     UnloadModel(modele);
 }
 
-void PlaneNode::Draw(){
+void PlaneNode::Draw(EditorContext& variables){
     DrawModelEx(modele, position, {0, 1, 0}, 0.0f, taille, couleur);
     if (isSelected)
     {
@@ -50,3 +50,4 @@ std::string PlaneNode::GetDrawCode(){
 std::string PlaneNode::GetInitCode(){
     return "";
 }
+std::string GetType() { return "Plan"; }

@@ -17,6 +17,7 @@ set(SRCS
     src/SceneNode_Cylindre.cpp
     src/SceneNode_Cone.cpp
     src/SceneNode_Plan.cpp
+    src/LightNode.cpp
     src/Interface.cpp
     src/ShaderManager.cpp
     src/tinyfiledialogs.c

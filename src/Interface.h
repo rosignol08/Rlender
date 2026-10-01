@@ -6,6 +6,7 @@
 #include "rlImGui.h"
 #include "Sauvgarde.h"
 #include "tinyfiledialogs.h"
+#include "LightNode.h"
 //pour l'interface utilisateur pour reduire la taille du code dans main.cpp
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& les_parametres, Parametres &Les_parametres);
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);
