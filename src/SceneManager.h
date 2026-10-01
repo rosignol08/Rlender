@@ -20,6 +20,7 @@ class SceneManager{
         public:
         ShaderManager shaderManager;//les shaders
         void       DrawScene(); //une boucle qui parcours les noeuds et les dessines chacuns
+        void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D

@@ -79,7 +79,7 @@ int main(void) {
                     Les_variables.modeFlyActif = false;
                 }
             }
-
+        La_scene.Update(cameraEditeur, Les_variables);
         // DESSIN idée de base
         BeginDrawing();
             ClearBackground(DARKGRAY);

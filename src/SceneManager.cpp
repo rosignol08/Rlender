@@ -21,6 +21,14 @@ void SceneManager::DrawScene(){
     return;
 }
 
+void Update(Camera3D& camera_editeur, EditorContext& variables){
+    variables.variables_globales["temps"] = (float)GetTime(); //normalement c'est un double mais osef
+    variables.variables_globales["viewPos"] = camera_editeur.position;//le point de vue de la vraie camera
+    //les obj
+    //for(auto & noeud : sceneNode){
+    //    noeud->Update(variables);
+    //}
+}
 
 //ça ajoute un cube simplement
 void SceneManager::AjouterCube(){
