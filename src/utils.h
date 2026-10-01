@@ -2,7 +2,7 @@
 #include "raylib.h"
 #include <vector>
 #include <variant>
-
+#include <unordered_map>
 //structure qui regroupe toutes les variables volantes de l'éditeur
 struct EditorContext {
     int compteurModifs = 0; //un compteur pour dire que
@@ -47,6 +47,12 @@ struct EditorContext {
 std::string nom_nouveau_shader = "ShaderLive";
 std::vector <std::string> liste_log;//les logs
 bool defiler_log = false;
+
+//liste des uniform possibles
+using UniformValue = std::variant<int, float, Vector2, Vector3, Vector4, Matrix>;
+//dictionaire globale des uniforms :
+std::unordered_map<std::string, UniformValue> variables_globales;
+
 };
 
 struct Parametres {
@@ -58,5 +64,4 @@ struct Parametres {
     bool attente_sauvegarde; //flag
     int nb_lignes_max_console = 500;
 };
-
 

@@ -10,6 +10,13 @@ set(SRCS
     src/Sauvgarde.cpp
     src/SceneManager.cpp
     src/SceneNode.cpp
+    src/SceneNode_Cube.cpp
+    src/SceneNode_Camera.cpp
+    src/SceneNode_Camera2D.cpp
+    src/SceneNode_Sphere.cpp
+    src/SceneNode_Cylindre.cpp
+    src/SceneNode_Cone.cpp
+    src/SceneNode_Plan.cpp
     src/Interface.cpp
     src/ShaderManager.cpp
     src/tinyfiledialogs.c
