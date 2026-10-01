@@ -30,9 +30,10 @@ std::string CubeNode::GetInitCode()
     code << "\t\t\t\tVector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " << std::to_string(this->position.z) << "};\n";
     return code.str();
 }
-void CubeNode::Draw()
-{
-    // les variables héritées de SceneNode
+void CubeNode::Draw(EditorContext& variables){
+    Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
+    AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
+    //les variables héritées de SceneNode
     DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
     if (isSelected)
     {

@@ -5,10 +5,14 @@
 #include <memory>
 #include <fstream>
 #include "raylib.h"
+#include "utils.h"
 #pragma once
 
 //la classe pour representer un objets de la scene
 class SceneNode {
+    protected:
+        //la fonction des uniformes pour les shaders
+        void AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible);
     public:
         std::string nom;
         Vector3 position;
@@ -25,7 +29,7 @@ class SceneNode {
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
-    virtual void Draw() = 0;
+    virtual void Draw(EditorContext& variables) = 0;
     virtual std::string ToCode() = 0;
     //avant while (!WindowShouldClose())
     virtual std::string GetInitCode() { return ""; }//par défaut TODO à changer
@@ -62,7 +66,7 @@ class CubeNode : public SceneNode{
 
     ~CubeNode() override;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     std::string ToCode(){
         return "";
     }
