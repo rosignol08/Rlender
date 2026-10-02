@@ -1,5 +1,5 @@
 #include "SceneNode.h"
-void AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible){
+void SceneNode::AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible){
     int loc = 0; //pour les locs
     for(auto & [nom,valeur] : variables.variables_globales){
         loc = GetShaderLocation(shader_cible, nom.c_str());

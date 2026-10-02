@@ -5,6 +5,8 @@
 #include "ShaderManager.h"
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
+
+#include "LightNode.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -24,6 +26,7 @@ class SceneManager{
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D
+        void       AjouterLight(); //ça ajoute un cube simplement
         void       SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         
         //des getters pour que l'interface graphique accede aux bon noeuds etc

@@ -131,7 +131,10 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             La_scene.AjouterCube();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
-        
+        if(ImGui::Button("Light",{50.0f,50.0f})){
+            La_scene.AjouterLight();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
         ImGui::EndMainMenuBar();
     }
 }

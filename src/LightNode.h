@@ -1,5 +1,5 @@
 #include "SceneNode.h"
-
+#pragma once
 class LightNode : public SceneNode{
     public:
     Vector3 couleur_lumiere;
