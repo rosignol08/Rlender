@@ -64,4 +64,4 @@ std::unique_ptr<SceneNode> CameraNode::Cloner(){
     return clone;
 }
 
-std::string GetType() { return "Camera"; }
+//std::string GetType() { return "Camera"; }

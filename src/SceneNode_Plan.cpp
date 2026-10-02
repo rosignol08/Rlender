@@ -50,4 +50,4 @@ std::string PlaneNode::GetDrawCode(){
 std::string PlaneNode::GetInitCode(){
     return "";
 }
-std::string GetType() { return "Plan"; }
+//std::string GetType() { return "Plan"; }

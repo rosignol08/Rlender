@@ -46,4 +46,4 @@ std::string ConeNode::GetInitCode(){
     return "";
 }
 
-std::string GetType() { return "Camera"; }
+//std::string GetType() { return "Camera"; }

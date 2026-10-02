@@ -61,4 +61,4 @@ void CubeNode::AppliquerShader(const std::string& nom_shader, Shader le_shader) 
     modele.materials[0].shader = le_shader; 
 }
 
-std::string GetType() { return "CubeNode"; }
+//std::string GetType() { return "CubeNode"; }

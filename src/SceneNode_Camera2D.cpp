@@ -7,7 +7,7 @@ Camera2DNode::Camera2DNode()
     type = "camera2D";
 }
 
-void Camera2DNode::Draw()
+void Camera2DNode::Draw(EditorContext& variables)
 {
     Color couleurLigne = isSelected ? YELLOW : PURPLE;
 

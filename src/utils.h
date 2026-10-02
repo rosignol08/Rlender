@@ -22,7 +22,7 @@ struct EditorContext {
     std::string code_preview;
 
     //Shaders
-    std::string codeFragmentShaderPhong = "#version 330"
+    std::string codeFragmentShader = "#version 330"
 "\n// Ce qui vient du Vertex Shader"
 "\nin vec3 fragPosition;"
 "\nin vec2 fragTexCoord;"

@@ -66,4 +66,4 @@ std::unique_ptr<SceneNode> SphereNode::Cloner(){
     return clone;
 }
 
-std::string GetType() { return "Sphere"; }
+//std::string GetType() { return "Sphere"; }

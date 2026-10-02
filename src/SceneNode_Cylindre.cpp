@@ -48,4 +48,4 @@ std::string CylinderNode::GetInitCode(){
     return "";
 }
 
-std::string GetType() { return "Cylindre"; }
+//std::string GetType() { return "Cylindre"; }

@@ -100,6 +100,7 @@ class CubeNode : public SceneNode{
 
     std::unique_ptr<SceneNode> Cloner() override;
     void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    std::string GetType() const override { return "CubeNode"; }
 };
 
 //pour representer une sphere
@@ -119,6 +120,7 @@ class SphereNode : public SceneNode{
     BoundingBox GetBoiteCollision() override;
     
     std::unique_ptr<SceneNode> Cloner() override;
+    std::string GetType() const override { return "SphereNode"; }
 };
 
 
@@ -137,6 +139,7 @@ public:
     std::string ToCode() override;
     std::string GetDrawCode() override;
     std::string GetInitCode() override;
+    std::string GetType() const override { return "PlaneNode"; }
 };
 
 //pour representer un cylindre
@@ -154,6 +157,7 @@ class CylinderNode : public SceneNode {
         std::string ToCode() override;
         std::string GetDrawCode() override;
         std::string GetInitCode() override;
+        std::string GetType() const override { return "CylinderNode"; }
 };
 
 //pour representer un cone
@@ -169,6 +173,7 @@ public:
     std::string ToCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode()override;
+    std::string GetType() const override { return "ConeNode"; }
 };
 
 class CameraNode : public SceneNode{
@@ -188,6 +193,7 @@ class CameraNode : public SceneNode{
 
     BoundingBox GetBoiteCollision()override;
     std::unique_ptr<SceneNode> Cloner() override;
+    std::string GetType() const override { return "CameraNode"; }
 };
 
 class Camera2DNode : public SceneNode{
@@ -210,7 +216,9 @@ class Camera2DNode : public SceneNode{
 
     std::string GetInitCode()override;
     std::unique_ptr<SceneNode> Cloner()override;
+    std::string GetType() const override { return "Camera2DNode"; }
 };
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
+
 

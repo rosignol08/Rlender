@@ -29,6 +29,18 @@ std::unique_ptr<SceneNode> LightNode::Cloner(){
     return clone;
 }
 
+std::string LightNode::ToCode(){
+    return "";
+}
+
+std::string LightNode::GetDrawCode(){
+    return "";
+}
+
+std::string LightNode::GetInitCode(){
+    return "";
+}
+
 std::string LightNode::GetType() const {
     return "LightNode";
 }
