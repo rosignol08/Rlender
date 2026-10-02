@@ -385,7 +385,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     //si on clique sur le bouton :
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
         const char * defaultVS = "";//c'est le shader vs de base de raylib
-        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, "", Les_variables.codeFragmentShader)){            
+        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, Les_variables.codeVertexShader, Les_variables.codeFragmentShader)){            
             Shader le_nouveau_shader = La_scene.shaderManager.dictionnaire_shaders[Les_variables.nom_nouveau_shader];
             
             for(auto & element : La_scene.GetNodes()){//mise a jours de tous les obj avec ce shader

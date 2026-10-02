@@ -27,6 +27,7 @@ void SceneManager::Update(Camera3D& camera_editeur, EditorContext& variables){
     //les obj
     
     for(auto& noeud : sceneNodes) {
+        //std::cout << "maj neoud " << noeud->GetType() << std::endl;
         noeud->Update(variables);
     }
 }
@@ -69,7 +70,7 @@ void SceneManager::AjouterLight(){
     std::string nom_test;
     while(nom_deja_pris == true){
         nom_deja_pris = false;//je dit que de base on a un bon nom
-        nom_test = "Cube_" + std::to_string(compteur_light);
+        nom_test = "Light_" + std::to_string(compteur_light);
         for(const auto & elem : sceneNodes){
             if(elem->nom == nom_test){
                 nom_deja_pris = true;
@@ -78,7 +79,7 @@ void SceneManager::AjouterLight(){
             }
         }
     }
-    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    //on fait comme ça :
     sceneNodes.push_back(std::make_unique<LightNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());

@@ -3,13 +3,13 @@
 LightNode::LightNode(){
     position = {0.0f, 0.0f, 0.0f};
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
-    intensite = 0.1;
+    intensite = 1.1;
 }
 
 void LightNode::Update(EditorContext& variables){
-    variables.variables_globales["lightPos"] = position;
-    variables.variables_globales["lightColor"] = couleur_lumiere;
-    variables.variables_globales["lightIntensity"] = intensite;
+    variables.variables_globales["lightPos"] = this->position;
+    variables.variables_globales["lightColor"] = this->couleur_lumiere;
+    variables.variables_globales["lightIntensity"] = this->intensite;
 }
 
 

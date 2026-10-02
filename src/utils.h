@@ -68,6 +68,27 @@ struct EditorContext {
 "\n    vec3 resultat = ambient + diffuse + specular;"
 "\n    finalColor = vec4(resultat, texelColor.a * colDiffuse.a);"
 "\n}";
+
+// Dans EditorContext
+std::string codeVertexShader = "#version 330\n"
+"in vec3 vertexPosition;\n"
+"in vec2 vertexTexCoord;\n"
+"in vec3 vertexNormal;\n"
+"in vec4 vertexColor;\n"
+"uniform mat4 mvp;\n"
+"uniform mat4 matModel;\n"
+"out vec3 fragPosition;\n"
+"out vec2 fragTexCoord;\n"
+"out vec3 fragNormal;\n"
+"out vec4 fragColor;\n"
+"void main(){\n"
+"    fragPosition = vec3(matModel * vec4(vertexPosition, 1.0));\n"
+"    fragTexCoord = vertexTexCoord;\n"
+"    fragColor = vertexColor;\n"
+"    fragNormal = normalize(vec3(matModel * vec4(vertexNormal, 0.0)));\n"
+"    gl_Position = mvp * vec4(vertexPosition, 1.0);\n"
+"}\n";
+
 std::string nom_nouveau_shader = "ShaderLive";
 std::vector <std::string> liste_log;//les logs
 bool defiler_log = false;
