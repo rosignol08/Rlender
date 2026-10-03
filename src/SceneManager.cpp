@@ -55,18 +55,10 @@ void SceneManager::AjouterCube(){
     sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
-
-    for(auto & element : sceneNodes){
-        if(element->isSelected){
-            element->isSelected = false; //deselectionne
-        }
-    }
-    sceneNodes.back()->isSelected = true;
 }
 
 //ça ajoute un cube simplement
 void SceneManager::AjouterLight(){
-    //static unsigned int compteur_cube = 0;//TODO checker si c'est une bonne idée de l'initialiser à 0 à chaque fois
     unsigned int compteur_light = 0;
     bool nom_deja_pris = true;
     std::string nom_test;
@@ -85,14 +77,29 @@ void SceneManager::AjouterLight(){
     sceneNodes.push_back(std::make_unique<LightNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
+}
 
-    for(auto & element : sceneNodes){
-        if(element->isSelected){
-            element->isSelected = false; //deselectionne
+void SceneManager::AjouterSoleil(){
+    unsigned int compteur_Soleil = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Soleil_" + std::to_string(compteur_Soleil);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_Soleil++;
+                break;
+            }
         }
     }
-    sceneNodes.back()->isSelected = true;
+    //on fait comme ça :
+    sceneNodes.push_back(std::make_unique<SoleilNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
 }
+
 
 //idem pour une caméra3D
 void SceneManager::AjouterCamera3D(){

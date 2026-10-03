@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "LightNode.h"
+#include "DirectionalLightNode.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -26,7 +27,8 @@ class SceneManager{
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D
-        void       AjouterLight(); //ça ajoute un cube simplement
+        void       AjouterLight(); //ça ajoute une lumiere (pointlight)
+        void       AjouterSoleil(); //ça ajoute un soleil
         void       SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         
         //des getters pour que l'interface graphique accede aux bon noeuds etc

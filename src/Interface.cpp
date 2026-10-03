@@ -135,6 +135,10 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             La_scene.AjouterLight();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
+        if(ImGui::Button("Soleil",{50.0f,50.0f})){
+            La_scene.AjouterSoleil();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
         ImGui::EndMainMenuBar();
     }
 }
@@ -187,25 +191,54 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                     Les_variables.flag_changements = true;
                 }
             ImGui::Separator();
+            
             if(noeuds_selectione[0]->GetType() == "LightNode"){
                 //on a une lumière
                 LightNode* objet = static_cast<LightNode*>(noeuds_selectione[0]);
-                bool modifie = false;
                 ImGui::Text("Propriétés de la Lumière");
-                // Le selecteur de couleur (renvoie vrai si l'utilisateur change la couleur)
+                //la couleur
                 if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
                     Les_variables.flag_changements = true;
                 }
 
                 // Le slider d'intensité
-                if (ImGui::DragFloat("Intensité", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
+                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
                     Les_variables.flag_changements = true;
                 }
+
                 if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
-                    modifie = true;
+                    Les_variables.flag_changements = true;
                 }
-                ImGui::DragFloat("Puissance lumineuse", &objet->puissance, 0.1f, 0.0f, 100.0f);
-            }else{
+
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+                
+            }else if(noeuds_selectione[0]->GetType() == "SoleilNode"){
+                //le soleil
+                SoleilNode* objet = static_cast<SoleilNode*>(noeuds_selectione[0]);
+                
+                if (ImGui::DragFloat3("Direction", &objet->direction.x, 0.01f, -1.0f, 1.0f)) {
+                    if (objet->direction.x == 0 && objet->direction.y == 0 && objet->direction.z == 0) {
+                        objet->direction = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
+                    }
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
+                    Les_variables.flag_changements = true;
+                }
+
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
+                    Les_variables.flag_changements = true;
+                }
+
+            }
+            else{
 
                 ImGui::Text("Materiau");
                 

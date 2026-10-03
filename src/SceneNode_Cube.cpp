@@ -51,6 +51,7 @@ std::unique_ptr<SceneNode> CubeNode::Cloner(){
     clone->isSelected = true;
     static unsigned int compteur_cube_clones = 0;                        // logiquement on a un compteur pour les clones
     clone->nom = this->nom + "_" + std::to_string(compteur_cube_clones); // nouveau nom
+    compteur_cube_clones++;
     return clone;
 }
 

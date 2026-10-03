@@ -18,6 +18,7 @@ void LightNode::Update(EditorContext& variables){
     variables.variables_globales["lightPos" + i] = this->position;
     variables.variables_globales["lightColor" + i] = this->couleur_lumiere;
     variables.variables_globales["lightIntensity" + i] = this->intensite;
+    variables.variables_globales["lightPower" + i] = this->puissance;
 
     variables.compteur_lumieres++;
     
@@ -44,6 +45,7 @@ std::unique_ptr<SceneNode> LightNode::Cloner(){
     clone->isSelected = true;
     static unsigned int compteur_Light_clones = 0; //logiquement on a un compteur pour les clones
     clone->nom = this->nom + "_" + std::to_string(compteur_Light_clones); // nouveau nom
+    compteur_Light_clones++;
     return clone;
 }
 
