@@ -4,6 +4,7 @@ LightNode::LightNode(){
     position = {0.0f, 0.0f, 0.0f};
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
     intensite = 1.1;
+    puissance = 5.0f;
     taille = 1.0f;
 }
 
@@ -38,6 +39,7 @@ std::unique_ptr<SceneNode> LightNode::Cloner(){
     clone->taille = this->taille;
     clone->couleur = this->couleur;
     clone->intensite = this->intensite;
+    clone->puissance = this->puissance;
     clone->est_allume = this->est_allume;
     clone->isSelected = true;
     static unsigned int compteur_Light_clones = 0; //logiquement on a un compteur pour les clones

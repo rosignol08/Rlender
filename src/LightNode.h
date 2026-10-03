@@ -4,6 +4,7 @@ class LightNode : public SceneNode{
     public:
     Vector3 couleur_lumiere;
     float intensite;
+    float puissance;
     float taille;
     bool est_allume = true;
         LightNode();

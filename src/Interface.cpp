@@ -204,6 +204,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
                     modifie = true;
                 }
+                ImGui::DragFloat("Puissance lumineuse", &objet->puissance, 0.1f, 0.0f, 100.0f);
             }else{
 
                 ImGui::Text("Materiau");
