@@ -22,6 +22,7 @@ void SceneManager::DrawScene(EditorContext& variables){
 }
 
 void SceneManager::Update(Camera3D& camera_editeur, EditorContext& variables){
+    variables.compteur_lumieres = 0;
     variables.variables_globales["temps"] = (float)GetTime(); //normalement c'est un double mais osef
     variables.variables_globales["viewPos"] = camera_editeur.position;//le point de vue de la vraie camera
     //les obj
@@ -30,6 +31,7 @@ void SceneManager::Update(Camera3D& camera_editeur, EditorContext& variables){
         //std::cout << "maj neoud " << noeud->GetType() << std::endl;
         noeud->Update(variables);
     }
+    variables.variables_globales["lightCount"] = variables.compteur_lumieres;
 }
 
 //ça ajoute un cube simplement

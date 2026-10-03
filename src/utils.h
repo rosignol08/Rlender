@@ -28,11 +28,12 @@ struct EditorContext {
 "\nin vec2 fragTexCoord;"
 "\nin vec3 fragNormal;"
 "\nin vec4 fragColor;"
-"\n"
+"\n#define MAX_LIGHTS 4"
 "\n// --- LES VARIABLES GLOBALES DE TON MOTEUR ---"
-"\nuniform vec3 lightPos;"
-"\nuniform vec3 lightColor;"
-"\nuniform float lightIntensity;"
+"\nuniform int lightCount;"
+"\nuniform vec3 lightPos[MAX_LIGHTS];"
+"\nuniform vec3 lightColor[MAX_LIGHTS];"
+"\nuniform float lightIntensity[MAX_LIGHTS];"
 "\nuniform vec3 viewPos;"
 "\n"
 "\n// Variables standards de Raylib (gérées automatiquement)"
@@ -49,23 +50,22 @@ struct EditorContext {
 "\n"
 "\n    // 2. Lumière Ambiante"
 "\n    float ambientStrength = 0.1;"
-"\n    vec3 ambient = ambientStrength * objetCouleur;"
+"\n    vec3 resultat = ambientStrength * objetCouleur;"
 "\n"
 "\n    // 3. Lumière Diffuse"
 "\n    vec3 norm = normalize(fragNormal);"
-"\n    vec3 lightDir = normalize(lightPos - fragPosition);"
-"\n    float diff = max(dot(norm, lightDir), 0.0);"
-"\n    vec3 diffuse = diff * lightColor * lightIntensity * objetCouleur;"
-"\n"
-"\n    // 4. Lumière Spéculaire (Le reflet)"
-"\n    float specularStrength = 0.5;"
-"\n    vec3 viewDir = normalize(viewPos - fragPosition);"
-"\n    vec3 reflectDir = reflect(-lightDir, norm);"
-"\n    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);"
-"\n    vec3 specular = specularStrength * spec * lightColor * lightIntensity;"
-"\n"
-"\n    // On additionne tout !"
-"\n    vec3 resultat = ambient + diffuse + specular;"
+"\nvec3 viewDir = normalize(viewPos - fragPosition);"
+"\nfor(int i = 0; i < lightCount && i < MAX_LIGHTS; i++){"
+"\n// Diffuse"
+"\n        vec3 lightDir = normalize(lightPos[i] - fragPosition);"
+"\n        float diff = max(dot(norm, lightDir), 0.0);"
+"\nvec3 diffuse = diff * lightColor[i] * lightIntensity[i] * objetCouleur;"
+"\n// Spéculaire"
+"\nvec3 reflectDir = reflect(-lightDir, norm);  "
+"\nfloat spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);"
+"\nvec3 specular = 0.5 * spec * lightColor[i] * lightIntensity[i];"
+"\nresultat += diffuse + specular; "
+"\n}"
 "\n    finalColor = vec4(resultat, texelColor.a * colDiffuse.a);"
 "\n}";
 
@@ -90,6 +90,9 @@ std::string codeVertexShader = "#version 330\n"
 "}\n";
 
 std::string nom_nouveau_shader = "ShaderLive";
+int compteur_lumieres = 0;//pour les lumières
+
+
 std::vector <std::string> liste_log;//les logs
 bool defiler_log = false;
 

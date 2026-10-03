@@ -4,6 +4,8 @@ class LightNode : public SceneNode{
     public:
     Vector3 couleur_lumiere;
     float intensite;
+    float taille;
+    bool est_allume = true;
         LightNode();
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
@@ -11,6 +13,9 @@ class LightNode : public SceneNode{
         std::string ToCode() override;
         std::string GetDrawCode() override;
         std::string GetInitCode() override;
-        std::string GetType() const override;
+        std::string GetType() const {
+            return "LightNode";
+        }
+        BoundingBox GetBoiteCollision() override;
         //bool DessinerProprietesImGui(ShaderManager& shaderManager) override;
 };

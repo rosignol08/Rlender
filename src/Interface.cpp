@@ -201,6 +201,9 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 if (ImGui::DragFloat("Intensité", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
                     Les_variables.flag_changements = true;
                 }
+                if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
+                    modifie = true;
+                }
             }else{
 
                 ImGui::Text("Materiau");
