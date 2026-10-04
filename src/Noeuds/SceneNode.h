@@ -5,7 +5,8 @@
 #include <memory>
 #include <fstream>
 #include "raylib.h"
-#include "utils.h"
+#include "raymath.h"
+#include "../utils.h"
 #pragma once
 
 //la classe pour representer un objets de la scene

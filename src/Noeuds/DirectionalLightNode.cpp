@@ -26,6 +26,25 @@ void SoleilNode::Update(EditorContext& variables){
 void SoleilNode::Draw(EditorContext& variables){
     //TODO dessiner un triangle ou une fleche qui pointe vers la direction du noeud 
     DrawSphereWires(position, 0.5f,16,16, YELLOW);
+    float longueur_direction = Vector3Length(direction);
+    if (longueur_direction > 0.001f) {
+        
+        // 3. On normalise (ramène la longueur à 1)
+        Vector3 dir_norm = Vector3Normalize(direction);
+        
+        // 4. On calcule le point final de la ligne (ex: longueur de 3.0 unités)
+        // fin = position + (direction * 3.0)
+        Vector3 fin_ligne = Vector3Add(position, Vector3Scale(dir_norm, 3.0f));
+
+        // 5. On dessine la ligne qui montre où la lumière frappe !
+        DrawLine3D(position, fin_ligne, YELLOW);
+
+        // Optionnel : Si l'objet est sélectionné, on dessine une petite "pointe" rouge 
+        // au bout de la ligne pour bien voir le sens de la flèche
+        if (this->isSelected) {
+            DrawSphereWires(fin_ligne, 0.2f, 8, 8, RED);
+        }
+    }
 }
 
 std::unique_ptr<SceneNode> SoleilNode::Cloner(){

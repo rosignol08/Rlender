@@ -1,13 +1,13 @@
-#include "SceneNode.h"
-#include "json.hpp"
+#include "../Noeuds/SceneNode.h"
+#include "../json.hpp"
 #include"imgui.h"
-#include "utils.h"
+#include "../utils.h"
 #include "ShaderManager.h"
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
 
-#include "LightNode.h"
-#include "DirectionalLightNode.h"
+#include "../Noeuds/LightNode.h"
+#include "../Noeuds/DirectionalLightNode.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds

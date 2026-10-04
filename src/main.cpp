@@ -1,9 +1,9 @@
 #include <vector>
 #include <iostream>
 #include <memory>//pour les unique ptr
-#include "SceneNode.h"
+#include "Noeuds/SceneNode.h"
 #include "Sauvgarde.h"
-#include "SceneManager.h"
+#include "Managers/SceneManager.h"
 #include "Interface.h"
 
 int main(void) {
