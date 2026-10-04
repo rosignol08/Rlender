@@ -12,10 +12,10 @@ void SceneManager::DrawScene(EditorContext& variables){
             if (elements == nullptr) continue;
             DrawBoundingBox(elements->GetBoiteCollision(), GREEN);
             //on dessine les gizmo voir si on affiche le gizmo ici
-                Vector3 position_base = elements[0].position; //pour eviter les acces mémoire répétés
-                DrawCylinderEx(position_base,(Vector3){position_base.x+4,position_base.y,position_base.z},0.20f,0.20f,10,RED);
-                DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y+4,position_base.z},0.20f,0.20f,10,GREEN);
-                DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y,position_base.z+4},0.20f,0.20f,10,BLUE);
+                //Vector3 position_base = elements[0].position; //pour eviter les acces mémoire répétés
+                //DrawCylinderEx(position_base,(Vector3){position_base.x+4,position_base.y,position_base.z},0.20f,0.20f,10,RED);
+                //DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y+4,position_base.z},0.20f,0.20f,10,GREEN);
+                //DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y,position_base.z+4},0.20f,0.20f,10,BLUE);
         }
     }
     return;

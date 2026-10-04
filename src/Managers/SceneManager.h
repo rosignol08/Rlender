@@ -15,10 +15,10 @@ classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
 */
 class SceneManager{
     private:
-        //pour stoquer les noeuds
-        std::vector<std::unique_ptr<SceneNode>> sceneNodes;
-        //le pointeur pour choisir un noeuds specifique
-        std::vector<SceneNode*> noeudSelectionne;
+    //pour stoquer les noeuds
+    std::vector<std::unique_ptr<SceneNode>> sceneNodes;
+    //le pointeur pour choisir un noeuds specifique
+    std::vector<SceneNode*> noeudSelectionne;
         std::unordered_map<std::string, Material> materiaux;//la banque des materiaux
         public:
         ShaderManager shaderManager;//les shaders

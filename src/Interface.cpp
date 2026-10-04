@@ -472,12 +472,66 @@ void Dessiner_Console(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::End();
 }
 
+void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene){
+    //secu
+    std::vector<SceneNode*> selection = La_scene.GetSelection();
+    if (selection.empty()) return;
+    SceneNode* noeud = selection[0];
+    //init fenetre gismo
+    ImGuizmo::BeginFrame();
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), (float)GetScreenHeight()));
+    ImGui::Begin("Gizmo_Fenetre", nullptr, 
+        ImGuiWindowFlags_NoTitleBar | 
+        ImGuiWindowFlags_NoResize | 
+        ImGuiWindowFlags_NoMove | 
+        ImGuiWindowFlags_NoScrollbar | 
+        ImGuiWindowFlags_NoSavedSettings | 
+        ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoInputs);
+
+    ImGuizmo::SetOrthographic(false);
+    ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(0, 0, GetScreenWidth(), GetScreenHeight());
+    //recuperation matrix camera3D raylib
+    Matrix matView = MatrixLookAt(camera.position, camera.target, camera.up);
+    
+    float aspect = (float)GetScreenWidth() / (float)GetScreenHeight();
+    // 0.01f et 1000.0f c'est plans Near et Far de la caméra
+    Matrix matProj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.01f, 1000.0f); 
+
+    //matrice de l'Objet (pour l'instant, juste sa position)
+    Matrix matModel = MatrixTranslate(noeud->position.x, noeud->position.y, noeud->position.z);
+    float16 viewFloat = MatrixToFloatV(matView);
+    float16 projFloat = MatrixToFloatV(matProj);
+    float16 modelFloat = MatrixToFloatV(matModel);
+    //Appel de ImGuizmo (Raylib utilise la même structure mémoire que ImGuizmo pour les matrices)
+    ImGuizmo::Manipulate(
+        viewFloat.v,            
+        projFloat.v,            
+        ImGuizmo::TRANSLATE,    //changer en ROTATE ou SCALE mais faut changer world par LOCAL et UNIVERSAL sinon
+        ImGuizmo::WORLD,        
+        modelFloat.v            
+    );
+
+    //Si l'utilisateur est en train de tirer sur une flèche, on met à jour le noeud
+    if (ImGuizmo::IsUsing()) {
+        // La nouvelle position se trouve aux index 12, 13 et 14 du tableau !
+        noeud->position.x = modelFloat.v[12];
+        noeud->position.y = modelFloat.v[13];
+        noeud->position.z = modelFloat.v[14];
+        // (Optionnel) Signaler à ton moteur que l'objet a bougé
+        // Les_variables.flag_changements = true;
+    }
+    ImGui::End();
+}
+
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres){
     nb_lignes_max_console = &Les_parametres.nb_lignes_max_console;
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
-    
+    Gerer_gizmo(cameraEditeur, La_scene);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_Hierarchie(La_scene, Les_variables);
     Dessiner_Inspecteur(La_scene, Les_variables);

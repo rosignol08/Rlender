@@ -1,5 +1,7 @@
 #pragma once
+#include <stdio.h>
 #include "raylib.h"
+#include "rlgl.h"
 #include "Managers/SceneManager.h"
 #include "utils.h"
 #include "imgui.h"
@@ -8,7 +10,9 @@
 #include "tinyfiledialogs.h"
 #include "Noeuds/LightNode.h"
 #include "Noeuds/DirectionalLightNode.h"
+#include "ImGuizmo.h"
 //pour l'interface utilisateur pour reduire la taille du code dans main.cpp
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& les_parametres, Parametres &Les_parametres);
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);
 void Initialiser_Logs(EditorContext* contexte_cible);
+void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene);
