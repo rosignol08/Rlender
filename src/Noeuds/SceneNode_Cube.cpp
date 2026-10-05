@@ -33,11 +33,18 @@ std::string CubeNode::GetInitCode()
 void CubeNode::Draw(EditorContext& variables){
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
     AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
-    //les variables héritées de SceneNode
-    DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
-    if (isSelected)
+    Matrix matTransform = MatrixIdentity();
+matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
+matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
+matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
+
+// On l'injecte dans le modèle
+modele.transform = matTransform;
+
+// On dessine avec DrawModel normal (position à 0, car la matrice s'occupe de tout !)
+DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
     {
-        DrawModelWiresEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, YELLOW);
+        DrawModelWires(modele, (Vector3){0, 0, 0}, 1.0f, YELLOW);
     }
 }
 

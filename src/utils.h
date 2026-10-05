@@ -3,6 +3,9 @@
 #include <vector>
 #include <variant>
 #include <unordered_map>
+#include "imgui.h"
+#include "ImGuizmo.h"
+
 //structure qui regroupe toutes les variables volantes de l'éditeur
 struct EditorContext {
     int compteurModifs = 0; //un compteur pour dire que
@@ -128,6 +131,9 @@ bool defiler_log = false;
 using UniformValue = std::variant<int, float, Vector2, Vector3, Vector4, Matrix>;
 //dictionaire globale des uniforms :
 std::unordered_map<std::string, UniformValue> variables_globales;
+
+ImGuizmo::OPERATION gizmo_operation;
+ImGuizmo::MODE gizmo_mode;
 
 };
 

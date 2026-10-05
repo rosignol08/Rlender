@@ -26,6 +26,9 @@ void SoleilNode::Update(EditorContext& variables){
 void SoleilNode::Draw(EditorContext& variables){
     //TODO dessiner un triangle ou une fleche qui pointe vers la direction du noeud 
     DrawSphereWires(position, 0.5f,16,16, YELLOW);
+    Matrix matRot = MatrixRotateXYZ((Vector3){ rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD });
+    Vector3 direction_par_defaut = { 0.0f, -1.0f, 0.0f };
+    this->direction = Vector3Transform(direction_par_defaut, matRot);
     float longueur_direction = Vector3Length(direction);
     if (longueur_direction > 0.001f) {
         
