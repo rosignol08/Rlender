@@ -6,6 +6,7 @@ SoleilNode::SoleilNode(){
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
     puissance = 1.0f;
     est_allume = true;
+    type = "SoleilNode";
 }
 
 void SoleilNode::Update(EditorContext& variables){

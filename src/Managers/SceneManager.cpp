@@ -248,7 +248,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
                 noeud_json["active_lumiere"] = sol->est_allume;
             }
         }
-        if (actuel->type == "PointLightNode") { // Si tu as ce noeud
+        if (actuel->type == "LightNode") {
             LightNode* lumiere = dynamic_cast<LightNode*>(actuel);
             if (lumiere != nullptr) {
                 noeud_json["puissance_lumiere"] = lumiere->puissance;
@@ -345,6 +345,25 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
             cam->zoom_camera = element_json["zoom_camera"];
             nouveau_noeud = std::move(cam);
         }
+        else if (le_type == "SoleilNode") {
+            auto sol = std::make_unique<SoleilNode>();
+            if (element_json.contains("puissance_lumiere")) sol->puissance = element_json["puissance_lumiere"];
+            if (element_json.contains("active_lumiere")) sol->est_allume = element_json["active_lumiere"];
+            if (element_json.contains("couleur_lumiere")) {
+                sol->couleur_lumiere = { element_json["couleur_lumiere"][0], element_json["couleur_lumiere"][1], element_json["couleur_lumiere"][2] };
+            }
+            nouveau_noeud = std::move(sol);
+        }
+        else if (le_type == "LightNode") {
+            auto lum = std::make_unique<LightNode>();
+            if (element_json.contains("puissance_lumiere")) lum->puissance = element_json["puissance_lumiere"];
+            if (element_json.contains("intensite_lumiere")) lum->intensite = element_json["intensite_lumiere"];
+            if (element_json.contains("active_lumiere")) lum->est_allume = element_json["active_lumiere"];
+            if (element_json.contains("couleur_lumiere")) {
+                lum->couleur_lumiere = { element_json["couleur_lumiere"][0], element_json["couleur_lumiere"][1], element_json["couleur_lumiere"][2] };
+            }
+            nouveau_noeud = std::move(lum);
+        }
         else{//par défaut si c'est rien on skip le noeud
             continue;
         }
@@ -377,11 +396,17 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
         nouveau_noeud->taille.x = element_json["taille"][0];
         nouveau_noeud->taille.y = element_json["taille"][1];
         nouveau_noeud->taille.z = element_json["taille"][2];
-        sceneNodes.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
+        nouvelle_scene.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
     }
 
     Deselectionne();
     sceneNodes = std::move(nouvelle_scene);
+    //pour reselectioner les objets
+    for (auto& noeud : sceneNodes) {
+        if (noeud->isSelected) {
+            noeudSelectionne.push_back(noeud.get());
+        }
+    }
 }
 
 void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){

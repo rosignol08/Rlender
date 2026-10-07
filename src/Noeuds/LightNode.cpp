@@ -6,6 +6,7 @@ LightNode::LightNode(){
     intensite = 1.1;
     puissance = 5.0f;
     taille = 1.0f;
+    type = "LightNode";
 }
 
 void LightNode::Update(EditorContext& variables){
