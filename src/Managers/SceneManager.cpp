@@ -239,6 +239,24 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
                 noeud_json["zoom_camera"] = cam->zoom_camera;
             }
         }
+        //si c'est une lumière :
+        if(actuel->type == "SoleilNode"){
+            SoleilNode* sol = dynamic_cast<SoleilNode*>(actuel);//faut dire que le noeud peut etre un soleil
+            if (sol != nullptr) {
+                noeud_json["puissance_lumiere"] = sol->puissance;
+                noeud_json["couleur_lumiere"] = {sol->couleur_lumiere.x,sol->couleur_lumiere.y,sol->couleur_lumiere.z};                
+                noeud_json["active_lumiere"] = sol->est_allume;
+            }
+        }
+        if (actuel->type == "PointLightNode") { // Si tu as ce noeud
+            LightNode* lumiere = dynamic_cast<LightNode*>(actuel);
+            if (lumiere != nullptr) {
+                noeud_json["puissance_lumiere"] = lumiere->puissance;
+                noeud_json["couleur_lumiere"] = {lumiere->couleur_lumiere.x,lumiere->couleur_lumiere.y,lumiere->couleur_lumiere.z};
+                noeud_json["active_lumiere"] = lumiere->est_allume;
+                noeud_json["intensite_lumiere"] = lumiere->intensite;//rayon d'atténuation
+            }
+        }
         //ajout du noeud à la sauvgarde du projet
         projet_json["noeuds"].push_back(noeud_json);
     }

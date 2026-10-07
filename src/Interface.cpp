@@ -69,7 +69,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             
                 if (cheminChoisi != NULL) {
                     std::string contenu = GenererCodeComplet(La_scene.GetNodes());
-                    Sauvgarde(cheminChoisi, contenu);
+                    Exporter(cheminChoisi, contenu);
                 }
             }
             //if(ImGui::MenuItem("Exporter","ctrl+e")){    
@@ -505,7 +505,7 @@ void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_va
     
     float16 modelFloat;
     ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, modelFloat.v);
-    Les_variables.gizmo_operation = ImGuizmo::ROTATE;
+    Les_variables.gizmo_operation = ImGuizmo::TRANSLATE;
     Les_variables.gizmo_mode = ImGuizmo::LOCAL;
     ImGuizmo::Manipulate(
         viewFloat.v,            

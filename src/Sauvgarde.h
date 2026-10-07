@@ -9,7 +9,7 @@ ici je defini des fonction pour les sauvgardes pour aleger le code dans le main
 #include "utils.h"
 #include "json.hpp"
 
-void Sauvgarde(std::string nom_fichier,std::string contenu);
+void Exporter(std::string nom_fichier,std::string contenu);
 
 //fonction utilitaire
 int Cree_Fichier(std::string nom_fichier);
