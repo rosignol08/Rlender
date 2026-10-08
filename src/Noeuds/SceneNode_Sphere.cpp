@@ -17,11 +17,20 @@ SphereNode::~SphereNode(){
 }
 
 void SphereNode::Draw(EditorContext& variables){
-    // les variables héritées de SceneNode
-    DrawModelEx(modele, position, {0.0f, 1.0f, 0.0f}, 0.0f, taille, couleur);
-    if (isSelected)
-    {
-        DrawSphereWires(position, taille.x, 16, 16, YELLOW); // 10 par defaut TODO a changer
+    Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
+    AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
+    Matrix matTransform = MatrixIdentity();
+    matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
+    matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
+    matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
+
+    //injecte dans modele
+    modele.transform = matTransform;
+
+    //Draw normal (position 0, car la matrice s'occupe de tout)
+    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
+    if(isSelected){
+        DrawModelWires(modele, (Vector3){0, 0, 0}, 1.0f, YELLOW);
     }
 }
 
@@ -66,4 +75,8 @@ std::unique_ptr<SceneNode> SphereNode::Cloner(){
     return clone;
 }
 
-//std::string GetType() { return "Sphere"; }
+void SphereNode::AppliquerShader(const std::string& nom_shader, Shader le_shader) {
+    nom_shader_actuel = nom_shader;
+    //assigne le shader à la carte graphique pour ce modèle précis
+    modele.materials[0].shader = le_shader; 
+}

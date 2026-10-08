@@ -57,7 +57,49 @@ void SceneManager::AjouterCube(){
     SetSelection(sceneNodes.back().get());
 }
 
-//ça ajoute un cube simplement
+void SceneManager::AjouterSphere(){
+    unsigned int compteur_sphere = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Sphere_" + std::to_string(compteur_sphere);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_sphere++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<SphereNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+void SceneManager::AjouterPlan(){
+    unsigned int compteur_plan = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Sphere_" + std::to_string(compteur_plan);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_plan++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<PlaneNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+//ça ajoute une light simplement
 void SceneManager::AjouterLight(){
     unsigned int compteur_light = 0;
     bool nom_deja_pris = true;
@@ -213,7 +255,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
         nlohmann::json noeud_json;
         noeud_json["type"] = actuel->type;
         noeud_json["nom"] = actuel->nom;
-        noeud_json["isSelected"] = actuel->isSelected;
+        //noeud_json["isSelected"] = actuel->isSelected;//on s'en fout
 
         //les Vector3 de Raylib en tableaux JSON = [x, y, z]
         noeud_json["position"] = { actuel->position.x, actuel->position.y, actuel->position.z };
@@ -411,6 +453,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
 
 void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){
     //raycasting
+    if (ImGuizmo::IsOver()) return;
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
         Ray rayon = GetScreenToWorldRay(GetMousePosition(), camera_editeur);
         SceneNode* objetTouche = nullptr;
@@ -427,77 +470,18 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & varia
         }
 
         //check si on a une selection
-        if(!GetSelection().empty()){
-
-            Vector3 position_base = GetSelection()[0]->position; //pour eviter les acces mémoire répétés
-            BoundingBox box_x = { 
-                (Vector3){position_base.x, position_base.y - 0.5f, position_base.z - 0.5f},
-                (Vector3){position_base.x + 4.0f, position_base.y + 0.5f, position_base.z + 0.5f}
-            };
-            BoundingBox box_y = { 
-                (Vector3){position_base.x - 0.5f, position_base.y, position_base.z - 0.5f},
-                (Vector3){position_base.x + 0.5f, position_base.y + 4.0f, position_base.z + 0.5f}
-            };
-            BoundingBox box_z = { 
-                (Vector3){position_base.x - 0.5f, position_base.y - 0.5f, position_base.z},
-                (Vector3){position_base.x + 0.5f, position_base.y + 0.5f, position_base.z + 4.0f}
-            };  
-            RayCollision collisionx = GetRayCollisionBox(rayon,box_x);
-            RayCollision collisiony = GetRayCollisionBox(rayon,box_y);
-            RayCollision collisionz = GetRayCollisionBox(rayon,box_z);
-                
-            if (collisionx.hit) { variables.axe_en_cours = 'X'; 
-                std::cout << "X touche" << std::endl;
-                return;
-            }
-            if (collisiony.hit) { variables.axe_en_cours = 'Y';
-                std::cout << "Y touche" << std::endl;
-                return;
-            }
-            if (collisionz.hit) { variables.axe_en_cours = 'Z'; 
-                std::cout << "Z touche" << std::endl;
-                return;
-            }   
-        }
-        variables.axe_en_cours = '0';
-
         if(objetTouche != nullptr){
-            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    
-                //ctrl avec plusieurs objets
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
                 ToggleSelection(objetTouche);
             }else{
                 SetSelection(objetTouche);
             }
-        }else{
+        } else {
+            // SI ON CLIQUE DANS LE VIDE
             if (!IsKeyDown(KEY_LEFT_CONTROL) && !IsKeyDown(KEY_RIGHT_CONTROL)){
-                Deselectionne();//si on clique dans le vide on déséléctionne
+                Deselectionne();
             }
         }
-    }
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && variables.axe_en_cours != '0'){
-        //si on maintient le clic et qu'on touche a un axe
-        if (!GetSelection().empty()) {
-            Vector2 pos_souris = GetMouseDelta();
-            switch (variables.axe_en_cours){
-                case 'X':
-                    GetSelection()[0]->position.x += pos_souris.x*0.02f; //psk en 2d la souris va vite TODO etaloner la valeurs
-                    variables.flag_changements = true;
-                    break;
-
-                case 'Y':
-                    GetSelection()[0]->position.y -= pos_souris.y*0.02f;//sur l'ecrant y descend et en 3D il monte c'est inversé donc -
-                    variables.flag_changements = true;
-                break;
-
-                case 'Z':
-                    GetSelection()[0]->position.z += pos_souris.x*0.01f + (pos_souris.y*0.01f);//les deux ? jsp au choix
-                    variables.flag_changements = true;
-                break;
-            }
-        }
-    }
-    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-        variables.axe_en_cours = '0';
     }
 }
 

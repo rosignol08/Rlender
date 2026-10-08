@@ -34,16 +34,16 @@ void CubeNode::Draw(EditorContext& variables){
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
     AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
     Matrix matTransform = MatrixIdentity();
-matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
-matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
-matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
+    matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
+    matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
+    matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
 
-// On l'injecte dans le modèle
-modele.transform = matTransform;
+    //injecte dans modele
+    modele.transform = matTransform;
 
-// On dessine avec DrawModel normal (position à 0, car la matrice s'occupe de tout !)
-DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
-    {
+    //Draw normal (position 0, car la matrice s'occupe de tout)
+    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
+    if(isSelected){
         DrawModelWires(modele, (Vector3){0, 0, 0}, 1.0f, YELLOW);
     }
 }

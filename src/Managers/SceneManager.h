@@ -25,6 +25,8 @@ class SceneManager{
         void       DrawScene(EditorContext& variables); //une boucle qui parcours les noeuds et les dessines chacuns
         void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc
         void       AjouterCube(); //ça ajoute un cube simplement
+        void       AjouterSphere(); //ça ajoute une sphere simplement
+        void       AjouterPlan();
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D
         void       AjouterLight(); //ça ajoute une lumiere (pointlight)
