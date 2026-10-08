@@ -157,11 +157,14 @@ class CylinderNode : public SceneNode {
 
         void Draw(EditorContext& variables) override ;
 
-        BoundingBox GetBoiteCollision() override;
-        std::unique_ptr<SceneNode> Cloner() override;
         std::string ToCode() override;
         std::string GetDrawCode() override;
         std::string GetInitCode() override;
+
+        BoundingBox GetBoiteCollision() override;
+        
+        std::unique_ptr<SceneNode> Cloner() override;
+        void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
         std::string GetType() const override { return "CylinderNode"; }
 };
 
@@ -172,12 +175,17 @@ private:
 public:
     ConeNode();
     ~ConeNode() override;
+    
     void Draw(EditorContext& variables) override;
-    BoundingBox GetBoiteCollision() override;
-    std::unique_ptr<SceneNode> Cloner() override;
+    
     std::string ToCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode()override;
+    
+    BoundingBox GetBoiteCollision() override;
+
+    std::unique_ptr<SceneNode> Cloner() override;
+    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
     std::string GetType() const override { return "ConeNode"; }
 };
 

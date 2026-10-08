@@ -39,17 +39,17 @@ BoundingBox PlaneNode::GetBoiteCollision(){
         {position.x + taille.x / 2, position.y + 0.01f, position.z + taille.z / 2}};
 }
 
-std::unique_ptr<SceneNode> PlaneNode::Cloner()
-{
-    auto clone = std::make_unique<PlaneNode>();
+std::unique_ptr<SceneNode> PlaneNode::Cloner(){
+    auto clone = std::make_unique<PlaneNode>(); // faut en cree un autre pour eviter les crash de mémoire
     clone->position = this->position;
     clone->taille = this->taille;
     clone->couleur = this->couleur;
     clone->nom_shader_actuel = this->nom_shader_actuel;
     clone->modele.materials[0].shader = this->modele.materials[0].shader; // on clone aussi le shader et le materiel
     clone->isSelected = true;
-    static unsigned int compteur_sphere_clones = 0;                        // logiquement on a un compteur pour les clones
-    clone->nom = this->nom + "_" + std::to_string(compteur_sphere_clones); // nouveau nom
+    static unsigned int compteur_plane_clones = 0;                        // logiquement on a un compteur pour les clones
+    clone->nom = this->nom + "_" + std::to_string(compteur_plane_clones); // nouveau nom
+    compteur_plane_clones++;
     return clone;
 }
 
@@ -71,5 +71,3 @@ void PlaneNode::AppliquerShader(const std::string& nom_shader, Shader le_shader)
     //assigne le shader à la carte graphique pour ce modèle précis
     modele.materials[0].shader = le_shader; 
 }
-
-//std::string GetType() { return "Plan"; }

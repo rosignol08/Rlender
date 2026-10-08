@@ -128,7 +128,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
         }
         //exemple d'ajout de bouton
         if(ImGui::Button("cube",{50.0f,50.0f})){
-            La_scene.AjouterPlan();
+            La_scene.AjouterCamera3D();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         if(ImGui::Button("Light",{50.0f,50.0f})){

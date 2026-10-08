@@ -27,6 +27,8 @@ class SceneManager{
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterSphere(); //ça ajoute une sphere simplement
         void       AjouterPlan();
+        void       AjouterCyl();
+        void       AjouterCone();
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D
         void       AjouterLight(); //ça ajoute une lumiere (pointlight)

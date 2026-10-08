@@ -84,7 +84,7 @@ void SceneManager::AjouterPlan(){
     std::string nom_test;
     while(nom_deja_pris == true){
         nom_deja_pris = false;//je dit que de base on a un bon nom
-        nom_test = "Sphere_" + std::to_string(compteur_plan);
+        nom_test = "Plan_" + std::to_string(compteur_plan);
         for(const auto & elem : sceneNodes){
             if(elem->nom == nom_test){
                 nom_deja_pris = true;
@@ -95,6 +95,49 @@ void SceneManager::AjouterPlan(){
     }
     //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.push_back(std::make_unique<PlaneNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+void SceneManager::AjouterCyl(){
+    unsigned int compteur_cyl = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Cylindre_" + std::to_string(compteur_cyl);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_cyl++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<CylinderNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+
+void SceneManager::AjouterCone(){
+    unsigned int compteur_Cone = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Cone_" + std::to_string(compteur_Cone);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_Cone++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<ConeNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
 }
