@@ -8,6 +8,7 @@
 #include "raymath.h"
 #include "../utils.h"
 #include <rlgl.h>
+#include "../Managers/MaterialManager.h"
 #pragma once
 
 //la classe pour representer un objets de la scene
@@ -16,6 +17,7 @@ class SceneNode {
         //la fonction des uniformes pour les shaders
         void AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible);
     public:
+        int id_materiau = 0; //de base
         std::string nom;
         Vector3 position;
         Vector3 rotation;

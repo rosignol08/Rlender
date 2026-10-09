@@ -31,6 +31,25 @@ std::string CubeNode::GetInitCode()
     return code.str();
 }
 void CubeNode::Draw(EditorContext& variables){
+    Color couleur_rendu = WHITE;//couleur de rendu
+
+    if (variables.banque_materiaux != nullptr) {
+        //demande du matériel de cet objet
+        DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+        
+        //securite si l'ID existe plus matériel par défaut (0)
+        if (mat == nullptr) {
+            mat = variables.banque_materiaux->GetMateriau(0);
+            this->id_materiau = 0; //l'objet pour la prochaine fois
+        }
+        
+        if (mat != nullptr) {
+            couleur_rendu = mat->couleurAlbedo;
+            
+            //plus tard :
+            //modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
+        }
+    }
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
     AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
     Matrix matTransform = MatrixIdentity();

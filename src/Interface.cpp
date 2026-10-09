@@ -163,7 +163,72 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
         }
     ImGui::End();
 }
+void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, std::vector<SceneNode*> noeuds_selectione){
+    ImGui::Text("Materiau");
+                
+                SceneNode* objet = noeuds_selectione[0];
+                if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
+                    for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
+                        bool est_selectione = (objet->nom_shader_actuel == nom);
+                        if(ImGui::Selectable(nom.c_str(),est_selectione)){
+                            //si on clique ça applique
+                            objet->AppliquerShader(nom,shader_obj);
+                            Les_variables.flag_changements = true;//pour l'autosave
+                        }
+                        if(est_selectione){
+                            ImGui::SetItemDefaultFocus();
+                        }
+                    }
+                    ImGui::EndCombo();
+                }
+                    ManagerMateriel* banque = Les_variables.banque_materiaux;
+                    if (banque != nullptr) {
+                        //le matériau actuellement assigné à l'objet
+                        DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
+                        std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
+                    
+                        //liste déroulante pour choisir matériau
+                        if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
+                            for (auto& mat : banque->GetTousLesMateriaux()) {
+                                bool est_selectione = (objet->id_materiau == mat.identifiant);
 
+                                if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
+                                    objet->id_materiau = mat.identifiant;
+                                    Les_variables.flag_changements = true;
+                                }
+                                if (est_selectione) {
+                                    ImGui::SetItemDefaultFocus();
+                                }
+                            }
+                            ImGui::EndCombo();
+                            }
+                        
+                            //pour editer me materiau
+                            if (mat_actuel != nullptr) {
+                                ImGui::Indent(); //décalage l'UI vers la droite
+
+                                //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
+                                float couleur_float[4] = {
+                                    mat_actuel->couleurAlbedo.r / 255.0f,
+                                    mat_actuel->couleurAlbedo.g / 255.0f,
+                                    mat_actuel->couleurAlbedo.b / 255.0f,
+                                    mat_actuel->couleurAlbedo.a / 255.0f
+                                };
+                            
+                                if (ImGui::ColorEdit4("Couleur", couleur_float)) {
+                                    //si changement couleur dans ImGui maj donnée Raylib
+                                    mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
+                                    mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
+                                    mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
+                                    mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
+                                    Les_variables.flag_changements = true;
+                                }
+
+                                ImGui::Unindent();
+                            }
+                        
+                }
+}
 void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
@@ -249,24 +314,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                          ImVec2(0, 1),  // UV min (Inversé Y)
                          ImVec2(1, 0)); // UV max (Inversé Y)
             }else{
-
-                ImGui::Text("Materiau");
-                
-                SceneNode* objet = noeuds_selectione[0];
-                if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
-                    for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
-                        bool est_selectione = (objet->nom_shader_actuel == nom);
-                        if(ImGui::Selectable(nom.c_str(),est_selectione)){
-                            //si on clique ça applique
-                            objet->AppliquerShader(nom,shader_obj);
-                            Les_variables.flag_changements = true;//pour l'autosave
-                        }
-                        if(est_selectione){
-                            ImGui::SetItemDefaultFocus();
-                        }
-                    }
-                    ImGui::EndCombo();
-                }
+                Dessiner_Materiaux_Manager(La_scene, Les_variables, noeuds_selectione);
             }
             }else{
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");

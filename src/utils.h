@@ -6,6 +6,8 @@
 #include "imgui.h"
 #include "ImGuizmo.h"
 
+class ManagerMateriel;//forward declaration
+
 //structure qui regroupe toutes les variables volantes de l'éditeur
 struct EditorContext {
     int compteurModifs = 0; //un compteur pour dire que
@@ -23,6 +25,9 @@ struct EditorContext {
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;
     std::string code_preview;
+
+    //les materiaux
+    ManagerMateriel* banque_materiaux = nullptr;
 
     //Shaders
     std::string codeFragmentShader = "#version 330\n"

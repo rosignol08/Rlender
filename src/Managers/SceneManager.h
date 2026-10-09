@@ -6,6 +6,7 @@
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
 
+#include "MaterialManager.h"
 #include "../Noeuds/LightNode.h"
 #include "../Noeuds/DirectionalLightNode.h"
 #pragma once
@@ -19,8 +20,8 @@ class SceneManager{
     std::vector<std::unique_ptr<SceneNode>> sceneNodes;
     //le pointeur pour choisir un noeuds specifique
     std::vector<SceneNode*> noeudSelectionne;
-        std::unordered_map<std::string, Material> materiaux;//la banque des materiaux
-        public:
+    public:
+    ManagerMateriel banque_materiaux;//la banque des materiaux
         ShaderManager shaderManager;//les shaders
         void       DrawScene(EditorContext& variables); //une boucle qui parcours les noeuds et les dessines chacuns
         void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc

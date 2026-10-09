@@ -20,6 +20,7 @@ set(SRCS
     src/Noeuds/SceneNode_Plan.cpp
     src/Noeuds/LightNode.cpp
     src/Noeuds/DirectionalLightNode.cpp
+    src/Managers/MaterialManager.cpp
     src/Interface.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp

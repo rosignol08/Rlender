@@ -34,6 +34,7 @@ int main(void) {
     SceneManager La_scene;
 
     EditorContext Les_variables;
+    Les_variables.banque_materiaux = &La_scene.banque_materiaux;//connexion des deux
 
     //les logs
     Initialiser_Logs(&Les_variables);
