@@ -11,7 +11,7 @@
 #include "Noeuds/LightNode.h"
 #include "Noeuds/DirectionalLightNode.h"
 //pour l'interface utilisateur pour reduire la taille du code dans main.cpp
-void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& les_parametres, Parametres &Les_parametres);
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres &Les_parametres, RenderTexture2D& texture_preview);
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);
 void Initialiser_Logs(EditorContext* contexte_cible);
 void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_variables);

@@ -7,6 +7,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "../utils.h"
+#include <rlgl.h>
 #pragma once
 
 //la classe pour representer un objets de la scene
@@ -195,6 +196,7 @@ class CameraNode : public SceneNode{
         float fovy = 45.0f;//par defaut
         CameraMode mode_camera = CAMERA_FREE;//par defaut
         CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
+        bool active = true;
     CameraNode();
     void Draw(EditorContext& variables) override;
     std::string ToCode()override;
@@ -206,7 +208,8 @@ class CameraNode : public SceneNode{
 
     BoundingBox GetBoiteCollision()override;
     std::unique_ptr<SceneNode> Cloner() override;
-    std::string GetType() const override { return "CameraNode"; }
+    std::string GetType() const override { return "Camera3D"; }
+    Camera3D ObtenirCameraRaylib() const;
 };
 
 class Camera2DNode : public SceneNode{
@@ -229,7 +232,7 @@ class Camera2DNode : public SceneNode{
 
     std::string GetInitCode()override;
     std::unique_ptr<SceneNode> Cloner()override;
-    std::string GetType() const override { return "Camera2DNode"; }
+    std::string GetType() const override { return "Camera2D"; }
 };
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);

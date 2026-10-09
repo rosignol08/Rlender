@@ -145,5 +145,8 @@ struct Parametres {
     float Chronos_sauvegarde = 0.0f; //on attend ce temps avant d'ecrire sur le json (pour épargner le disque dur)
     bool attente_sauvegarde; //flag
     int nb_lignes_max_console = 500;
+
+    int res_preview_x = 640;//TODO securite pour garder le ratio 16:9
+    int res_preview_y = 360;
 };
 

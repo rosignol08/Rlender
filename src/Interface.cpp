@@ -72,10 +72,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     Exporter(cheminChoisi, contenu);
                 }
             }
-            //if(ImGui::MenuItem("Exporter","ctrl+e")){    
-            //    std::string cheminFichier; //fonction pour selectioner un fichier ou un emplacement depuis l'editeur externe
-            //    ChargerProjet(cheminFichier);
-            //}
+            
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Paramètres")) {
@@ -136,7 +133,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         if(ImGui::Button("Soleil",{50.0f,50.0f})){
-            La_scene.AjouterSoleil();
+            La_scene.AjouterCube();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         ImGui::EndMainMenuBar();
@@ -167,7 +164,7 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::End();
 }
 
-void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
+void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
     ImGui::Begin("Inspecteur");
@@ -238,7 +235,20 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 }
 
             }
-            else{
+            else if(noeuds_selectione[0]->GetType() == "Camera3D"){
+                CameraNode* objet = static_cast<CameraNode*>(noeuds_selectione[0]);
+                ImGui::Text("Apercu Camera :");
+                ImGui::Checkbox("Active : ", &objet->active);
+                //ImVec2(0,1) et (1,0) c'est pour inverser l'image verticalement (probleme OpenGL/Raylib)
+                float largeurFenetre = ImGui::GetContentRegionAvail().x;
+                float ratio = (float)Les_parametres.res_preview_y / (float)Les_parametres.res_preview_x;
+                float hauteurCalculee = largeurFenetre * ratio;
+
+            ImGui::Image((ImTextureID)(size_t)texture_preview.texture.id,
+                         ImVec2(largeurFenetre, hauteurCalculee), 
+                         ImVec2(0, 1),  // UV min (Inversé Y)
+                         ImVec2(1, 0)); // UV max (Inversé Y)
+            }else{
 
                 ImGui::Text("Materiau");
                 
@@ -445,17 +455,22 @@ void Initialiser_Logs(EditorContext* contexte_cible){
     contexte_global_pour_les_logs = contexte_cible;
 }
 
-void Fonction_Log(int type_message, const char *texte,  va_list arguments){
-    //TraceLogCallback(type_message, texte, arguments);
+void Fonction_Log(int type_message, const char *texte, va_list arguments){
     char buffer[256];
-    vsnprintf(buffer, 256,texte,arguments);
-    if (contexte_global_pour_les_logs != nullptr){
-        if(contexte_global_pour_les_logs->liste_log.size() >= *nb_lignes_max_console){
-            contexte_global_pour_les_logs->liste_log.erase (contexte_global_pour_les_logs->liste_log.begin ());
-        }
-        contexte_global_pour_les_logs->liste_log.push_back(buffer);
-        contexte_global_pour_les_logs->defiler_log = true;
+    vsnprintf(buffer, sizeof(buffer), texte, arguments);
+
+    if (contexte_global_pour_les_logs == nullptr) return;
+
+    auto& logs = contexte_global_pour_les_logs->liste_log;
+
+    //valeur par défaut si le pointeur est pas encore prêt
+    size_t max_lignes = (nb_lignes_max_console != nullptr) ? *nb_lignes_max_console : 200;
+
+    while (!logs.empty() && logs.size() >= max_lignes) {
+        logs.erase(logs.begin());
     }
+    logs.push_back(buffer);
+    contexte_global_pour_les_logs->defiler_log = true;
 }
 
 void Dessiner_Console(SceneManager& La_scene, EditorContext& Les_variables){
@@ -527,7 +542,7 @@ void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_va
 }
 
 
-void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres){
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D& texture_preview){
     nb_lignes_max_console = &Les_parametres.nb_lignes_max_console;
     rlImGuiBegin();
     //raycasting
@@ -535,7 +550,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     Gerer_gizmo(cameraEditeur, La_scene, Les_variables);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_Hierarchie(La_scene, Les_variables);
-    Dessiner_Inspecteur(La_scene, Les_variables);
+    Dessiner_Inspecteur(La_scene, Les_variables, Les_parametres, texture_preview);
     Dessiner_ControlesCamera(cameraEditeur, Les_variables);
     Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
     Dessiner_EditeurShader(La_scene,Les_variables);
