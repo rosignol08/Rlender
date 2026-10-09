@@ -165,69 +165,91 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
 }
 void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, std::vector<SceneNode*> noeuds_selectione){
     ImGui::Text("Materiau");
-                
-                SceneNode* objet = noeuds_selectione[0];
-                if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
-                    for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
-                        bool est_selectione = (objet->nom_shader_actuel == nom);
-                        if(ImGui::Selectable(nom.c_str(),est_selectione)){
-                            //si on clique ça applique
-                            objet->AppliquerShader(nom,shader_obj);
-                            Les_variables.flag_changements = true;//pour l'autosave
-                        }
-                        if(est_selectione){
-                            ImGui::SetItemDefaultFocus();
-                        }
+    SceneNode* objet = noeuds_selectione[0];
+    if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
+        for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
+            bool est_selectione = (objet->nom_shader_actuel == nom);
+            if(ImGui::Selectable(nom.c_str(),est_selectione)){
+                //si on clique ça applique
+                objet->AppliquerShader(nom,shader_obj);
+                Les_variables.flag_changements = true;//pour l'autosave
+            }
+            if(est_selectione){
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+        ManagerMateriel* banque = Les_variables.banque_materiaux;
+        if (banque != nullptr) {
+            //le matériau actuellement assigné à l'objet
+            DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
+            std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
+        
+            //liste déroulante pour choisir matériau
+            if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
+                for (auto& mat : banque->GetTousLesMateriaux()) {
+                    bool est_selectione = (objet->id_materiau == mat.identifiant);
+                    if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
+                        objet->id_materiau = mat.identifiant;
+                        Les_variables.flag_changements = true;
                     }
-                    ImGui::EndCombo();
+                    if (est_selectione) {
+                        ImGui::SetItemDefaultFocus();
+                    }
                 }
-                    ManagerMateriel* banque = Les_variables.banque_materiaux;
-                    if (banque != nullptr) {
-                        //le matériau actuellement assigné à l'objet
-                        DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
-                        std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
+                ImGui::EndCombo();
+                }
+                ImGui::Spacing();
+                if (ImGui::Button("Créer un Matériel")){
+                    std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
+                    int nouvel_identifiant = banque->CreerMateriau(nom);
+                    objet->id_materiau = nouvel_identifiant;
+                    Les_variables.flag_changements = true;//pour la sauvgarde
+                }
+                    //pour editer me materiau
+                    if (mat_actuel != nullptr) {
+                        ImGui::Indent(); //décalage l'UI vers la droite
+                        //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
+                        float couleur_float[4] = {
+                            mat_actuel->couleurAlbedo.r / 255.0f,
+                            mat_actuel->couleurAlbedo.g / 255.0f,
+                            mat_actuel->couleurAlbedo.b / 255.0f,
+                            mat_actuel->couleurAlbedo.a / 255.0f
+                        };
                     
-                        //liste déroulante pour choisir matériau
-                        if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
-                            for (auto& mat : banque->GetTousLesMateriaux()) {
-                                bool est_selectione = (objet->id_materiau == mat.identifiant);
+                        if (ImGui::ColorEdit4("Couleur", couleur_float)) {
+                            //si changement couleur dans ImGui maj donnée Raylib
+                            mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
+                            mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
+                            mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
+                            mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
+                            Les_variables.flag_changements = true;
+                        }
+                        if (mat_actuel->identifiant != 0) {
+                            ImGui::Spacing();
 
-                                if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
-                                    objet->id_materiau = mat.identifiant;
-                                    Les_variables.flag_changements = true;
-                                }
-                                if (est_selectione) {
-                                    ImGui::SetItemDefaultFocus();
-                                }
-                            }
-                            ImGui::EndCombo();
-                            }
-                        
-                            //pour editer me materiau
-                            if (mat_actuel != nullptr) {
-                                ImGui::Indent(); //décalage l'UI vers la droite
+                            //bouton en rouge
+                            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
 
-                                //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
-                                float couleur_float[4] = {
-                                    mat_actuel->couleurAlbedo.r / 255.0f,
-                                    mat_actuel->couleurAlbedo.g / 255.0f,
-                                    mat_actuel->couleurAlbedo.b / 255.0f,
-                                    mat_actuel->couleurAlbedo.a / 255.0f
-                                };
-                            
-                                if (ImGui::ColorEdit4("Couleur", couleur_float)) {
-                                    //si changement couleur dans ImGui maj donnée Raylib
-                                    mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
-                                    mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
-                                    mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
-                                    mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
-                                    Les_variables.flag_changements = true;
-                                }
+                            if (ImGui::Button("Supprimer ce Matériau")) {
+                                //supprime le matériau de la banque + unload texture
+                                banque->Nettoyer_Materiau(mat_actuel->identifiant);
 
-                                ImGui::Unindent();
+                                //assigne le matériau par défaut à objet sélectionné
+                                objet->id_materiau = 0;
+                                Les_variables.flag_changements = true;
                             }
-                        
-                }
+
+                            //faut retirer les couleurs personnalisées du bouton
+                            ImGui::PopStyleColor(3); 
+                        }
+                        ImGui::Unindent();
+                    }
+                
+        }
 }
 void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc

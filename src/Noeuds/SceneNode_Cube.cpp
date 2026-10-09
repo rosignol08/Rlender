@@ -61,7 +61,7 @@ void CubeNode::Draw(EditorContext& variables){
     modele.transform = matTransform;
 
     //Draw normal (position 0, car la matrice s'occupe de tout)
-    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
+    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, couleur_rendu);
     if(isSelected){
         DrawModelWires(modele, (Vector3){0, 0, 0}, 1.0f, YELLOW);
     }
