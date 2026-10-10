@@ -201,10 +201,15 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                 ImGui::EndCombo();
                 }
                 ImGui::Spacing();
+                
+                ImGui::InputText("Nom du Materiel", &Les_variables.nom_nouveau_materiau[0], 64);
+
                 if (ImGui::Button("Créer un Matériel")){
-                    std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
-                    int nouvel_identifiant = banque->CreerMateriau(nom);
+                    //std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
+                    int nouvel_identifiant = banque->CreerMateriau(Les_variables.nom_nouveau_materiau.c_str());
                     objet->id_materiau = nouvel_identifiant;
+                    //reset le nom
+                    Les_variables.nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
                     Les_variables.flag_changements = true;//pour la sauvgarde
                 }
                     //pour editer me materiau
@@ -225,6 +230,19 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                             mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
                             mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
                             Les_variables.flag_changements = true;
+                        }
+                        if (ImGui::Button("Charger Texture Albedo")){
+                            const char* filtres[4] = { "*.jpeg","*.jpg","*.png","*.exr" };
+                            const char* cheminChoisi = tinyfd_openFileDialog(
+                                "Texture Albedo", //titre
+                                "",                 //chemin par défaut
+                                4, filtres,        //filtres d'extension
+                                "Texture (.png, .jpg, .exr)",   //fescription
+                                0                  //sélection multiple activéé
+                            );
+                            if(cheminChoisi != nullptr){
+                                
+                            }
                         }
                         if (mat_actuel->identifiant != 0) {
                             ImGui::Spacing();

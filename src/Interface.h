@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <cstring>
 #include "raylib.h"
 #include "rlgl.h"
 #include "Managers/SceneManager.h"

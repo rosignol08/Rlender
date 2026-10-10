@@ -26,9 +26,6 @@ struct EditorContext {
     int type_projection_camera = CAMERA_PERSPECTIVE;
     std::string code_preview;
 
-    //les materiaux
-    ManagerMateriel* banque_materiaux = nullptr;
-
     //Shaders
     std::string codeFragmentShader = "#version 330\n"
 "\nin vec3 fragPosition;\n"
@@ -126,6 +123,11 @@ std::string codeVertexShader = "#version 330\n"
 "}\n";
 
 std::string nom_nouveau_shader = "ShaderLive";
+
+//les materiaux
+ManagerMateriel* banque_materiaux = nullptr;
+std::string nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
+
 int compteur_lumieres = 0;//pour les lumières
 
 
