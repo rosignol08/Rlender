@@ -5,11 +5,19 @@
 #include <memory>
 #include <fstream>
 #include "raylib.h"
+#include "raymath.h"
+#include "../utils.h"
+#include <rlgl.h>
+#include "../Managers/MaterialManager.h"
 #pragma once
 
 //la classe pour representer un objets de la scene
 class SceneNode {
+    protected:
+        //la fonction des uniformes pour les shaders
+        void AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible);
     public:
+        int id_materiau = 0; //de base
         std::string nom;
         Vector3 position;
         Vector3 rotation;
@@ -25,7 +33,7 @@ class SceneNode {
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
-    virtual void Draw() = 0;
+    virtual void Draw(EditorContext& variables) = 0;
     virtual std::string ToCode() = 0;
     //avant while (!WindowShouldClose())
     virtual std::string GetInitCode() { return ""; }//par défaut TODO à changer
@@ -38,6 +46,14 @@ class SceneNode {
 
     //la boucle les unloads
     virtual std::string GetCleanupCode() { return "";}
+
+    //update
+    virtual void Update(EditorContext& variables) {}
+
+    //pour l'ui
+    virtual std::string GetType() const = 0; //les enfants disent qui ils sont
+
+    
     //le shader
     virtual void AppliquerShader(const std::string& nom_shader, Shader le_shader) {
         nom_shader_actuel = nom_shader;
@@ -62,7 +78,7 @@ class CubeNode : public SceneNode{
 
     ~CubeNode() override;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     std::string ToCode(){
         return "";
     }
@@ -88,6 +104,7 @@ class CubeNode : public SceneNode{
 
     std::unique_ptr<SceneNode> Cloner() override;
     void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    std::string GetType() const override { return "CubeNode"; }
 };
 
 //pour representer une sphere
@@ -98,7 +115,7 @@ class SphereNode : public SceneNode{
     SphereNode();
     ~SphereNode() override;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
 
     std::string ToCode()override;
     std::string GetDrawCode()override;
@@ -107,6 +124,8 @@ class SphereNode : public SceneNode{
     BoundingBox GetBoiteCollision() override;
     
     std::unique_ptr<SceneNode> Cloner() override;
+    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    std::string GetType() const override { return "SphereNode"; }
 };
 
 
@@ -118,13 +137,17 @@ public:
     PlaneNode();
     ~PlaneNode() override ;
 
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     
-    BoundingBox GetBoiteCollision() override;
-    std::unique_ptr<SceneNode> Cloner() override;
     std::string ToCode() override;
     std::string GetDrawCode() override;
     std::string GetInitCode() override;
+
+    BoundingBox GetBoiteCollision() override;
+
+    std::unique_ptr<SceneNode> Cloner() override;
+    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    std::string GetType() const override { return "PlaneNode"; }
 };
 
 //pour representer un cylindre
@@ -135,13 +158,17 @@ class CylinderNode : public SceneNode {
         CylinderNode();
         ~CylinderNode() override;
 
-        void Draw() override ;
+        void Draw(EditorContext& variables) override ;
 
-        BoundingBox GetBoiteCollision() override;
-        std::unique_ptr<SceneNode> Cloner() override;
         std::string ToCode() override;
         std::string GetDrawCode() override;
         std::string GetInitCode() override;
+
+        BoundingBox GetBoiteCollision() override;
+        
+        std::unique_ptr<SceneNode> Cloner() override;
+        void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+        std::string GetType() const override { return "CylinderNode"; }
 };
 
 //pour representer un cone
@@ -151,12 +178,18 @@ private:
 public:
     ConeNode();
     ~ConeNode() override;
-    void Draw() override;
-    BoundingBox GetBoiteCollision() override;
-    std::unique_ptr<SceneNode> Cloner() override;
+    
+    void Draw(EditorContext& variables) override;
+    
     std::string ToCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode()override;
+    
+    BoundingBox GetBoiteCollision() override;
+
+    std::unique_ptr<SceneNode> Cloner() override;
+    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    std::string GetType() const override { return "ConeNode"; }
 };
 
 class CameraNode : public SceneNode{
@@ -165,8 +198,9 @@ class CameraNode : public SceneNode{
         float fovy = 45.0f;//par defaut
         CameraMode mode_camera = CAMERA_FREE;//par defaut
         CameraProjection projetction_cam = CAMERA_PERSPECTIVE;//par defaut
+        bool active = true;
     CameraNode();
-    void Draw() override;
+    void Draw(EditorContext& variables) override;
     std::string ToCode()override;
 
     std::string GetDrawCode()override;
@@ -176,6 +210,8 @@ class CameraNode : public SceneNode{
 
     BoundingBox GetBoiteCollision()override;
     std::unique_ptr<SceneNode> Cloner() override;
+    std::string GetType() const override { return "Camera3D"; }
+    Camera3D ObtenirCameraRaylib() const;
 };
 
 class Camera2DNode : public SceneNode{
@@ -188,7 +224,7 @@ class Camera2DNode : public SceneNode{
         float zoom_camera = 1.0f;
         Camera2DNode();
 
-    void Draw()override;
+    void Draw(EditorContext& variables)override;
 
     std::string ToCode()override;
 
@@ -198,7 +234,9 @@ class Camera2DNode : public SceneNode{
 
     std::string GetInitCode()override;
     std::unique_ptr<SceneNode> Cloner()override;
+    std::string GetType() const override { return "Camera2D"; }
 };
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
+
 

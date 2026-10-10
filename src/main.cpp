@@ -1,9 +1,9 @@
 #include <vector>
 #include <iostream>
 #include <memory>//pour les unique ptr
-#include "SceneNode.h"
+#include "Noeuds/SceneNode.h"
 #include "Sauvgarde.h"
-#include "SceneManager.h"
+#include "Managers/SceneManager.h"
 #include "Interface.h"
 
 int main(void) {
@@ -18,12 +18,6 @@ int main(void) {
     
     std::string contenu = ""; //c'est un pointeur sur la stack le vrai texte est sur le tas donc pas de soucis de taille c'est dans la ram :)
 
-    //pour gerer les objets de la scene:
-
-    SceneManager La_scene;
-
-    EditorContext Les_variables;
-
     //la fenêtre Raylib pour voir le rendu
     
     Parametres Les_parametres;
@@ -35,10 +29,21 @@ int main(void) {
     }
     SetTargetFPS(60);
     
+    //pour gerer les objets de la scene:
+
+    SceneManager La_scene;
+
+    EditorContext Les_variables;
+    Les_variables.banque_materiaux = &La_scene.banque_materiaux;//connexion des deux
+
     //les logs
     Initialiser_Logs(&Les_variables);
     SetTraceLogCallback(Fonction_Log);
-    
+    /*
+        TraceLog(LOG_INFO, "Ton message ici");
+        TraceLog(LOG_WARNING, "Attention, fichier introuvable !");
+        TraceLog(LOG_ERROR, "Erreur fatale !");
+    */
     /*
     la camera 3D pour voir la scene
     ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
@@ -51,9 +56,12 @@ int main(void) {
     cameraEditeur.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     cameraEditeur.fovy = 45.0f;
     cameraEditeur.projection = type_projection_camera;//possibilité de changer ça apres
+    
+    std::cout << "TEST FBO - Preview X: " << Les_parametres.res_preview_x << " Y: " << Les_parametres.res_preview_y << std::endl;
+    RenderTexture2D CameratexturePreview = LoadRenderTexture(640, 360);
+    std::cout << "TEST FBO - REUSSI !" << std::endl;
 
     rlImGuiSetup(true);
-
     // Boucle principale
         while (!WindowShouldClose()) {
             //gestion de la camera de l'editeur
@@ -79,14 +87,34 @@ int main(void) {
                     Les_variables.modeFlyActif = false;
                 }
             }
-
+        La_scene.Update(cameraEditeur, Les_variables);
         // DESSIN idée de base
+        
+        std::vector<SceneNode*> selection = La_scene.GetSelection();
+        if (!selection.empty() && selection[0]->type == "Camera3D") {
+                CameraNode* camNode = dynamic_cast<CameraNode*>(selection[0]);
+                if (camNode) {
+                    BeginTextureMode(CameratexturePreview);
+                        ClearBackground(SKYBLUE);
+                        BeginMode3D(camNode->ObtenirCameraRaylib());
+                            //draw la scene point de vue de la camera active
+                            for (auto& noeud : La_scene.GetNodes()) {
+                                if (noeud->type != "Camera3D"){
+                                    noeud->Draw(Les_variables);
+                                    //std::cout << "dessin" << std::endl;
+                                }
+                            }
+                            EndMode3D();
+                            EndTextureMode();
+                        }
+                    }
+                    
         BeginDrawing();
             ClearBackground(DARKGRAY);
             //TODO faire un vrai truc ici
             BeginMode3D(cameraEditeur);
             //cette ligne dessine tout
-            La_scene.DrawScene();
+            La_scene.DrawScene(Les_variables);
             DrawGrid(1000, 1.0f);
             EndMode3D();
 
@@ -108,7 +136,7 @@ int main(void) {
             }
             
             //l'interface graphique (apres la 3D)
-            gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres);
+            gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres, CameratexturePreview);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
 
@@ -117,10 +145,12 @@ int main(void) {
     }
 
     //nettoyage
+    Les_variables.banque_materiaux = nullptr;
     rlImGuiShutdown();
     La_scene.shaderManager.Nettoyer_tout();
+    La_scene.banque_materiaux.NettoyerTout();
     La_scene.ViderScene();
-    
+    UnloadRenderTexture(CameratexturePreview);
     CloseWindow();
 
     return 0;

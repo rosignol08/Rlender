@@ -8,10 +8,20 @@ set(SRCS
     src/main.cpp
     src/CodeGenerator.cpp
     src/Sauvgarde.cpp
-    src/SceneManager.cpp
-    src/SceneNode.cpp
+    src/Managers/SceneManager.cpp
+    src/Managers/ShaderManager.cpp
+    src/Noeuds/SceneNode.cpp
+    src/Noeuds/SceneNode_Cube.cpp
+    src/Noeuds/SceneNode_Camera.cpp
+    src/Noeuds/SceneNode_Camera2D.cpp
+    src/Noeuds/SceneNode_Sphere.cpp
+    src/Noeuds/SceneNode_Cylindre.cpp
+    src/Noeuds/SceneNode_Cone.cpp
+    src/Noeuds/SceneNode_Plan.cpp
+    src/Noeuds/LightNode.cpp
+    src/Noeuds/DirectionalLightNode.cpp
+    src/Managers/MaterialManager.cpp
     src/Interface.cpp
-    src/ShaderManager.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp
     lib/imgui/imgui.cpp
@@ -19,6 +29,8 @@ set(SRCS
     lib/imgui/imgui_draw.cpp
     lib/imgui/imgui_tables.cpp
     lib/imgui/imgui_widgets.cpp
+    lib/imgui/ImGuizmo.cpp
+    lib/imgui/ImSequencer.cpp
 )
 
 add_executable(application ${SRCS})

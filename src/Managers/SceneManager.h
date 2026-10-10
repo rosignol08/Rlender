@@ -1,10 +1,14 @@
-#include "SceneNode.h"
-#include "json.hpp"
+#include "../Noeuds/SceneNode.h"
+#include "../json.hpp"
 #include"imgui.h"
-#include "utils.h"
+#include "../utils.h"
 #include "ShaderManager.h"
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
+
+#include "MaterialManager.h"
+#include "../Noeuds/LightNode.h"
+#include "../Noeuds/DirectionalLightNode.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
@@ -12,17 +16,24 @@ classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds
 */
 class SceneManager{
     private:
-        //pour stoquer les noeuds
-        std::vector<std::unique_ptr<SceneNode>> sceneNodes;
-        //le pointeur pour choisir un noeuds specifique
-        std::vector<SceneNode*> noeudSelectionne;
-        std::unordered_map<std::string, Material> materiaux;//la banque des materiaux
-        public:
+    //pour stoquer les noeuds
+    std::vector<std::unique_ptr<SceneNode>> sceneNodes;
+    //le pointeur pour choisir un noeuds specifique
+    std::vector<SceneNode*> noeudSelectionne;
+    public:
+    ManagerMateriel banque_materiaux;//la banque des materiaux
         ShaderManager shaderManager;//les shaders
-        void       DrawScene(); //une boucle qui parcours les noeuds et les dessines chacuns
+        void       DrawScene(EditorContext& variables); //une boucle qui parcours les noeuds et les dessines chacuns
+        void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc
         void       AjouterCube(); //ça ajoute un cube simplement
+        void       AjouterSphere(); //ça ajoute une sphere simplement
+        void       AjouterPlan();
+        void       AjouterCyl();
+        void       AjouterCone();
         void       AjouterCamera3D(); //idem pour une caméra3D
         void       AjouterCamera2D(); //idem pour une caméra2D
+        void       AjouterLight(); //ça ajoute une lumiere (pointlight)
+        void       AjouterSoleil(); //ça ajoute un soleil
         void       SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         
         //des getters pour que l'interface graphique accede aux bon noeuds etc

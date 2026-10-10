@@ -1,10 +1,10 @@
 #include "SceneManager.h"
 
 //une boucle qui parcours les noeuds et les dessines chacuns
-void SceneManager::DrawScene(){
+void SceneManager::DrawScene(EditorContext& variables){
     //pour parcourir tous les noeuds a dessiner faut boucler sur la liste par reference pas copie
     for(auto& noeud : sceneNodes){
-        noeud->Draw();//->parce que faut aller acceder à la fonction de l'objet pointée par noeud
+        noeud->Draw(variables);//->parce que faut aller acceder à la fonction de l'objet pointée par noeud
     }
     std::vector<SceneNode*> selection = GetSelection();
     if(!selection.empty()){
@@ -12,15 +12,27 @@ void SceneManager::DrawScene(){
             if (elements == nullptr) continue;
             DrawBoundingBox(elements->GetBoiteCollision(), GREEN);
             //on dessine les gizmo voir si on affiche le gizmo ici
-                Vector3 position_base = elements[0].position; //pour eviter les acces mémoire répétés
-                DrawCylinderEx(position_base,(Vector3){position_base.x+4,position_base.y,position_base.z},0.20f,0.20f,10,RED);
-                DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y+4,position_base.z},0.20f,0.20f,10,GREEN);
-                DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y,position_base.z+4},0.20f,0.20f,10,BLUE);
+                //Vector3 position_base = elements[0].position; //pour eviter les acces mémoire répétés
+                //DrawCylinderEx(position_base,(Vector3){position_base.x+4,position_base.y,position_base.z},0.20f,0.20f,10,RED);
+                //DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y+4,position_base.z},0.20f,0.20f,10,GREEN);
+                //DrawCylinderEx(position_base,(Vector3){position_base.x,position_base.y,position_base.z+4},0.20f,0.20f,10,BLUE);
         }
     }
     return;
 }
 
+void SceneManager::Update(Camera3D& camera_editeur, EditorContext& variables){
+    variables.compteur_lumieres = 0;
+    variables.variables_globales["temps"] = (float)GetTime(); //normalement c'est un double mais osef
+    variables.variables_globales["viewPos"] = camera_editeur.position;//le point de vue de la vraie camera
+    //les obj
+    
+    for(auto& noeud : sceneNodes) {
+        //std::cout << "maj neoud " << noeud->GetType() << std::endl;
+        noeud->Update(variables);
+    }
+    variables.variables_globales["lightCount"] = variables.compteur_lumieres;
+}
 
 //ça ajoute un cube simplement
 void SceneManager::AjouterCube(){
@@ -43,14 +55,136 @@ void SceneManager::AjouterCube(){
     sceneNodes.push_back(std::make_unique<CubeNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
+}
 
-    for(auto & element : sceneNodes){
-        if(element->isSelected){
-            element->isSelected = false; //deselectionne
+void SceneManager::AjouterSphere(){
+    unsigned int compteur_sphere = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Sphere_" + std::to_string(compteur_sphere);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_sphere++;
+                break;
+            }
         }
     }
-    sceneNodes.back()->isSelected = true;
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<SphereNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
 }
+
+void SceneManager::AjouterPlan(){
+    unsigned int compteur_plan = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Plan_" + std::to_string(compteur_plan);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_plan++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<PlaneNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+void SceneManager::AjouterCyl(){
+    unsigned int compteur_cyl = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Cylindre_" + std::to_string(compteur_cyl);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_cyl++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<CylinderNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+
+void SceneManager::AjouterCone(){
+    unsigned int compteur_Cone = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Cone_" + std::to_string(compteur_Cone);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_Cone++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<ConeNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+//ça ajoute une light simplement
+void SceneManager::AjouterLight(){
+    unsigned int compteur_light = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Light_" + std::to_string(compteur_light);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_light++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça :
+    sceneNodes.push_back(std::make_unique<LightNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+void SceneManager::AjouterSoleil(){
+    unsigned int compteur_Soleil = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Soleil_" + std::to_string(compteur_Soleil);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_Soleil++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça :
+    sceneNodes.push_back(std::make_unique<SoleilNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
 
 //idem pour une caméra3D
 void SceneManager::AjouterCamera3D(){
@@ -164,7 +298,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
         nlohmann::json noeud_json;
         noeud_json["type"] = actuel->type;
         noeud_json["nom"] = actuel->nom;
-        noeud_json["isSelected"] = actuel->isSelected;
+        //noeud_json["isSelected"] = actuel->isSelected;//on s'en fout
 
         //les Vector3 de Raylib en tableaux JSON = [x, y, z]
         noeud_json["position"] = { actuel->position.x, actuel->position.y, actuel->position.z };
@@ -188,6 +322,24 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
             Camera2DNode* cam = dynamic_cast<Camera2DNode*>(actuel);//faut dire que le noeud peut etre une camera
             if (cam != nullptr) {
                 noeud_json["zoom_camera"] = cam->zoom_camera;
+            }
+        }
+        //si c'est une lumière :
+        if(actuel->type == "SoleilNode"){
+            SoleilNode* sol = dynamic_cast<SoleilNode*>(actuel);//faut dire que le noeud peut etre un soleil
+            if (sol != nullptr) {
+                noeud_json["puissance_lumiere"] = sol->puissance;
+                noeud_json["couleur_lumiere"] = {sol->couleur_lumiere.x,sol->couleur_lumiere.y,sol->couleur_lumiere.z};                
+                noeud_json["active_lumiere"] = sol->est_allume;
+            }
+        }
+        if (actuel->type == "LightNode") {
+            LightNode* lumiere = dynamic_cast<LightNode*>(actuel);
+            if (lumiere != nullptr) {
+                noeud_json["puissance_lumiere"] = lumiere->puissance;
+                noeud_json["couleur_lumiere"] = {lumiere->couleur_lumiere.x,lumiere->couleur_lumiere.y,lumiere->couleur_lumiere.z};
+                noeud_json["active_lumiere"] = lumiere->est_allume;
+                noeud_json["intensite_lumiere"] = lumiere->intensite;//rayon d'atténuation
             }
         }
         //ajout du noeud à la sauvgarde du projet
@@ -278,6 +430,25 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
             cam->zoom_camera = element_json["zoom_camera"];
             nouveau_noeud = std::move(cam);
         }
+        else if (le_type == "SoleilNode") {
+            auto sol = std::make_unique<SoleilNode>();
+            if (element_json.contains("puissance_lumiere")) sol->puissance = element_json["puissance_lumiere"];
+            if (element_json.contains("active_lumiere")) sol->est_allume = element_json["active_lumiere"];
+            if (element_json.contains("couleur_lumiere")) {
+                sol->couleur_lumiere = { element_json["couleur_lumiere"][0], element_json["couleur_lumiere"][1], element_json["couleur_lumiere"][2] };
+            }
+            nouveau_noeud = std::move(sol);
+        }
+        else if (le_type == "LightNode") {
+            auto lum = std::make_unique<LightNode>();
+            if (element_json.contains("puissance_lumiere")) lum->puissance = element_json["puissance_lumiere"];
+            if (element_json.contains("intensite_lumiere")) lum->intensite = element_json["intensite_lumiere"];
+            if (element_json.contains("active_lumiere")) lum->est_allume = element_json["active_lumiere"];
+            if (element_json.contains("couleur_lumiere")) {
+                lum->couleur_lumiere = { element_json["couleur_lumiere"][0], element_json["couleur_lumiere"][1], element_json["couleur_lumiere"][2] };
+            }
+            nouveau_noeud = std::move(lum);
+        }
         else{//par défaut si c'est rien on skip le noeud
             continue;
         }
@@ -310,15 +481,22 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
         nouveau_noeud->taille.x = element_json["taille"][0];
         nouveau_noeud->taille.y = element_json["taille"][1];
         nouveau_noeud->taille.z = element_json["taille"][2];
-        sceneNodes.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
+        nouvelle_scene.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
     }
 
     Deselectionne();
     sceneNodes = std::move(nouvelle_scene);
+    //pour reselectioner les objets
+    for (auto& noeud : sceneNodes) {
+        if (noeud->isSelected) {
+            noeudSelectionne.push_back(noeud.get());
+        }
+    }
 }
 
 void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){
     //raycasting
+    if (ImGuizmo::IsOver()) return;
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){
         Ray rayon = GetScreenToWorldRay(GetMousePosition(), camera_editeur);
         SceneNode* objetTouche = nullptr;
@@ -335,77 +513,18 @@ void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & varia
         }
 
         //check si on a une selection
-        if(!GetSelection().empty()){
-
-            Vector3 position_base = GetSelection()[0]->position; //pour eviter les acces mémoire répétés
-            BoundingBox box_x = { 
-                (Vector3){position_base.x, position_base.y - 0.5f, position_base.z - 0.5f},
-                (Vector3){position_base.x + 4.0f, position_base.y + 0.5f, position_base.z + 0.5f}
-            };
-            BoundingBox box_y = { 
-                (Vector3){position_base.x - 0.5f, position_base.y, position_base.z - 0.5f},
-                (Vector3){position_base.x + 0.5f, position_base.y + 4.0f, position_base.z + 0.5f}
-            };
-            BoundingBox box_z = { 
-                (Vector3){position_base.x - 0.5f, position_base.y - 0.5f, position_base.z},
-                (Vector3){position_base.x + 0.5f, position_base.y + 0.5f, position_base.z + 4.0f}
-            };  
-            RayCollision collisionx = GetRayCollisionBox(rayon,box_x);
-            RayCollision collisiony = GetRayCollisionBox(rayon,box_y);
-            RayCollision collisionz = GetRayCollisionBox(rayon,box_z);
-                
-            if (collisionx.hit) { variables.axe_en_cours = 'X'; 
-                std::cout << "X touche" << std::endl;
-                return;
-            }
-            if (collisiony.hit) { variables.axe_en_cours = 'Y';
-                std::cout << "Y touche" << std::endl;
-                return;
-            }
-            if (collisionz.hit) { variables.axe_en_cours = 'Z'; 
-                std::cout << "Z touche" << std::endl;
-                return;
-            }   
-        }
-        variables.axe_en_cours = '0';
-
         if(objetTouche != nullptr){
-            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){    
-                //ctrl avec plusieurs objets
+            if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
                 ToggleSelection(objetTouche);
             }else{
                 SetSelection(objetTouche);
             }
-        }else{
+        } else {
+            // SI ON CLIQUE DANS LE VIDE
             if (!IsKeyDown(KEY_LEFT_CONTROL) && !IsKeyDown(KEY_RIGHT_CONTROL)){
-                Deselectionne();//si on clique dans le vide on déséléctionne
+                Deselectionne();
             }
         }
-    }
-    if(IsMouseButtonDown(MOUSE_BUTTON_LEFT) && variables.axe_en_cours != '0'){
-        //si on maintient le clic et qu'on touche a un axe
-        if (!GetSelection().empty()) {
-            Vector2 pos_souris = GetMouseDelta();
-            switch (variables.axe_en_cours){
-                case 'X':
-                    GetSelection()[0]->position.x += pos_souris.x*0.02f; //psk en 2d la souris va vite TODO etaloner la valeurs
-                    variables.flag_changements = true;
-                    break;
-
-                case 'Y':
-                    GetSelection()[0]->position.y -= pos_souris.y*0.02f;//sur l'ecrant y descend et en 3D il monte c'est inversé donc -
-                    variables.flag_changements = true;
-                break;
-
-                case 'Z':
-                    GetSelection()[0]->position.z += pos_souris.x*0.01f + (pos_souris.y*0.01f);//les deux ? jsp au choix
-                    variables.flag_changements = true;
-                break;
-            }
-        }
-    }
-    if(IsMouseButtonReleased(MOUSE_BUTTON_LEFT)){
-        variables.axe_en_cours = '0';
     }
 }
 

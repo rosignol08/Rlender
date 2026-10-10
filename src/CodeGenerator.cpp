@@ -1,4 +1,4 @@
-#include "SceneNode.h"
+#include "Noeuds/SceneNode.h"
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes) {
     std::stringstream code;

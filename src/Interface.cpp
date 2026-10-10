@@ -69,13 +69,10 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             
                 if (cheminChoisi != NULL) {
                     std::string contenu = GenererCodeComplet(La_scene.GetNodes());
-                    Sauvgarde(cheminChoisi, contenu);
+                    Exporter(cheminChoisi, contenu);
                 }
             }
-            //if(ImGui::MenuItem("Exporter","ctrl+e")){    
-            //    std::string cheminFichier; //fonction pour selectioner un fichier ou un emplacement depuis l'editeur externe
-            //    ChargerProjet(cheminFichier);
-            //}
+            
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Paramètres")) {
@@ -128,10 +125,17 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
         }
         //exemple d'ajout de bouton
         if(ImGui::Button("cube",{50.0f,50.0f})){
+            La_scene.AjouterCamera3D();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+        if(ImGui::Button("Light",{50.0f,50.0f})){
+            La_scene.AjouterLight();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+        if(ImGui::Button("Soleil",{50.0f,50.0f})){
             La_scene.AjouterCube();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
-        
         ImGui::EndMainMenuBar();
     }
 }
@@ -159,8 +163,123 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
         }
     ImGui::End();
 }
+void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, std::vector<SceneNode*> noeuds_selectione){
+    ImGui::Text("Materiau");
+    SceneNode* objet = noeuds_selectione[0];
+    if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
+        for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
+            bool est_selectione = (objet->nom_shader_actuel == nom);
+            if(ImGui::Selectable(nom.c_str(),est_selectione)){
+                //si on clique ça applique
+                objet->AppliquerShader(nom,shader_obj);
+                Les_variables.flag_changements = true;//pour l'autosave
+            }
+            if(est_selectione){
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+        ManagerMateriel* banque = Les_variables.banque_materiaux;
+        if (banque != nullptr) {
+            //le matériau actuellement assigné à l'objet
+            DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
+            std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
+        
+            //liste déroulante pour choisir matériau
+            if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
+                for (auto& mat : banque->GetTousLesMateriaux()) {
+                    bool est_selectione = (objet->id_materiau == mat.identifiant);
+                    if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
+                        objet->id_materiau = mat.identifiant;
+                        Les_variables.flag_changements = true;
+                    }
+                    if (est_selectione) {
+                        ImGui::SetItemDefaultFocus();
+                    }
+                }
+                ImGui::EndCombo();
+                }
+                ImGui::Spacing();
+                
+                ImGui::InputText("Nom du Materiel", &Les_variables.nom_nouveau_materiau[0], 64);
 
-void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
+                if (ImGui::Button("Créer un Matériel")){
+                    //std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
+                    int nouvel_identifiant = banque->CreerMateriau(Les_variables.nom_nouveau_materiau.c_str());
+                    objet->id_materiau = nouvel_identifiant;
+                    //reset le nom
+                    Les_variables.nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
+                    Les_variables.flag_changements = true;//pour la sauvgarde
+                }
+                    //pour editer me materiau
+                    if (mat_actuel != nullptr) {
+                        ImGui::Indent(); //décalage l'UI vers la droite
+                        //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
+                        float couleur_float[4] = {
+                            mat_actuel->couleurAlbedo.r / 255.0f,
+                            mat_actuel->couleurAlbedo.g / 255.0f,
+                            mat_actuel->couleurAlbedo.b / 255.0f,
+                            mat_actuel->couleurAlbedo.a / 255.0f
+                        };
+                    
+                        if (ImGui::ColorEdit4("Couleur", couleur_float)) {
+                            //si changement couleur dans ImGui maj donnée Raylib
+                            mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
+                            mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
+                            mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
+                            mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
+                            Les_variables.flag_changements = true;
+                        }
+                        
+                        }
+                        if (mat_actuel->identifiant != 0) {
+                            //on peut changer la texture que si c'est un materiel différent
+                            if (ImGui::Button("Charger Texture Albedo")){
+                            const char* filtres[4] = { "*.jpeg","*.jpg","*.png","*.exr" };
+                            const char* cheminChoisi = tinyfd_openFileDialog(
+                                "Texture Albedo", //titre
+                                "",                 //chemin par défaut
+                                4, filtres,        //filtres d'extension
+                                "Texture (.png, .jpg, .exr)",   //fescription
+                                0                  //sélection multiple activéé
+                            );
+                            if(cheminChoisi != nullptr){//si on a choisi un fichier
+                                banque->ChargerTextureAlbedo(mat_actuel->identifiant, cheminChoisi);
+                                Les_variables.flag_changements = true;
+                                TraceLog(LOG_INFO, "Fichier donné.");
+                            }if(mat_actuel->textureAlbedo.id != 0){
+                                ImGui::SameLine();
+                                ImGui::Text("Texture chargée");
+                            }else{
+                                ImGui::SameLine();
+                                ImGui::Text("Aucune texture");
+                            }
+                            ImGui::Spacing();
+
+                            //bouton en rouge
+                            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+
+                            if (ImGui::Button("Supprimer ce Matériau")) {
+                                //supprime le matériau de la banque + unload texture
+                                banque->Nettoyer_Materiau(mat_actuel->identifiant);
+
+                                //assigne le matériau par défaut à objet sélectionné
+                                objet->id_materiau = 0;
+                                Les_variables.flag_changements = true;
+                            }
+
+                            //faut retirer les couleurs personnalisées du bouton
+                            ImGui::PopStyleColor(3); 
+                        }
+                        ImGui::Unindent();
+                    }
+                
+        }
+}
+void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
     ImGui::Begin("Inspecteur");
@@ -180,27 +299,72 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables){
                 // sliders pour modifier dynamiquement les variables
             if (
                 // TODO ajouter les bouton pour ajouter des objetsg ici aussi
-                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f))
-                {
+                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f)){
                     Les_variables.flag_changements = true;
                 }
             ImGui::Separator();
-            ImGui::Text("Materiau");
-
-            SceneNode* objet = noeuds_selectione[0];
-            if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
-                for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
-                    bool est_selectione = (objet->nom_shader_actuel == nom);
-                    if(ImGui::Selectable(nom.c_str(),est_selectione)){
-                        //si on clique ça applique
-                        objet->AppliquerShader(nom,shader_obj);
-                        Les_variables.flag_changements = true;//pour l'autosave
-                    }
-                    if(est_selectione){
-                        ImGui::SetItemDefaultFocus();
-                    }
+            
+            if(noeuds_selectione[0]->GetType() == "LightNode"){
+                //on a une lumière
+                LightNode* objet = static_cast<LightNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés de la Lumière");
+                //la couleur
+                if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
+                    Les_variables.flag_changements = true;
                 }
-                ImGui::EndCombo();
+
+                // Le slider d'intensité
+                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
+                    Les_variables.flag_changements = true;
+                }
+
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+                
+            }else if(noeuds_selectione[0]->GetType() == "SoleilNode"){
+                //le soleil
+                SoleilNode* objet = static_cast<SoleilNode*>(noeuds_selectione[0]);
+                
+                if (ImGui::DragFloat3("Direction", &objet->direction.x, 0.01f, -1.0f, 1.0f)) {
+                    if (objet->direction.x == 0 && objet->direction.y == 0 && objet->direction.z == 0) {
+                        objet->direction = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
+                    }
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
+                    Les_variables.flag_changements = true;
+                }
+
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
+                    Les_variables.flag_changements = true;
+                }
+
+            }
+            else if(noeuds_selectione[0]->GetType() == "Camera3D"){
+                CameraNode* objet = static_cast<CameraNode*>(noeuds_selectione[0]);
+                ImGui::Text("Apercu Camera :");
+                ImGui::Checkbox("Active : ", &objet->active);
+                //ImVec2(0,1) et (1,0) c'est pour inverser l'image verticalement (probleme OpenGL/Raylib)
+                float largeurFenetre = ImGui::GetContentRegionAvail().x;
+                float ratio = (float)Les_parametres.res_preview_y / (float)Les_parametres.res_preview_x;
+                float hauteurCalculee = largeurFenetre * ratio;
+
+            ImGui::Image((ImTextureID)(size_t)texture_preview.texture.id,
+                         ImVec2(largeurFenetre, hauteurCalculee), 
+                         ImVec2(0, 1),  // UV min (Inversé Y)
+                         ImVec2(1, 0)); // UV max (Inversé Y)
+            }else{
+                Dessiner_Materiaux_Manager(La_scene, Les_variables, noeuds_selectione);
             }
             }else{
                 ImGui::TextColored(ImVec4(1, 0, 0, 1), "ERREUR FATALE : Pointeur NULL !");
@@ -366,7 +530,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     //si on clique sur le bouton :
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
         const char * defaultVS = "";//c'est le shader vs de base de raylib
-        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, "", Les_variables.codeFragmentShader)){            
+        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, Les_variables.codeVertexShader, Les_variables.codeFragmentShader)){            
             Shader le_nouveau_shader = La_scene.shaderManager.dictionnaire_shaders[Les_variables.nom_nouveau_shader];
             
             for(auto & element : La_scene.GetNodes()){//mise a jours de tous les obj avec ce shader
@@ -389,17 +553,22 @@ void Initialiser_Logs(EditorContext* contexte_cible){
     contexte_global_pour_les_logs = contexte_cible;
 }
 
-void Fonction_Log(int type_message, const char *texte,  va_list arguments){
-    //TraceLogCallback(type_message, texte, arguments);
+void Fonction_Log(int type_message, const char *texte, va_list arguments){
     char buffer[256];
-    vsnprintf(buffer, 256,texte,arguments);
-    if (contexte_global_pour_les_logs != nullptr){
-        if(contexte_global_pour_les_logs->liste_log.size() >= *nb_lignes_max_console){
-            contexte_global_pour_les_logs->liste_log.erase (contexte_global_pour_les_logs->liste_log.begin ());
-        }
-        contexte_global_pour_les_logs->liste_log.push_back(buffer);
-        contexte_global_pour_les_logs->defiler_log = true;
+    vsnprintf(buffer, sizeof(buffer), texte, arguments);
+
+    if (contexte_global_pour_les_logs == nullptr) return;
+
+    auto& logs = contexte_global_pour_les_logs->liste_log;
+
+    //valeur par défaut si le pointeur est pas encore prêt
+    size_t max_lignes = (nb_lignes_max_console != nullptr) ? *nb_lignes_max_console : 200;
+
+    while (!logs.empty() && logs.size() >= max_lignes) {
+        logs.erase(logs.begin());
     }
+    logs.push_back(buffer);
+    contexte_global_pour_les_logs->defiler_log = true;
 }
 
 void Dessiner_Console(SceneManager& La_scene, EditorContext& Les_variables){
@@ -416,15 +585,70 @@ void Dessiner_Console(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::End();
 }
 
-void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres){
+void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_variables){
+    std::vector<SceneNode*> selection = La_scene.GetSelection();
+    if (selection.empty()) return;
+    SceneNode* noeud = selection[0];
+    
+    ImGuizmo::BeginFrame();
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), (float)GetScreenHeight()));
+    ImGui::Begin("Gizmo_Fenetre", nullptr, 
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | 
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground | 
+        ImGuiWindowFlags_NoInputs);
+
+    ImGuizmo::SetOrthographic(false);
+    //ImGuizmo::SetDrawlist();
+    ImGuizmo::SetRect(0, 0, GetScreenWidth(), GetScreenHeight());
+
+    // --- LES LIGNES MANQUANTES SONT ICI ---
+    Matrix matView = MatrixLookAt(camera.position, camera.target, camera.up);
+    float aspect = (float)GetScreenWidth() / (float)GetScreenHeight();
+    Matrix matProj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.01f, 1000.0f); 
+
+    float16 viewFloat = MatrixToFloatV(matView);
+    float16 projFloat = MatrixToFloatV(matProj);
+    // --------------------------------------
+    
+    float translation[3] = { noeud->position.x, noeud->position.y, noeud->position.z };
+    float rotation[3]    = { noeud->rotation.x, noeud->rotation.y, noeud->rotation.z };
+    float scale[3]       = { noeud->taille.x, noeud->taille.y, noeud->taille.z };
+    
+    float16 modelFloat;
+    ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, modelFloat.v);
+    Les_variables.gizmo_operation = ImGuizmo::TRANSLATE;
+    Les_variables.gizmo_mode = ImGuizmo::LOCAL;
+    ImGuizmo::Manipulate(
+        viewFloat.v,            
+        projFloat.v,            
+        Les_variables.gizmo_operation, // Ta variable (TRANSLATE, ROTATE, SCALE)
+        Les_variables.gizmo_mode, // Ta variable (WORLD, LOCAL)
+        modelFloat.v            
+    );
+
+    if (ImGuizmo::IsUsing()) {
+        ImGuizmo::DecomposeMatrixToComponents(modelFloat.v, translation, rotation, scale);
+        noeud->position = { translation[0], translation[1], translation[2] };
+        noeud->rotation = { rotation[0], rotation[1], rotation[2] }; 
+        noeud->taille   = { scale[0], scale[1], scale[2] };
+        Les_variables.flag_changements = true; 
+    }
+    
+    ImGui::End();
+}
+
+
+void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D& texture_preview){
     nb_lignes_max_console = &Les_parametres.nb_lignes_max_console;
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
-    
+    Gerer_gizmo(cameraEditeur, La_scene, Les_variables);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_Hierarchie(La_scene, Les_variables);
-    Dessiner_Inspecteur(La_scene, Les_variables);
+    Dessiner_Inspecteur(La_scene, Les_variables, Les_parametres, texture_preview);
     Dessiner_ControlesCamera(cameraEditeur, Les_variables);
     Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
     Dessiner_EditeurShader(La_scene,Les_variables);
