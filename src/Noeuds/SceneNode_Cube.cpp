@@ -41,13 +41,16 @@ void CubeNode::Draw(EditorContext& variables){
         if (mat == nullptr) {
             mat = variables.banque_materiaux->GetMateriau(0);
             this->id_materiau = 0; //l'objet pour la prochaine fois
-        }
-        
-        if (mat != nullptr) {
+        }else{
             couleur_rendu = mat->couleurAlbedo;
             
-            //plus tard :
-            //modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
+            //TODO ajouter les autre types de textures
+            if(mat->textureAlbedo.id != 0){
+                modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
+                TraceLog(LOG_INFO, "Texture");
+            }else{
+                modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = {0};
+            }
         }
     }
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire

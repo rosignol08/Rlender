@@ -231,7 +231,11 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                             mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
                             Les_variables.flag_changements = true;
                         }
-                        if (ImGui::Button("Charger Texture Albedo")){
+                        
+                        }
+                        if (mat_actuel->identifiant != 0) {
+                            //on peut changer la texture que si c'est un materiel différent
+                            if (ImGui::Button("Charger Texture Albedo")){
                             const char* filtres[4] = { "*.jpeg","*.jpg","*.png","*.exr" };
                             const char* cheminChoisi = tinyfd_openFileDialog(
                                 "Texture Albedo", //titre
@@ -240,11 +244,17 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                                 "Texture (.png, .jpg, .exr)",   //fescription
                                 0                  //sélection multiple activéé
                             );
-                            if(cheminChoisi != nullptr){
-                                
+                            if(cheminChoisi != nullptr){//si on a choisi un fichier
+                                banque->ChargerTextureAlbedo(mat_actuel->identifiant, cheminChoisi);
+                                Les_variables.flag_changements = true;
+                                TraceLog(LOG_INFO, "Fichier donné.");
+                            }if(mat_actuel->textureAlbedo.id != 0){
+                                ImGui::SameLine();
+                                ImGui::Text("Texture chargée");
+                            }else{
+                                ImGui::SameLine();
+                                ImGui::Text("Aucune texture");
                             }
-                        }
-                        if (mat_actuel->identifiant != 0) {
                             ImGui::Spacing();
 
                             //bouton en rouge

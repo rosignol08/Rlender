@@ -39,7 +39,11 @@ int main(void) {
     //les logs
     Initialiser_Logs(&Les_variables);
     SetTraceLogCallback(Fonction_Log);
-    
+    /*
+        TraceLog(LOG_INFO, "Ton message ici");
+        TraceLog(LOG_WARNING, "Attention, fichier introuvable !");
+        TraceLog(LOG_ERROR, "Erreur fatale !");
+    */
     /*
     la camera 3D pour voir la scene
     ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
@@ -141,8 +145,10 @@ int main(void) {
     }
 
     //nettoyage
+    Les_variables.banque_materiaux = nullptr;
     rlImGuiShutdown();
     La_scene.shaderManager.Nettoyer_tout();
+    La_scene.banque_materiaux.NettoyerTout();
     La_scene.ViderScene();
     UnloadRenderTexture(CameratexturePreview);
     CloseWindow();

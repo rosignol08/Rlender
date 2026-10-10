@@ -2,7 +2,14 @@
 
 
 ManagerMateriel::ManagerMateriel(){
-    ManagerMateriel::CreerMateriau("Materiau_Defaut");
+    Image img_blanche = GenImageColor(1, 1, WHITE);
+    Texture2D texture_par_defaut = LoadTextureFromImage(img_blanche);
+    UnloadImage(img_blanche);
+    int id = ManagerMateriel::CreerMateriau("Materiau_Defaut");
+    DataMateriel* mat_defaut = GetMateriau(id);
+    if (mat_defaut){
+        mat_defaut->textureAlbedo = texture_par_defaut;
+    }
 }
 ManagerMateriel::~ManagerMateriel(){
     NettoyerTout();
