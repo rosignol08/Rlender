@@ -14,6 +14,34 @@ ConeNode::~ConeNode(){
 }
 
 void ConeNode::Draw(EditorContext& variables){
+    Color couleur_rendu = WHITE;//couleur de rendu
+
+    if (variables.banque_materiaux != nullptr) {
+        //demande du matériel de cet objet
+        DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+        
+        //securite si l'ID existe plus matériel par défaut (0)
+        if (mat == nullptr) {
+            mat = variables.banque_materiaux->GetMateriau(0);
+            this->id_materiau = 0; //l'objet pour la prochaine fois
+        }else{
+            couleur_rendu = mat->couleurAlbedo;
+            
+            //TODO ajouter les autre types de textures
+            if(mat->textureAlbedo.id != 0){
+                modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
+                //TraceLog(LOG_INFO, "Texture");
+            }else{
+                modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = {0};
+            }
+            if (variables.gestionnaire_shaders != nullptr) {
+                //check le shader dans le dictionnaire
+                if (variables.gestionnaire_shaders->dictionnaire_shaders.count(mat->nom_shader_actuel) > 0) {
+                    modele.materials[0].shader = variables.gestionnaire_shaders->dictionnaire_shaders[mat->nom_shader_actuel];
+                }
+            }
+        }
+    }
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
     AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
     Matrix matTransform = MatrixIdentity();
@@ -25,7 +53,7 @@ void ConeNode::Draw(EditorContext& variables){
     modele.transform = matTransform;
 
     //Draw normal (position 0, car la matrice s'occupe de tout)
-    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, WHITE);
+    DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, couleur_rendu);
     if(isSelected){
         DrawModelWires(modele, (Vector3){0, 0, 0}, 1.0f, YELLOW);
     }
@@ -40,7 +68,7 @@ std::unique_ptr<SceneNode> ConeNode::Cloner(){
     clone->position = this->position;
     clone->taille = this->taille;
     clone->couleur = this->couleur;
-    clone->nom_shader_actuel = this->nom_shader_actuel;
+    clone->id_materiau = this->id_materiau;
     clone->modele.materials[0].shader = this->modele.materials[0].shader; // on clone aussi le shader et le materiel
     clone->isSelected = true;
     static unsigned int compteur_Cone_clones = 0;                        // logiquement on a un compteur pour les clones
@@ -59,11 +87,4 @@ std::string ConeNode::GetDrawCode(){
 
 std::string ConeNode::GetInitCode(){
     return "";
-}
-
-
-void ConeNode::AppliquerShader(const std::string& nom_shader, Shader le_shader) {
-    nom_shader_actuel = nom_shader;
-    //assigne le shader à la carte graphique pour ce modèle précis
-    modele.materials[0].shader = le_shader; 
 }

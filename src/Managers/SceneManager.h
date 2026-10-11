@@ -45,7 +45,7 @@ class SceneManager{
         //pour la sauvgarde
         void SauvegarderProjet(std::string cheminFichier);//parcour le vecteur d'objets et remplis le json
         void ChargerProjet(std::string cheminFichier);//vide la scene actuelle et remplis avec le json lu
-        void Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables);
+        void Gerer_pointeur(Camera3D camera_editeur);
         void AjouterNoeud(std::unique_ptr<SceneNode> nouveau_noeud);
         void SupprimerNoeud(SceneNode* cible);
         void ViderScene();

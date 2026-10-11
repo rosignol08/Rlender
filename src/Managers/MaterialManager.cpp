@@ -25,11 +25,21 @@ int ManagerMateriel::CreerMateriau(const std::string& nom) {
 }
 
 DataMateriel* ManagerMateriel::GetMateriau(int id) {
-        if (id >= 0 && id < liste_materiaux.size()) {
-            return &liste_materiaux[id];
-        }
-        return nullptr;
+    if (id >= 0 && id < liste_materiaux.size()) {
+        return &liste_materiaux[id];
     }
+    return nullptr;
+}
+
+DataMateriel* ManagerMateriel::GetMateriau(const std::string& nom){
+    for(auto & elem : liste_materiaux) {
+        if(elem.nom == nom){
+            return &elem;
+        }
+    }
+    return nullptr;
+}
+
 void ManagerMateriel::ChargerTextureAlbedo(int id, const std::string& cheminFichier) {
         DataMateriel* mat = GetMateriau(id);
         if (mat) {
@@ -39,6 +49,7 @@ void ManagerMateriel::ChargerTextureAlbedo(int id, const std::string& cheminFich
             }
             mat->textureAlbedo = LoadTexture(cheminFichier.c_str());
             std::cout << "Texture chargee pour le materiau : " << mat->nom << std::endl;
+            mat->chemins_textures["albedo"] = cheminFichier;
         }
     }
 

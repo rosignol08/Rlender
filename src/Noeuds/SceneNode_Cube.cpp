@@ -5,10 +5,8 @@ CubeNode::CubeNode()
     nom = "Cube";
     taille = {2.0f, 2.0f, 2.0f}; // Petite taille par défaut pour le voir
     type = "cube";
-    // un maillage de base
-    Mesh maillage = GenMeshCube(1.0f, 1.0f, 1.0f);
     // ça contient automatiquement un Material par défaut
-    modele = LoadModelFromMesh(maillage);
+    modele = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
 }
 
 CubeNode::~CubeNode()
@@ -30,6 +28,7 @@ std::string CubeNode::GetInitCode()
     code << "\t\t\t\tVector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " << std::to_string(this->position.z) << "};\n";
     return code.str();
 }
+
 void CubeNode::Draw(EditorContext& variables){
     Color couleur_rendu = WHITE;//couleur de rendu
 
@@ -47,9 +46,15 @@ void CubeNode::Draw(EditorContext& variables){
             //TODO ajouter les autre types de textures
             if(mat->textureAlbedo.id != 0){
                 modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
-                TraceLog(LOG_INFO, "Texture");
+                //TraceLog(LOG_INFO, "Texture");
             }else{
                 modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = {0};
+            }
+            if (variables.gestionnaire_shaders != nullptr) {
+                //check le shader dans le dictionnaire
+                if (variables.gestionnaire_shaders->dictionnaire_shaders.count(mat->nom_shader_actuel) > 0) {
+                    modele.materials[0].shader = variables.gestionnaire_shaders->dictionnaire_shaders[mat->nom_shader_actuel];
+                }
             }
         }
     }
@@ -75,7 +80,7 @@ std::unique_ptr<SceneNode> CubeNode::Cloner(){
     clone->position = this->position;
     clone->taille = this->taille;
     clone->couleur = this->couleur;
-    clone->nom_shader_actuel = this->nom_shader_actuel;
+    clone->id_materiau = this->id_materiau;
     clone->modele.materials[0].shader = this->modele.materials[0].shader; // on clone aussi le shader et le materiel
     clone->isSelected = true;
     static unsigned int compteur_cube_clones = 0;                        // logiquement on a un compteur pour les clones
@@ -83,12 +88,3 @@ std::unique_ptr<SceneNode> CubeNode::Cloner(){
     compteur_cube_clones++;
     return clone;
 }
-
-//TODO le faire pour les autres
-void CubeNode::AppliquerShader(const std::string& nom_shader, Shader le_shader) {
-    nom_shader_actuel = nom_shader;
-    //assigne le shader à la carte graphique pour ce modèle précis
-    modele.materials[0].shader = le_shader; 
-}
-
-//std::string GetType() { return "CubeNode"; }

@@ -29,7 +29,6 @@ class SceneNode {
             //pour la selectioner avec la souris l'objet a une bounding box
             return BoundingBox{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
         }
-        std::string nom_shader_actuel = "Defaut";
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
@@ -52,12 +51,6 @@ class SceneNode {
 
     //pour l'ui
     virtual std::string GetType() const = 0; //les enfants disent qui ils sont
-
-    
-    //le shader
-    virtual void AppliquerShader(const std::string& nom_shader, Shader le_shader) {
-        nom_shader_actuel = nom_shader;
-    }
     //faut faire un constructeur par défaut au cas où
     SceneNode(){
         nom = "";
@@ -103,7 +96,6 @@ class CubeNode : public SceneNode{
     }
 
     std::unique_ptr<SceneNode> Cloner() override;
-    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
     std::string GetType() const override { return "CubeNode"; }
 };
 
@@ -124,7 +116,7 @@ class SphereNode : public SceneNode{
     BoundingBox GetBoiteCollision() override;
     
     std::unique_ptr<SceneNode> Cloner() override;
-    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    
     std::string GetType() const override { return "SphereNode"; }
 };
 
@@ -146,7 +138,7 @@ public:
     BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
-    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    
     std::string GetType() const override { return "PlaneNode"; }
 };
 
@@ -167,7 +159,7 @@ class CylinderNode : public SceneNode {
         BoundingBox GetBoiteCollision() override;
         
         std::unique_ptr<SceneNode> Cloner() override;
-        void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+        
         std::string GetType() const override { return "CylinderNode"; }
 };
 
@@ -188,7 +180,7 @@ public:
     BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
-    void AppliquerShader(const std::string& nom_shader, Shader le_shader) override;
+    
     std::string GetType() const override { return "ConeNode"; }
 };
 

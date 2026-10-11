@@ -304,7 +304,7 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
         noeud_json["position"] = { actuel->position.x, actuel->position.y, actuel->position.z };
         noeud_json["rotation"] = { actuel->rotation.x, actuel->rotation.y, actuel->rotation.z };
         noeud_json["taille"]   = { actuel->taille.x, actuel->taille.y, actuel->taille.z };
-
+        noeud_json["id_materiau"] = actuel->id_materiau;
         //idem pour la couleur
         noeud_json["couleur"]  = { actuel->couleur.r, actuel->couleur.g, actuel->couleur.b, actuel->couleur.a };
         if(actuel->type == "camera3D"){
@@ -345,6 +345,26 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
         //ajout du noeud à la sauvgarde du projet
         projet_json["noeuds"].push_back(noeud_json);
     }
+    projet_json["materiaux"] = nlohmann::json::array();
+    for(auto & materiel : banque_materiaux.GetTousLesMateriaux()){
+        nlohmann::json materiel_json;//materiel temporaire
+        materiel_json["identifiant"] = materiel.identifiant;
+        materiel_json["nom"] = materiel.nom;
+
+        materiel_json["couleurAlbedo"] = {materiel.couleurAlbedo.r,materiel.couleurAlbedo.g,materiel.couleurAlbedo.b,materiel.couleurAlbedo.a};
+        nlohmann::json textures_json = nlohmann::json::object();
+
+        for(auto const& [type, chemin] : materiel.chemins_textures){
+            textures_json[type] = chemin; 
+            // ça créera par exemple : "albedo": "assets/bois.png"
+        }
+        materiel_json["chemins_textures"] = textures_json;
+        //pour le shader
+        //Il faut ajouter "std::string nom_shader;" dans la struct DataMateriel
+        materiel_json["nom_shader_actuel"] = materiel.nom_shader_actuel;
+        projet_json["materiaux"].push_back(materiel_json);
+        
+    }
 
     std::ofstream file(cheminFichier);
     if (!file) {
@@ -381,6 +401,31 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     if (!projet_json.is_object() || !projet_json.contains("noeuds") || !projet_json["noeuds"].is_array()) {
         std::cerr << "Erreur : structure JSON invalide pour " << cheminFichier << std::endl;
         return;
+    }
+
+    banque_materiaux.NettoyerTout();
+
+    for (auto& element_json : projet_json["materiaux"]) {
+        if (!element_json.is_object()) {
+            continue;
+        }
+        
+        DataMateriel * pointeur_element = banque_materiaux.GetMateriau(banque_materiaux.CreerMateriau(element_json["nom"]));
+        pointeur_element->identifiant = element_json["identifiant"];
+        pointeur_element->couleurAlbedo.r = element_json["couleurAlbedo"][0];
+        pointeur_element->couleurAlbedo.g = element_json["couleurAlbedo"][1];
+        pointeur_element->couleurAlbedo.b = element_json["couleurAlbedo"][2];
+        pointeur_element->couleurAlbedo.a = element_json["couleurAlbedo"][3];
+
+        pointeur_element->chemins_textures = element_json["chemins_textures"];
+        pointeur_element->nom_shader_actuel = element_json["nom_shader_actuel"];
+        
+    }
+    for(auto & elem : banque_materiaux.GetTousLesMateriaux()){
+        //load toutes les textures
+        for (auto & kv : elem.chemins_textures) {
+            banque_materiaux.ChargerTextureAlbedo(elem.identifiant, kv.second);
+        }
     }
 
     std::vector<std::unique_ptr<SceneNode>> nouvelle_scene;
@@ -481,9 +526,14 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
         nouveau_noeud->taille.x = element_json["taille"][0];
         nouveau_noeud->taille.y = element_json["taille"][1];
         nouveau_noeud->taille.z = element_json["taille"][2];
+        if (element_json.contains("id_materiau")) {
+            nouveau_noeud->id_materiau = element_json["id_materiau"];
+        } else {
+            nouveau_noeud->id_materiau = 0; //le matériau par défaut
+        }
         nouvelle_scene.push_back(std::move(nouveau_noeud));//move pour déplacer la propriété du pointeur
     }
-
+    
     Deselectionne();
     sceneNodes = std::move(nouvelle_scene);
     //pour reselectioner les objets
@@ -494,7 +544,7 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
     }
 }
 
-void SceneManager::Gerer_pointeur(Camera3D camera_editeur, EditorContext & variables){
+void SceneManager::Gerer_pointeur(Camera3D camera_editeur){
     //raycasting
     if (ImGuizmo::IsOver()) return;
     if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !ImGui::GetIO().WantCaptureMouse){

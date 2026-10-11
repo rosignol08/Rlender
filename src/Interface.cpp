@@ -166,119 +166,115 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
 void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, std::vector<SceneNode*> noeuds_selectione){
     ImGui::Text("Materiau");
     SceneNode* objet = noeuds_selectione[0];
-    if(ImGui::BeginCombo("Shader", objet->nom_shader_actuel.c_str())){
-        for(auto const& [nom, shader_obj] : La_scene.shaderManager.dictionnaire_shaders){
-            bool est_selectione = (objet->nom_shader_actuel == nom);
-            if(ImGui::Selectable(nom.c_str(),est_selectione)){
-                //si on clique ça applique
-                objet->AppliquerShader(nom,shader_obj);
-                Les_variables.flag_changements = true;//pour l'autosave
+    ManagerMateriel* banque = Les_variables.banque_materiaux;
+    if (banque != nullptr) {
+        //le matériau actuellement assigné à l'objet
+        DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
+        std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
+    
+        //liste déroulante pour choisir matériau
+        if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
+            for (auto& mat : banque->GetTousLesMateriaux()) {
+                bool est_selectione = (objet->id_materiau == mat.identifiant);
+                if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
+                    objet->id_materiau = mat.identifiant;
+                    Les_variables.flag_changements = true;
+                }
+                if (est_selectione) {
+                    ImGui::SetItemDefaultFocus();
+                }
             }
-            if(est_selectione){
-                ImGui::SetItemDefaultFocus();
+            ImGui::EndCombo();
             }
-        }
-        ImGui::EndCombo();
-    }
-        ManagerMateriel* banque = Les_variables.banque_materiaux;
-        if (banque != nullptr) {
-            //le matériau actuellement assigné à l'objet
-            DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
-            std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
-        
-            //liste déroulante pour choisir matériau
-            if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
-                for (auto& mat : banque->GetTousLesMateriaux()) {
-                    bool est_selectione = (objet->id_materiau == mat.identifiant);
-                    if (ImGui::Selectable(mat.nom.c_str(), est_selectione)) {
-                        objet->id_materiau = mat.identifiant;
+            ImGui::Spacing();
+            
+            ImGui::InputText("Nom du Materiel", &Les_variables.nom_nouveau_materiau[0], 64);
+            if (ImGui::Button("Créer un Matériel")){
+                //std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
+                int nouvel_identifiant = banque->CreerMateriau(Les_variables.nom_nouveau_materiau.c_str());
+                objet->id_materiau = nouvel_identifiant;
+                //reset le nom
+                Les_variables.nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
+                Les_variables.flag_changements = true;//pour la sauvgarde
+            }
+                //pour editer me materiau
+                if (mat_actuel != nullptr) {
+                    ImGui::Indent(); //décalage l'UI vers la droite
+                    if (ImGui::BeginCombo("Shader du Matériau", mat_actuel->nom_shader_actuel.c_str())) {
+                        for (auto const& [nom_shader, shader_obj] : La_scene.shaderManager.dictionnaire_shaders) {
+                            bool est_selectionne = (mat_actuel->nom_shader_actuel == nom_shader);
+                            if (ImGui::Selectable(nom_shader.c_str(), est_selectionne)) {
+                                mat_actuel->nom_shader_actuel = nom_shader;
+                                Les_variables.flag_changements = true;
+                            }
+                            if (est_selectionne) {
+                                ImGui::SetItemDefaultFocus();
+                            }
+                        }
+                        ImGui::EndCombo();
+                    }
+                    //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
+                    float couleur_float[4] = {
+                        mat_actuel->couleurAlbedo.r / 255.0f,
+                        mat_actuel->couleurAlbedo.g / 255.0f,
+                        mat_actuel->couleurAlbedo.b / 255.0f,
+                        mat_actuel->couleurAlbedo.a / 255.0f
+                    };
+                
+                    if (ImGui::ColorEdit4("Couleur", couleur_float)) {
+                        //si changement couleur dans ImGui maj donnée Raylib
+                        mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
+                        mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
+                        mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
+                        mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
                         Les_variables.flag_changements = true;
                     }
-                    if (est_selectione) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-                }
-                ImGui::Spacing();
-                
-                ImGui::InputText("Nom du Materiel", &Les_variables.nom_nouveau_materiau[0], 64);
-
-                if (ImGui::Button("Créer un Matériel")){
-                    //std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
-                    int nouvel_identifiant = banque->CreerMateriau(Les_variables.nom_nouveau_materiau.c_str());
-                    objet->id_materiau = nouvel_identifiant;
-                    //reset le nom
-                    Les_variables.nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
-                    Les_variables.flag_changements = true;//pour la sauvgarde
-                }
-                    //pour editer me materiau
-                    if (mat_actuel != nullptr) {
-                        ImGui::Indent(); //décalage l'UI vers la droite
-                        //ImGui utilise des float (0.0f à 1.0f) pour les couleurs mais Raylib utilise des octets (0 à 255)
-                        float couleur_float[4] = {
-                            mat_actuel->couleurAlbedo.r / 255.0f,
-                            mat_actuel->couleurAlbedo.g / 255.0f,
-                            mat_actuel->couleurAlbedo.b / 255.0f,
-                            mat_actuel->couleurAlbedo.a / 255.0f
-                        };
                     
-                        if (ImGui::ColorEdit4("Couleur", couleur_float)) {
-                            //si changement couleur dans ImGui maj donnée Raylib
-                            mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
-                            mat_actuel->couleurAlbedo.g = (unsigned char)(couleur_float[1] * 255.0f);
-                            mat_actuel->couleurAlbedo.b = (unsigned char)(couleur_float[2] * 255.0f);
-                            mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
+                    }
+                    if (mat_actuel->identifiant != 0) {
+                        //on peut changer la texture que si c'est un materiel différent
+                        if (ImGui::Button("Charger Texture Albedo")){
+                        const char* filtres[4] = { "*.jpeg","*.jpg","*.png","*.exr" };
+                        const char* cheminChoisi = tinyfd_openFileDialog(
+                            "Texture Albedo", //titre
+                            "",                 //chemin par défaut
+                            4, filtres,        //filtres d'extension
+                            "Texture (.png, .jpg, .exr)",   //fescription
+                            0                  //sélection multiple activéé
+                        );
+                        if(cheminChoisi != nullptr){//si on a choisi un fichier
+                            banque->ChargerTextureAlbedo(mat_actuel->identifiant, cheminChoisi);
+                            Les_variables.flag_changements = true;
+                            TraceLog(LOG_INFO, "Fichier donné.");
+                        }
+                    }
+                    ImGui::SameLine();
+                    if(mat_actuel->textureAlbedo.id != 0){
+                        ImGui::Text("Texture chargée");
+                    }else{
+                        ImGui::Text("Aucune texture");
+                    }
+                    ImGui::Spacing();
+                    //bouton en rouge
+                    ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
+                        if (ImGui::Button("Supprimer ce Matériau")) {
+                            //supprime le matériau de la banque + unload texture
+                            banque->Nettoyer_Materiau(mat_actuel->identifiant);
+                            //assigne le matériau par défaut à objet sélectionné
+                            objet->id_materiau = 0;
                             Les_variables.flag_changements = true;
                         }
-                        
-                        }
-                        if (mat_actuel->identifiant != 0) {
-                            //on peut changer la texture que si c'est un materiel différent
-                            if (ImGui::Button("Charger Texture Albedo")){
-                            const char* filtres[4] = { "*.jpeg","*.jpg","*.png","*.exr" };
-                            const char* cheminChoisi = tinyfd_openFileDialog(
-                                "Texture Albedo", //titre
-                                "",                 //chemin par défaut
-                                4, filtres,        //filtres d'extension
-                                "Texture (.png, .jpg, .exr)",   //fescription
-                                0                  //sélection multiple activéé
-                            );
-                            if(cheminChoisi != nullptr){//si on a choisi un fichier
-                                banque->ChargerTextureAlbedo(mat_actuel->identifiant, cheminChoisi);
-                                Les_variables.flag_changements = true;
-                                TraceLog(LOG_INFO, "Fichier donné.");
-                            }if(mat_actuel->textureAlbedo.id != 0){
-                                ImGui::SameLine();
-                                ImGui::Text("Texture chargée");
-                            }else{
-                                ImGui::SameLine();
-                                ImGui::Text("Aucune texture");
-                            }
-                            ImGui::Spacing();
-
-                            //bouton en rouge
-                            ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(0.0f, 0.6f, 0.6f));
-                            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(0.0f, 0.7f, 0.7f));
-                            ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4)ImColor::HSV(0.0f, 0.8f, 0.8f));
-
-                            if (ImGui::Button("Supprimer ce Matériau")) {
-                                //supprime le matériau de la banque + unload texture
-                                banque->Nettoyer_Materiau(mat_actuel->identifiant);
-
-                                //assigne le matériau par défaut à objet sélectionné
-                                objet->id_materiau = 0;
-                                Les_variables.flag_changements = true;
-                            }
-
-                            //faut retirer les couleurs personnalisées du bouton
-                            ImGui::PopStyleColor(3); 
-                        }
-                        ImGui::Unindent();
-                    }
+                        //faut retirer les couleurs personnalisées du bouton
+                        ImGui::PopStyleColor(3); 
+                    
+                    ImGui::Unindent();
+                }
                 
         }
 }
+
 void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
@@ -480,6 +476,31 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
     ImGui::End();
 }
 
+void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, DataMateriel *mat_actuel){
+    if (mat_actuel != nullptr) {
+        
+        if (ImGui::BeginCombo("Shader du Matériau", mat_actuel->nom_shader_actuel.c_str())) {
+            
+            //parcourt du dictionnaire (clé = nom_shader, valeur = shader_obj)
+            for (auto const& [nom_shader, shader_obj] : La_scene.shaderManager.dictionnaire_shaders) {
+                
+                bool est_selectionne = (mat_actuel->nom_shader_actuel == nom_shader);
+                
+                //la clé (le nom) dans la liste
+                if (ImGui::Selectable(nom_shader.c_str(), est_selectionne)) {
+                    mat_actuel->nom_shader_actuel = nom_shader;
+                    Les_variables.flag_changements = true;
+                }
+                
+                if (est_selectionne) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+    }
+}
+
 void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::Begin("Shader");
     
@@ -532,7 +553,15 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
         const char * defaultVS = "";//c'est le shader vs de base de raylib
         if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, Les_variables.codeVertexShader, Les_variables.codeFragmentShader)){            
             Shader le_nouveau_shader = La_scene.shaderManager.dictionnaire_shaders[Les_variables.nom_nouveau_shader];
+            //faut pas crée dans le dico si il existe pas ?
             
+            for(auto & noeud : La_scene.GetSelection()){//pour les objets selectione
+                
+                DataMateriel *mat = La_scene.banque_materiaux.GetMateriau(noeud->id_materiau);
+                mat->nom_shader_actuel = Les_variables.nom_nouveau_shader;
+                std::cout << "shader applique au elements selectione" << std::endl;
+            }
+            /*
             for(auto & element : La_scene.GetNodes()){//mise a jours de tous les obj avec ce shader
                 //std::cout << "objets selectionne : " << element << "nom shader objet :" << element->nom_shader_actuel << "nouveau nom shader " << Les_variables.nom_nouveau_shader << std::endl;
                 if(element->nom_shader_actuel == Les_variables.nom_nouveau_shader){
@@ -540,10 +569,13 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
                     std::cout << "shader applique" << std::endl;
                 }
             }
-            for(auto & element : La_scene.GetSelection()){//pour les objets selectione
-                element->AppliquerShader(Les_variables.nom_nouveau_shader, le_nouveau_shader);
-                std::cout << "shader applique au elements selectione" << std::endl;
-            }
+                    
+        for(auto & element : La_scene.GetSelection()){//pour les objets selectione
+            element->AppliquerShader(Les_variables.nom_nouveau_shader, le_nouveau_shader);
+            std::cout << "shader applique au elements selectione" << std::endl;
+        }
+        */
+        
         }
     }
     ImGui::End();

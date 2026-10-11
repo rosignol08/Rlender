@@ -35,7 +35,14 @@ int main(void) {
 
     EditorContext Les_variables;
     Les_variables.banque_materiaux = &La_scene.banque_materiaux;//connexion des deux
+    Les_variables.gestionnaire_shaders = &La_scene.shaderManager;
 
+    //chargement shader par défaut
+    La_scene.shaderManager.ChargerShaders(Les_variables.codeFragmentShader,Les_variables.codeVertexShader);
+    DataMateriel* mat_defaut = La_scene.banque_materiaux.GetMateriau(0);
+    if (mat_defaut != nullptr) {
+        mat_defaut->nom_shader_actuel = "Shader_defaut"; 
+    }
     //les logs
     Initialiser_Logs(&Les_variables);
     SetTraceLogCallback(Fonction_Log);
