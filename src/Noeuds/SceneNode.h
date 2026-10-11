@@ -229,6 +229,43 @@ class Camera2DNode : public SceneNode{
     std::string GetType() const override { return "Camera2D"; }
 };
 
+class ModeleNode : public SceneNode{
+    private:
+        Model modele;
+        std::string chemin_modele;
+    public :
+    ModeleNode(std::string nom_model);
+
+    ~ModeleNode() override;
+
+    void Draw(EditorContext& variables) override;
+    std::string ToCode(){
+        return "";
+    }
+    std::string GetDrawCode() override;
+    
+    std::string GetInitCode() override;
+    
+    BoundingBox GetBoiteCollision() override {
+        Vector3 min, max;
+        BoundingBox ma_bounding_box;
+
+        min.x = position.x - taille.x/2.0f;
+        min.y = position.y - taille.y/2.0f;
+        min.z = position.z - taille.z/2.0f;
+
+        max.x = position.x + taille.x/2.0f;
+        max.y = position.y + taille.y/2.0f;
+        max.z = position.z + taille.z/2.0f;
+        ma_bounding_box.max = max;
+        ma_bounding_box.min = min;
+        return ma_bounding_box;
+    }
+
+    std::unique_ptr<SceneNode> Cloner() override;
+    std::string GetType() const override { return "ModeleNode"; }
+};
+
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
 
 

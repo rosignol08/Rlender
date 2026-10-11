@@ -27,7 +27,7 @@ int main(void) {
     if (Les_parametres.Plein_ecran == 1) {
         MaximizeWindow();//si on a le plein ecran a mettre au demarage
     }
-    SetTargetFPS(60);
+    SetTargetFPS(60000);
     
     //pour gerer les objets de la scene:
 

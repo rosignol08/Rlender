@@ -18,6 +18,7 @@ set(SRCS
     src/Noeuds/SceneNode_Cylindre.cpp
     src/Noeuds/SceneNode_Cone.cpp
     src/Noeuds/SceneNode_Plan.cpp
+    src/Noeuds/SceneNode_Model.cpp
     src/Noeuds/LightNode.cpp
     src/Noeuds/DirectionalLightNode.cpp
     src/Managers/MaterialManager.cpp

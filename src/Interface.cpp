@@ -133,7 +133,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         if(ImGui::Button("Soleil",{50.0f,50.0f})){
-            La_scene.AjouterCube();
+            La_scene.AjouterModele();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         ImGui::EndMainMenuBar();
@@ -676,7 +676,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     nb_lignes_max_console = &Les_parametres.nb_lignes_max_console;
     rlImGuiBegin();
     //raycasting
-    La_scene.Gerer_pointeur(cameraEditeur, Les_variables);
+    La_scene.Gerer_pointeur(cameraEditeur);
     Gerer_gizmo(cameraEditeur, La_scene, Les_variables);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_Hierarchie(La_scene, Les_variables);

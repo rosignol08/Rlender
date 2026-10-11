@@ -208,6 +208,27 @@ void SceneManager::AjouterCamera2D(){
     compteur++;
 }
 
+void SceneManager::AjouterModele(){
+    unsigned int compteur_modele = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Modele_" + std::to_string(compteur_modele);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_modele++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
+    sceneNodes.push_back(std::make_unique<ModeleNode>("/home/romaric/Téléchargements/stanford_dragon_pbr.glb"));
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
 //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
 void SceneManager::SupprimerSelection(){
     //on doit utiliser le pointeur
