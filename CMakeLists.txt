@@ -10,6 +10,8 @@ set(SRCS
     src/Sauvgarde.cpp
     src/Managers/SceneManager.cpp
     src/Managers/ShaderManager.cpp
+    src/Managers/MaterialManager.cpp
+    src/Managers/ModelManager.cpp
     src/Noeuds/SceneNode.cpp
     src/Noeuds/SceneNode_Cube.cpp
     src/Noeuds/SceneNode_Camera.cpp
@@ -21,7 +23,6 @@ set(SRCS
     src/Noeuds/SceneNode_Model.cpp
     src/Noeuds/LightNode.cpp
     src/Noeuds/DirectionalLightNode.cpp
-    src/Managers/MaterialManager.cpp
     src/Interface.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp

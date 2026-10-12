@@ -322,7 +322,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                         );
                     
                         if (cheminChoisi != NULL) {
-                            objet->ChargerFichier3D(cheminChoisi);
+                            objet->ChargerFichier3D(cheminChoisi, Les_variables.gestionnaire_modeles);
                             Les_variables.flag_changements = true;
                         }
                     }

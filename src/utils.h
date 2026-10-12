@@ -7,7 +7,8 @@
 #include "ImGuizmo.h"
 
 class ShaderManager;//forward declaration
-class ManagerMateriel;//iedm
+class ManagerMateriel;//idem
+class ManagerModele;//idem
 
 //structure qui regroupe toutes les variables volantes de l'éditeur
 struct EditorContext {
@@ -128,7 +129,7 @@ std::string nom_nouveau_shader = "ShaderLive";
 //les materiaux
 ManagerMateriel* banque_materiaux = nullptr;
 ShaderManager* gestionnaire_shaders = nullptr;
-
+ManagerModele* gestionnaire_modeles = nullptr;
 std::string nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
 
 int compteur_lumieres = 0;//pour les lumières

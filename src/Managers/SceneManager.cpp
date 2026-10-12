@@ -363,6 +363,12 @@ void SceneManager::SauvegarderProjet(std::string cheminFichier) {
                 noeud_json["intensite_lumiere"] = lumiere->intensite;//rayon d'atténuation
             }
         }
+        if(actuel->type == "ModeleNode"){
+            ModeleNode* modele = dynamic_cast<ModeleNode*>(actuel);
+            if(modele != nullptr){
+                noeud_json["chemin_modele"] = modele->chemin_modele;
+            }
+        }
         //ajout du noeud à la sauvgarde du projet
         projet_json["noeuds"].push_back(noeud_json);
     }
@@ -514,6 +520,9 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
                 lum->couleur_lumiere = { element_json["couleur_lumiere"][0], element_json["couleur_lumiere"][1], element_json["couleur_lumiere"][2] };
             }
             nouveau_noeud = std::move(lum);
+        }else if(le_type == "ModeleNode"){
+            auto mod = std::make_unique<ModeleNode>();
+            if(element_json.contains("chemin_modele"))
         }
         else{//par défaut si c'est rien on skip le noeud
             continue;

@@ -9,6 +9,8 @@
 #include "../utils.h"
 #include <rlgl.h>
 #include "../Managers/MaterialManager.h"
+#include "../Managers/ModelManager.h"
+
 #pragma once
 
 //la classe pour representer un objets de la scene
@@ -232,9 +234,9 @@ class Camera2DNode : public SceneNode{
 class ModeleNode : public SceneNode{
     private:
         bool modele_charge = false;
-        Model modele = { 0 };
-        std::string chemin_modele;
+        Model* modele = nullptr;
     public :
+        std::string chemin_modele;
     ModeleNode();
 
     ~ModeleNode() override;
@@ -244,7 +246,7 @@ class ModeleNode : public SceneNode{
         return "";
     }
 
-    void ChargerFichier3D(std::string chemin);
+    void ChargerFichier3D(std::string chemin, ManagerModele* manager);
     std::string GetDrawCode() override;
     
     std::string GetInitCode() override;

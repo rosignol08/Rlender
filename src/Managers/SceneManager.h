@@ -2,11 +2,12 @@
 #include "../json.hpp"
 #include"imgui.h"
 #include "../utils.h"
-#include "ShaderManager.h"
 #include <algorithm>//pour les operation sur le vecteur
 #include <unordered_map>
 
+#include "ShaderManager.h"
 #include "MaterialManager.h"
+#include "ModelManager.h"
 #include "../Noeuds/LightNode.h"
 #include "../Noeuds/DirectionalLightNode.h"
 #pragma once
@@ -21,8 +22,9 @@ class SceneManager{
     //le pointeur pour choisir un noeuds specifique
     std::vector<SceneNode*> noeudSelectionne;
     public:
-    ManagerMateriel banque_materiaux;//la banque des materiaux
+        ManagerMateriel banque_materiaux;//la banque des materiaux
         ShaderManager shaderManager;//les shaders
+        ManagerModele banque_modeles;//pour stoquer les modeles
         void       DrawScene(EditorContext& variables); //une boucle qui parcours les noeuds et les dessines chacuns
         void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc
         void       AjouterCube(); //ça ajoute un cube simplement
