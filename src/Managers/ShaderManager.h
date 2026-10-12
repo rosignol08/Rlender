@@ -8,6 +8,7 @@
 class ShaderManager {
 public:
     std::unordered_map<std::string, Shader> dictionnaire_shaders;//la liste des shaders compilés
+    std::unordered_map<std::string, std::string> chemins_shaders;//liste des chemin des shaders TODO voir comment faire pour les shader en live coding
     //load les fichiers GLSL (.vs et .fs) depuis le disque
     void ChargerShaders(const std::string& cheminVS, const std::string& cheminFS);
     
