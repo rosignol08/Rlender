@@ -3,6 +3,28 @@
 //pour les log
 EditorContext* contexte_global_pour_les_logs = nullptr;
 int * nb_lignes_max_console; //pointeur argument
+void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variables){
+    ImGui::Begin("Ajouts");
+    //exemple d'ajout de bouton
+        if(ImGui::Button("Camera3D",{50.0f,50.0f})){
+            La_scene.AjouterCamera3D();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+        if(ImGui::Button("Light",{50.0f,50.0f})){
+            La_scene.AjouterLight();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+        if(ImGui::Button("Cube",{50.0f,50.0f})){
+            La_scene.AjouterCube();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+        if(ImGui::Button("Modele",{50.0f,50.0f})){
+            La_scene.AjouterModele();
+            Les_variables.flag_changements = true; //pour mettre à jour le code
+        }
+    ImGui::End();
+}
+
 void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
@@ -122,19 +144,6 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             }
             ImGui::EndMenu();
 
-        }
-        //exemple d'ajout de bouton
-        if(ImGui::Button("cube",{50.0f,50.0f})){
-            La_scene.AjouterCamera3D();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
-        }
-        if(ImGui::Button("Light",{50.0f,50.0f})){
-            La_scene.AjouterLight();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
-        }
-        if(ImGui::Button("Soleil",{50.0f,50.0f})){
-            La_scene.AjouterModele();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
         }
         ImGui::EndMainMenuBar();
     }
@@ -299,7 +308,26 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     Les_variables.flag_changements = true;
                 }
             ImGui::Separator();
-            
+            if(noeuds_selectione[0]->GetType() == "ModeleNode"){
+                ModeleNode* objet = static_cast<ModeleNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés du Modèle");
+                    if (ImGui::Button("Ouvrir modele 3D")) {
+                        const char* filtres[4] = { "*.glb","*gltf","*obj","*.vox"};
+                        const char* cheminChoisi = tinyfd_openFileDialog(
+                            "Ouvrir un modele", //titre
+                            "",                 //chemin par défaut
+                            4, filtres,        //filtres d'extension
+                            "Fichiers model",   //fescription
+                            0                  //sélection multiple désactivée
+                        );
+                    
+                        if (cheminChoisi != NULL) {
+                            objet->ChargerFichier3D(cheminChoisi);
+                            Les_variables.flag_changements = true;
+                        }
+                    }
+                    
+            }
             if(noeuds_selectione[0]->GetType() == "LightNode"){
                 //on a une lumière
                 LightNode* objet = static_cast<LightNode*>(noeuds_selectione[0]);
@@ -685,5 +713,6 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
     Dessiner_EditeurShader(La_scene,Les_variables);
     Dessiner_Console(La_scene, Les_variables);
+    Dessiner_Boutons_Ajouts(La_scene, Les_variables);
     rlImGuiEnd();
 }

@@ -231,10 +231,11 @@ class Camera2DNode : public SceneNode{
 
 class ModeleNode : public SceneNode{
     private:
-        Model modele;
+        bool modele_charge = false;
+        Model modele = { 0 };
         std::string chemin_modele;
     public :
-    ModeleNode(std::string nom_model);
+    ModeleNode();
 
     ~ModeleNode() override;
 
@@ -242,6 +243,8 @@ class ModeleNode : public SceneNode{
     std::string ToCode(){
         return "";
     }
+
+    void ChargerFichier3D(std::string chemin);
     std::string GetDrawCode() override;
     
     std::string GetInitCode() override;

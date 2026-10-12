@@ -224,7 +224,7 @@ void SceneManager::AjouterModele(){
         }
     }
     //on fait comme ça : sceneNodes.push_back(std::make_unique<CubeNode>());
-    sceneNodes.push_back(std::make_unique<ModeleNode>("/home/romaric/Téléchargements/stanford_dragon_pbr.glb"));
+    sceneNodes.push_back(std::make_unique<ModeleNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
 }
