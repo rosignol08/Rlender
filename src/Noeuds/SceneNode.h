@@ -249,21 +249,7 @@ class ModeleNode : public SceneNode{
     
     std::string GetInitCode() override;
     //TOTO changer ça
-    BoundingBox GetBoiteCollision() override {
-        Vector3 min, max;
-        BoundingBox ma_bounding_box;
-
-        min.x = position.x - taille.x/2.0f;
-        min.y = position.y - taille.y/2.0f;
-        min.z = position.z - taille.z/2.0f;
-
-        max.x = position.x + taille.x/2.0f;
-        max.y = position.y + taille.y/2.0f;
-        max.z = position.z + taille.z/2.0f;
-        ma_bounding_box.max = max;
-        ma_bounding_box.min = min;
-        return ma_bounding_box;
-    }
+    BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
     std::string GetType() const override { return "ModeleNode"; }

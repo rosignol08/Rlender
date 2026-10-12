@@ -98,6 +98,25 @@ void ModeleNode::Draw(EditorContext& variables){
     }
 }
 
+BoundingBox ModeleNode::GetBoiteCollision(){
+    if(modele == nullptr){
+        Vector3 min, max;
+        BoundingBox ma_bounding_box;
+
+        min.x = position.x - taille.x/2.0f;
+        min.y = position.y - taille.y/2.0f;
+        min.z = position.z - taille.z/2.0f;
+
+        max.x = position.x + taille.x/2.0f;
+        max.y = position.y + taille.y/2.0f;
+        max.z = position.z + taille.z/2.0f;
+        ma_bounding_box.max = max;
+        ma_bounding_box.min = min;
+        return ma_bounding_box;   
+    }
+    return GetModelBoundingBox(*modele);
+}
+
 std::unique_ptr<SceneNode> ModeleNode::Cloner(){
     auto clone = std::make_unique<ModeleNode>(); // faut en cree un autre pour eviter les crash de mémoire
     clone->position = this->position;
@@ -113,3 +132,4 @@ std::unique_ptr<SceneNode> ModeleNode::Cloner(){
     compteur_Modele_clones++;
     return clone;
 }
+
