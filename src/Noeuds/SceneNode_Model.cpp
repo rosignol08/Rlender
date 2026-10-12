@@ -37,7 +37,7 @@ void ModeleNode::Draw(EditorContext& variables){
     if (this->modele == nullptr){
         DrawCubeWires(position, taille.x, taille.y, taille.z, GRAY);
         return;
-    }else{    
+    }   
         Color couleur_rendu = WHITE;//couleur de rendu
 
         if (variables.banque_materiaux != nullptr) {
@@ -51,22 +51,37 @@ void ModeleNode::Draw(EditorContext& variables){
             }else{
                 couleur_rendu = mat->couleurAlbedo;
 
-                //TODO ajouter les autre types de textures
-                if(mat->textureAlbedo.id != 0){
-                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
-                }else{
-                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = variables.banque_materiaux->GetMateriau(0)->textureAlbedo;
+                Texture2D texture_a_appliquer = variables.banque_materiaux->GetMateriau(0)->textureAlbedo;
+                if (mat->textureAlbedo.id != 0) {
+                    texture_a_appliquer = mat->textureAlbedo;
                 }
+
+                Shader shader_a_appliquer = modele->materials[0].shader; //valeur de secours
                 if (variables.gestionnaire_shaders != nullptr) {
-                    //check le shader dans le dictionnaire
                     if (variables.gestionnaire_shaders->dictionnaire_shaders.count(mat->nom_shader_actuel) > 0) {
-                        modele->materials[0].shader = variables.gestionnaire_shaders->dictionnaire_shaders[mat->nom_shader_actuel];
+                        shader_a_appliquer = variables.gestionnaire_shaders->dictionnaire_shaders[mat->nom_shader_actuel];
+                    }
+                }
+
+                for (int i = 0; i < modele->materialCount; i++) {
+                //appliquation du shader defaut
+                modele->materials[i].shader = shader_a_appliquer;
+                
+                //ecrasement texture si on a un matériau custom (ID différent de 0)
+                if (this->id_materiau != 0) {
+                    if (mat->textureAlbedo.id != 0) {
+                        modele->materials[i].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
+                    } else {
+                        //si le matériau perso a pas de texture du blanc pour masquer l'ancienne texture
+                        modele->materials[i].maps[MATERIAL_MAP_ALBEDO].texture = variables.banque_materiaux->GetMateriau(0)->textureAlbedo;
                     }
                 }
             }
-        }
-        Shader le_shader = modele->materials[0].shader;//pour limiter les acces mémoire
-        AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
+                
+                //TODO ajouter les autre types de textures
+            }
+        
+        AppliquerVariablesGlobales(variables, modele->materials[0].shader);//fonction utilitaire de gestion des uniformes de shaders
         Matrix matTransform = MatrixIdentity();
         matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
         matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
@@ -86,10 +101,12 @@ void ModeleNode::Draw(EditorContext& variables){
 std::unique_ptr<SceneNode> ModeleNode::Cloner(){
     auto clone = std::make_unique<ModeleNode>(); // faut en cree un autre pour eviter les crash de mémoire
     clone->position = this->position;
+    clone->rotation = this->rotation;
     clone->taille = this->taille;
     clone->couleur = this->couleur;
     clone->id_materiau = this->id_materiau;
-    clone->modele->materials[0].shader = this->modele->materials[0].shader; // on clone aussi le shader et le materiel
+    clone->chemin_modele = this->chemin_modele;
+    clone->modele = this->modele;
     clone->isSelected = true;
     static unsigned int compteur_Modele_clones = 0;                        // logiquement on a un compteur pour les clones
     clone->nom = this->nom + "_" + std::to_string(compteur_Modele_clones); // nouveau nom

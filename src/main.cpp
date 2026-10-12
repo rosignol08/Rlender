@@ -39,7 +39,8 @@ int main(void) {
     Les_variables.gestionnaire_modeles = &La_scene.banque_modeles;
     
     //chargement shader par défaut
-    La_scene.shaderManager.ChargerShaders(Les_variables.codeFragmentShader,Les_variables.codeVertexShader);
+    //La_scene.shaderManager.ChargerShaders(Les_variables.codeFragmentShader,Les_variables.codeVertexShader);
+    La_scene.shaderManager.ChargerShaderDepuisTexte("Shader_defaut", Les_variables.codeVertexShader, Les_variables.codeFragmentShader);
     DataMateriel* mat_defaut = La_scene.banque_materiaux.GetMateriau(0);
     if (mat_defaut != nullptr) {
         mat_defaut->nom_shader_actuel = "Shader_defaut"; 
@@ -154,10 +155,14 @@ int main(void) {
 
     //nettoyage
     Les_variables.banque_materiaux = nullptr;
+    Les_variables.gestionnaire_modeles = nullptr;
     rlImGuiShutdown();
+
+    La_scene.ViderScene();
+    La_scene.banque_modeles.Vider_modeles();
     La_scene.shaderManager.Nettoyer_tout();
     La_scene.banque_materiaux.NettoyerTout();
-    La_scene.ViderScene();
+    
     UnloadRenderTexture(CameratexturePreview);
     CloseWindow();
 

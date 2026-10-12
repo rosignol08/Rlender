@@ -19,6 +19,7 @@ void ManagerModele::Vider_modeles(){
     for(auto & element : dictionnaire_modeles){
         UnloadModel(element.second);
     }
+    dictionnaire_modeles.clear();
 }
 
 ManagerModele::ManagerModele(){};
