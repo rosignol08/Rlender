@@ -1,3 +1,11 @@
+# Rlender
+### C'est un logiciel de conception de scenes 3D ou 2D qui traduit le code.
+
+Exemple :
+
+![Aperçu du projet](src/Ressources/exemple_rendu_rlender.png)
+
+
 ## Compilation sous Windows
 (faut Raylib >= 5.5)
 Installer CMake et MinGW, puis verifier que `g++` et `mingw32-make` sont disponibles dans le `PATH` :
