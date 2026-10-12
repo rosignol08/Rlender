@@ -34,8 +34,9 @@ std::string ModeleNode::GetInitCode()
 }
 
 void ModeleNode::Draw(EditorContext& variables){
-    if(!modele_charge){
+    if (this->modele == nullptr){
         DrawCubeWires(position, taille.x, taille.y, taille.z, GRAY);
+        return;
     }else{    
         Color couleur_rendu = WHITE;//couleur de rendu
 
@@ -52,11 +53,9 @@ void ModeleNode::Draw(EditorContext& variables){
 
                 //TODO ajouter les autre types de textures
                 if(mat->textureAlbedo.id != 0){
-                    //modele.materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
-                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = variables.banque_materiaux->GetMateriau(0)->textureAlbedo;
-                    //TraceLog(LOG_INFO, "Texture");
+                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = mat->textureAlbedo;
                 }else{
-                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = {0};
+                    modele->materials[0].maps[MATERIAL_MAP_ALBEDO].texture = variables.banque_materiaux->GetMateriau(0)->textureAlbedo;
                 }
                 if (variables.gestionnaire_shaders != nullptr) {
                     //check le shader dans le dictionnaire
@@ -89,7 +88,6 @@ std::unique_ptr<SceneNode> ModeleNode::Cloner(){
     clone->position = this->position;
     clone->taille = this->taille;
     clone->couleur = this->couleur;
-    clone->modele_charge = false;
     clone->id_materiau = this->id_materiau;
     clone->modele->materials[0].shader = this->modele->materials[0].shader; // on clone aussi le shader et le materiel
     clone->isSelected = true;

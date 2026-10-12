@@ -232,10 +232,8 @@ class Camera2DNode : public SceneNode{
 };
 
 class ModeleNode : public SceneNode{
-    private:
-        bool modele_charge = false;
-        Model* modele = nullptr;
     public :
+        Model* modele = nullptr;
         std::string chemin_modele;
     ModeleNode();
 
@@ -250,7 +248,7 @@ class ModeleNode : public SceneNode{
     std::string GetDrawCode() override;
     
     std::string GetInitCode() override;
-    
+    //TOTO changer ça
     BoundingBox GetBoiteCollision() override {
         Vector3 min, max;
         BoundingBox ma_bounding_box;

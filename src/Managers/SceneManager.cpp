@@ -522,7 +522,12 @@ void SceneManager::ChargerProjet(std::string cheminFichier){
             nouveau_noeud = std::move(lum);
         }else if(le_type == "ModeleNode"){
             auto mod = std::make_unique<ModeleNode>();
-            if(element_json.contains("chemin_modele"))
+            if(element_json.contains("chemin_modele")){
+                mod->chemin_modele = element_json["chemin_modele"];
+                mod->ChargerFichier3D(mod->chemin_modele, &banque_modeles);
+            }
+            nouveau_noeud = std::move(mod);
+            //je connais pas les autre propriétées specifiques au modele a charger et sauvgarder
         }
         else{//par défaut si c'est rien on skip le noeud
             continue;
