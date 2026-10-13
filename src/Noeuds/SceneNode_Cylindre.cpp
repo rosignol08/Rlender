@@ -76,7 +76,7 @@ std::unique_ptr<SceneNode> CylinderNode::Cloner(){
     return clone;
 }
 
-std::string CylinderNode::ToCode(){
+std::string CylinderNode::GetUpdateCode(){
     return "";
 }
 

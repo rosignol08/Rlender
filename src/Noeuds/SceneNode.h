@@ -35,7 +35,7 @@ class SceneNode {
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
     virtual void Draw(EditorContext& variables) = 0;
-    virtual std::string ToCode() = 0;
+    virtual std::string GetUpdateCode() = 0;
     //avant while (!WindowShouldClose())
     virtual std::string GetInitCode() { return ""; }//par défaut TODO à changer
 
@@ -74,7 +74,7 @@ class CubeNode : public SceneNode{
     ~CubeNode() override;
 
     void Draw(EditorContext& variables) override;
-    std::string ToCode(){
+    std::string GetUpdateCode(){
         return "";
     }
     std::string GetDrawCode() override;
@@ -111,7 +111,7 @@ class SphereNode : public SceneNode{
 
     void Draw(EditorContext& variables) override;
 
-    std::string ToCode()override;
+    std::string GetUpdateCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode()override;
 
@@ -133,7 +133,7 @@ public:
 
     void Draw(EditorContext& variables) override;
     
-    std::string ToCode() override;
+    std::string GetUpdateCode() override;
     std::string GetDrawCode() override;
     std::string GetInitCode() override;
 
@@ -154,7 +154,7 @@ class CylinderNode : public SceneNode {
 
         void Draw(EditorContext& variables) override ;
 
-        std::string ToCode() override;
+        std::string GetUpdateCode() override;
         std::string GetDrawCode() override;
         std::string GetInitCode() override;
 
@@ -175,7 +175,7 @@ public:
     
     void Draw(EditorContext& variables) override;
     
-    std::string ToCode()override;
+    std::string GetUpdateCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode()override;
     
@@ -195,7 +195,7 @@ class CameraNode : public SceneNode{
         bool active = true;
     CameraNode();
     void Draw(EditorContext& variables) override;
-    std::string ToCode()override;
+    std::string GetUpdateCode()override;
 
     std::string GetDrawCode()override;
     
@@ -220,7 +220,7 @@ class Camera2DNode : public SceneNode{
 
     void Draw(EditorContext& variables)override;
 
-    std::string ToCode()override;
+    std::string GetUpdateCode()override;
 
     std::string GetDrawCode()override;
     
@@ -240,7 +240,7 @@ class ModeleNode : public SceneNode{
     ~ModeleNode() override;
 
     void Draw(EditorContext& variables) override;
-    std::string ToCode(){
+    std::string GetUpdateCode(){
         return "";
     }
 

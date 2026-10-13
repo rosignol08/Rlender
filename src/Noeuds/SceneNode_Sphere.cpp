@@ -59,7 +59,7 @@ void SphereNode::Draw(EditorContext& variables){
     }
 }
 
-std::string SphereNode::ToCode(){
+std::string SphereNode::GetUpdateCode(){
     return "";
 }
 

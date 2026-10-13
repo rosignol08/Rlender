@@ -80,7 +80,7 @@ std::unique_ptr<SceneNode> PlaneNode::Cloner(){
     return clone;
 }
 
-std::string PlaneNode::ToCode(){
+std::string PlaneNode::GetUpdateCode(){
     return "";
 }
 

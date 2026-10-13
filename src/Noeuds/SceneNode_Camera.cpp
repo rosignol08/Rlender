@@ -77,7 +77,7 @@ Camera3D CameraNode::ObtenirCameraRaylib() const {
     return cam;
 }
 
-std::string CameraNode::ToCode(){
+std::string CameraNode::GetUpdateCode(){
     return "";
 }
 

@@ -24,7 +24,7 @@ void Camera2DNode::Draw(EditorContext& variables)
     DrawLine3D(p2, p3, couleurLigne); // droite
 }
 
-std::string Camera2DNode::ToCode()
+std::string Camera2DNode::GetUpdateCode()
 {
     return "";
 }

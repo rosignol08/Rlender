@@ -50,7 +50,7 @@ std::unique_ptr<SceneNode> LightNode::Cloner(){
     return clone;
 }
 
-std::string LightNode::ToCode(){
+std::string LightNode::GetUpdateCode(){
     return "";
 }
 
