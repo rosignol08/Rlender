@@ -350,7 +350,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
         //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
         if(noeuds_selectione.size() > 1){
             //si on a plus d'un element alors faut faire le cas N elements
-            ImGui::Text("%ld éléments Selectionné", noeuds_selectione.size());
+            ImGui::Text("%d éléments Selectionné", (int)noeuds_selectione.size());
             ImGui::Separator();
         }else{
             if(noeuds_selectione[0] != nullptr){
@@ -359,17 +359,17 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 ImGui::Separator();
 
                 // sliders pour modifier dynamiquement les variables
-            if (
-                // TODO ajouter les bouton pour ajouter des objetsg ici aussi
-                ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f) || ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f) || ImGui::DragFloat3("Taille", &noeuds_selectione[0]->taille.x, 0.1f)){
-                    Les_variables.flag_changements = true;
-                }
+            // TODO ajouter les bouton pour ajouter des objetsg ici aussi
+            //un if par ligne sinon avec || les autres s'affichent pas quand on modifie la premiere
+            if (ImGui::DragFloat3("Position", &noeuds_selectione[0]->position.x, 0.1f)) Les_variables.flag_changements = true;
+            if (ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f)) Les_variables.flag_changements = true;
+            if (ImGui::DragFloat3("Taille",   &noeuds_selectione[0]->taille.x,   0.1f)) Les_variables.flag_changements = true;
             ImGui::Separator();
             if(noeuds_selectione[0]->GetType() == "ModeleNode"){
                 ModeleNode* objet = static_cast<ModeleNode*>(noeuds_selectione[0]);
                 ImGui::Text("Propriétés du Modèle");
                     if (ImGui::Button("Ouvrir modele 3D")) {
-                        const char* filtres[4] = { "*.glb","*gltf","*obj","*.vox"};
+                        const char* filtres[4] = { "*.glb","*.gltf","*.obj","*.vox"};
                         const char* cheminChoisi = tinyfd_openFileDialog(
                             "Ouvrir un modele", //titre
                             "",                 //chemin par défaut
@@ -613,7 +613,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
                 }else if(chemin.find(".vs") != std::string::npos){
                     Les_variables.codeVertexShader = buffer.str();
                 }
-                size_t position_separateur = chemin.find_last_of('/\\|');//le separateur c'est pour choper le nom du fichier
+                size_t position_separateur = chemin.find_last_of("/\\");//le separateur c'est pour choper le nom du fichier
                 if (position_separateur == std::string::npos){
                     Les_variables.nom_nouveau_shader = chemin;
                 }else{
