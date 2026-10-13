@@ -3,6 +3,63 @@
 //pour les log
 EditorContext* contexte_global_pour_les_logs = nullptr;
 int * nb_lignes_max_console; //pointeur argument
+
+//couleur de selection
+const ImVec4 ACCENT       = {0.32f, 0.52f, 0.65f, 1.0f};
+const ImVec4 ACCENT_CLAIR = {0.38f, 0.60f, 0.75f, 1.0f};
+
+//les couleurs et les tailles de l'interface
+void Appliquer_Theme(){
+    ImGuiStyle& s = ImGui::GetStyle();
+    s.WindowRounding    = 0.0f;
+    s.ChildRounding     = 2.0f;
+    s.FrameRounding     = 3.0f;
+    s.PopupRounding     = 3.0f;
+    s.TabRounding       = 3.0f;
+    s.GrabRounding      = 3.0f;
+    s.ScrollbarRounding = 3.0f;
+    s.WindowBorderSize  = 1.0f;
+    s.FrameBorderSize   = 0.0f;
+    s.WindowPadding     = {8, 8};
+    s.FramePadding      = {6, 4};
+    s.ItemSpacing       = {6, 5};
+    s.IndentSpacing     = 14.0f;
+    s.ScrollbarSize     = 12.0f;
+    s.WindowTitleAlign  = {0.0f, 0.5f};
+
+    ImVec4* c = s.Colors;
+    c[ImGuiCol_Text]                 = {0.86f, 0.86f, 0.86f, 1};
+    c[ImGuiCol_TextDisabled]         = {0.55f, 0.55f, 0.55f, 1};
+    c[ImGuiCol_WindowBg]             = {0.27f, 0.27f, 0.27f, 1};
+    c[ImGuiCol_ChildBg]              = {0.22f, 0.22f, 0.22f, 1};
+    c[ImGuiCol_PopupBg]              = {0.20f, 0.20f, 0.20f, 0.98f};
+    c[ImGuiCol_Border]               = {0.16f, 0.16f, 0.16f, 1};
+    c[ImGuiCol_FrameBg]              = {0.17f, 0.17f, 0.17f, 1};
+    c[ImGuiCol_FrameBgHovered]       = {0.21f, 0.21f, 0.21f, 1};
+    c[ImGuiCol_FrameBgActive]        = {0.24f, 0.24f, 0.24f, 1};
+    c[ImGuiCol_TitleBg]              = {0.21f, 0.21f, 0.21f, 1};
+    c[ImGuiCol_TitleBgActive]        = {0.21f, 0.21f, 0.21f, 1};
+    c[ImGuiCol_MenuBarBg]            = {0.21f, 0.21f, 0.21f, 1};
+    c[ImGuiCol_ScrollbarBg]          = {0.20f, 0.20f, 0.20f, 1};
+    c[ImGuiCol_ScrollbarGrab]        = {0.38f, 0.38f, 0.38f, 1};
+    c[ImGuiCol_CheckMark]            = ACCENT_CLAIR;
+    c[ImGuiCol_SliderGrab]           = ACCENT;
+    c[ImGuiCol_SliderGrabActive]     = ACCENT_CLAIR;
+    c[ImGuiCol_Button]               = {0.36f, 0.36f, 0.36f, 1};
+    c[ImGuiCol_ButtonHovered]        = {0.44f, 0.44f, 0.44f, 1};
+    c[ImGuiCol_ButtonActive]         = ACCENT;
+    c[ImGuiCol_Header]               = ACCENT;
+    c[ImGuiCol_HeaderHovered]        = {0.40f, 0.40f, 0.40f, 1};
+    c[ImGuiCol_HeaderActive]         = ACCENT_CLAIR;
+    c[ImGuiCol_Separator]            = {0.18f, 0.18f, 0.18f, 1};
+    c[ImGuiCol_Tab]                  = {0.22f, 0.22f, 0.22f, 1};
+    c[ImGuiCol_TabHovered]           = {0.40f, 0.40f, 0.40f, 1};
+    c[ImGuiCol_TabActive]            = {0.33f, 0.33f, 0.33f, 1};
+    c[ImGuiCol_TabUnfocused]         = {0.22f, 0.22f, 0.22f, 1};
+    c[ImGuiCol_TabUnfocusedActive]   = {0.30f, 0.30f, 0.30f, 1};
+    c[ImGuiCol_TextSelectedBg]       = {0.32f, 0.52f, 0.65f, 0.5f};
+}
+
 void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::Begin("Ajouts");
     //exemple d'ajout de bouton
@@ -44,7 +101,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     La_scene.AjouterNoeud(element->Cloner());
                 }
             }
-            
+
             ImGui::EndPopup();
         }
     }
@@ -62,7 +119,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     "Fichiers JSON",   //fescription
                     0                  //sélection multiple désactivée
                 );
-            
+
                 if (cheminChoisi != NULL) {
                     La_scene.ChargerProjet(cheminChoisi);
                 }
@@ -75,7 +132,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     1, filtres,        //filtres d'extension (*.json)
                     "Fichiers JSON"   //fescription
                 );
-            
+
                 if (cheminChoisi != NULL) {
                     La_scene.SauvegarderProjet(cheminChoisi);
                 }
@@ -88,26 +145,26 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     1, filtres,        //filtres d'extension (*.json)
                     "Fichiers CPP"
                 );
-            
+
                 if (cheminChoisi != NULL) {
                     std::string contenu = GenererCodeComplet(La_scene.GetNodes(),&La_scene.banque_materiaux,&La_scene.shaderManager,&La_scene.banque_modeles,Les_variables);
                     Exporter(cheminChoisi, contenu);
                 }
             }
-            
+
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Paramètres")) {
             bool Changement = false;//c'est remis à false à chaque fois
-    
+
             if (ImGui::SliderInt("Seuil de Sauvegarde", &Les_parametres.limiteSauvgarde, 10, 200)) {
                 Changement = true;
             }
-        
+
             if (ImGui::InputInt("Largeur", &Les_parametres.screenWidth)) {
                 Changement = true;
             }
-        
+
             //si utilisateur tape un nouveau chiffre pour la hauteur
             if (ImGui::InputInt("Hauteur", &Les_parametres.screenHeight)) {
                 Changement = true;
@@ -180,7 +237,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
         //le matériau actuellement assigné à l'objet
         DataMateriel* mat_actuel = banque->GetMateriau(objet->id_materiau);
         std::string nom_mat_actuel = (mat_actuel != nullptr) ? mat_actuel->nom : "Inconnu";
-    
+
         //liste déroulante pour choisir matériau
         if (ImGui::BeginCombo("Materiau Assigné", nom_mat_actuel.c_str())) {
             for (auto& mat : banque->GetTousLesMateriaux()) {
@@ -196,7 +253,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
             ImGui::EndCombo();
             }
             ImGui::Spacing();
-            
+
             ImGui::InputText("Nom du Materiel", &Les_variables.nom_nouveau_materiau[0], 64);
             if (ImGui::Button("Créer un Matériel")){
                 //std::string nom = "Materiau_" + std::to_string(banque->GetTousLesMateriaux().size());
@@ -229,7 +286,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                         mat_actuel->couleurAlbedo.b / 255.0f,
                         mat_actuel->couleurAlbedo.a / 255.0f
                     };
-                
+
                     if (ImGui::ColorEdit4("Couleur", couleur_float)) {
                         //si changement couleur dans ImGui maj donnée Raylib
                         mat_actuel->couleurAlbedo.r = (unsigned char)(couleur_float[0] * 255.0f);
@@ -238,7 +295,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                         mat_actuel->couleurAlbedo.a = (unsigned char)(couleur_float[3] * 255.0f);
                         Les_variables.flag_changements = true;
                     }
-                    
+
                     }
                     if (mat_actuel->identifiant != 0) {
                         //on peut changer la texture que si c'est un materiel différent
@@ -276,11 +333,11 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
                             Les_variables.flag_changements = true;
                         }
                         //faut retirer les couleurs personnalisées du bouton
-                        ImGui::PopStyleColor(3); 
-                    
+                        ImGui::PopStyleColor(3);
+
                     ImGui::Unindent();
                 }
-                
+
         }
 }
 
@@ -294,13 +351,13 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
         if(noeuds_selectione.size() > 1){
             //si on a plus d'un element alors faut faire le cas N elements
             ImGui::Text("%ld éléments Selectionné", noeuds_selectione.size());
-            ImGui::Separator();    
+            ImGui::Separator();
         }else{
             if(noeuds_selectione[0] != nullptr){
 
                 ImGui::Text("Modification de : %s", noeuds_selectione[0]->nom.c_str());
                 ImGui::Separator();
-                
+
                 // sliders pour modifier dynamiquement les variables
             if (
                 // TODO ajouter les bouton pour ajouter des objetsg ici aussi
@@ -320,13 +377,13 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                             "Fichiers model",   //fescription
                             0                  //sélection multiple désactivée
                         );
-                    
+
                         if (cheminChoisi != NULL) {
                             objet->ChargerFichier3D(cheminChoisi, Les_variables.gestionnaire_modeles);
                             Les_variables.flag_changements = true;
                         }
                     }
-                    
+
             }
             if(noeuds_selectione[0]->GetType() == "LightNode"){
                 //on a une lumière
@@ -349,11 +406,11 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
                     Les_variables.flag_changements = true;
                 }
-                
+
             }else if(noeuds_selectione[0]->GetType() == "SoleilNode"){
                 //le soleil
                 SoleilNode* objet = static_cast<SoleilNode*>(noeuds_selectione[0]);
-                
+
                 if (ImGui::DragFloat3("Direction", &objet->direction.x, 0.01f, -1.0f, 1.0f)) {
                     if (objet->direction.x == 0 && objet->direction.y == 0 && objet->direction.z == 0) {
                         objet->direction = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
@@ -384,7 +441,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 float hauteurCalculee = largeurFenetre * ratio;
 
             ImGui::Image((ImTextureID)(size_t)texture_preview.texture.id,
-                         ImVec2(largeurFenetre, hauteurCalculee), 
+                         ImVec2(largeurFenetre, hauteurCalculee),
                          ImVec2(0, 1),  // UV min (Inversé Y)
                          ImVec2(1, 0)); // UV max (Inversé Y)
             }else{
@@ -506,20 +563,20 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
 
 void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_variables, DataMateriel *mat_actuel){
     if (mat_actuel != nullptr) {
-        
+
         if (ImGui::BeginCombo("Shader du Matériau", mat_actuel->nom_shader_actuel.c_str())) {
-            
+
             //parcourt du dictionnaire (clé = nom_shader, valeur = shader_obj)
             for (auto const& [nom_shader, shader_obj] : La_scene.shaderManager.dictionnaire_shaders) {
-                
+
                 bool est_selectionne = (mat_actuel->nom_shader_actuel == nom_shader);
-                
+
                 //la clé (le nom) dans la liste
                 if (ImGui::Selectable(nom_shader.c_str(), est_selectionne)) {
                     mat_actuel->nom_shader_actuel = nom_shader;
                     Les_variables.flag_changements = true;
                 }
-                
+
                 if (est_selectionne) {
                     ImGui::SetItemDefaultFocus();
                 }
@@ -531,7 +588,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
 
 void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::Begin("Shader");
-    
+
     if (ImGui::Button("ouvrir dossier shader",ImVec2(-1,20))) {
         const char* filtres[2] = { "*.fs","*.vs" };//voir pour envoyer 2 fichier en meme temps ou 1 si besoin
         const char* cheminChoisi = tinyfd_openFileDialog(
@@ -544,7 +601,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
 
         if (cheminChoisi != NULL) {
             std::string chemin(cheminChoisi);
-            
+
             //lecture fichier shader
             std::ifstream fichier(chemin);
             if(fichier.is_open()){
@@ -565,14 +622,14 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
             }
         }
     }
-            
+
     ImGui::Text("Nom du shader dans la banque :");
     //secu place dans les scting
-    Les_variables.nom_nouveau_shader.resize(64); 
+    Les_variables.nom_nouveau_shader.resize(64);
     ImGui::InputText("###nom_shader", &Les_variables.nom_nouveau_shader[0], 64);
     ImGui::Text("Code Fragment Shader :");
     Les_variables.codeFragmentShader.resize(8192); //alloc 8Ko pour le texte shader TODO voir pour augmenter
-    ImGui::InputTextMultiline("###code_fs", &Les_variables.codeFragmentShader[0], 8192, ImVec2(-1, 300)); 
+    ImGui::InputTextMultiline("###code_fs", &Les_variables.codeFragmentShader[0], 8192, ImVec2(-1, 300));
     //compil
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1, 30))){
         //clean la string
@@ -606,28 +663,28 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     ImGui::End();
 }
 
-//ancien : 
+//ancien :
 /*
             Les_variables.nom_nouveau_shader =
             if (position_separateur != std::string::npos) {
             //si un '|', on a plusieurs fichiers
             std::string fichier1 = chemin.substr(0, position_separateur);
             std::string fichier2 = chemin.substr(position_separateur + 1);
-                    
+
             //tinyfd garantit pas l'ordre des fichiers fonc faut check lequel est le .vs et lequel est le .fs
             std::string cheminVS = (fichier1.find(".vs") != std::string::npos) ? fichier1 : fichier2;//un ternaire pour voir si il est dedans
             std::string cheminFS = (fichier1.find(".fs") != std::string::npos) ? fichier1 : fichier2;
-                    
+
             La_scene.shaderManager.ChargerShaders(cheminVS, cheminFS);
             std::cout << "Shaders charges : " << cheminVS << " et " << cheminFS << std::endl;//debut pour moi
-        } 
+        }
         else {
             //si pas de '|', l'utilisateur a choisi qu'un seul fichier donc l'ature c'est un shader pas dafaut
             if (chemins.find(".fs") != std::string::npos) {
                 std::cout << "Fragment Shader seul charge : " << chemins << std::endl;
                 //le Vertex par défaut de Raylib
-                La_scene.shaderManager.ChargerShaders("", chemins); 
-            } 
+                La_scene.shaderManager.ChargerShaders("", chemins);
+            }
             else if (chemins.find(".vs") != std::string::npos) {
                 std::cout << "Vertex Shader seul charge : " << chemins << std::endl;
                 La_scene.shaderManager.ChargerShaders(chemins, "");
@@ -636,21 +693,21 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     }
     }
     ImGui::Text("Fragment shader :");
-    
+
     ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200)); //TODO voir si on peut pas augmenter la limite
-    
-    
+
+
     //rendu du champ de text
     ImGui::InputText("Nom du shader", &Les_variables.nom_nouveau_shader[0], 64);
     //si on clique sur le bouton :
     if(ImGui::Button("Compiler et Appliquer", ImVec2(-1,30))){
         const char * defaultVS = "";//c'est le shader vs de base de raylib
-        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, Les_variables.codeVertexShader, Les_variables.codeFragmentShader)){            
+        if(La_scene.shaderManager.ChargerShaderDepuisTexte( Les_variables.nom_nouveau_shader, Les_variables.codeVertexShader, Les_variables.codeFragmentShader)){
             Shader le_nouveau_shader = La_scene.shaderManager.dictionnaire_shaders[Les_variables.nom_nouveau_shader];
             //faut pas crée dans le dico si il existe pas ?
-            
+
             for(auto & noeud : La_scene.GetSelection()){//pour les objets selectione
-                
+
                 DataMateriel *mat = La_scene.banque_materiaux.GetMateriau(noeud->id_materiau);
                 mat->nom_shader_actuel = Les_variables.nom_nouveau_shader;
                 std::cout << "shader applique au elements selectione" << std::endl;
@@ -700,14 +757,14 @@ void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_va
     std::vector<SceneNode*> selection = La_scene.GetSelection();
     if (selection.empty()) return;
     SceneNode* noeud = selection[0];
-    
+
     ImGuizmo::BeginFrame();
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2((float)GetScreenWidth(), (float)GetScreenHeight()));
-    ImGui::Begin("Gizmo_Fenetre", nullptr, 
-        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | 
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | 
-        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground | 
+    ImGui::Begin("Gizmo_Fenetre", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBackground |
         ImGuiWindowFlags_NoInputs);
 
     ImGuizmo::SetOrthographic(false);
@@ -717,42 +774,48 @@ void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_va
     // --- LES LIGNES MANQUANTES SONT ICI ---
     Matrix matView = MatrixLookAt(camera.position, camera.target, camera.up);
     float aspect = (float)GetScreenWidth() / (float)GetScreenHeight();
-    Matrix matProj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.01f, 1000.0f); 
+    Matrix matProj = MatrixPerspective(camera.fovy * DEG2RAD, aspect, 0.01f, 1000.0f);
 
     float16 viewFloat = MatrixToFloatV(matView);
     float16 projFloat = MatrixToFloatV(matProj);
     // --------------------------------------
-    
+
     float translation[3] = { noeud->position.x, noeud->position.y, noeud->position.z };
     float rotation[3]    = { noeud->rotation.x, noeud->rotation.y, noeud->rotation.z };
     float scale[3]       = { noeud->taille.x, noeud->taille.y, noeud->taille.z };
-    
+
     float16 modelFloat;
     ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, modelFloat.v);
     Les_variables.gizmo_operation = ImGuizmo::TRANSLATE;
     Les_variables.gizmo_mode = ImGuizmo::LOCAL;
     ImGuizmo::Manipulate(
-        viewFloat.v,            
-        projFloat.v,            
+        viewFloat.v,
+        projFloat.v,
         Les_variables.gizmo_operation, // Ta variable (TRANSLATE, ROTATE, SCALE)
         Les_variables.gizmo_mode, // Ta variable (WORLD, LOCAL)
-        modelFloat.v            
+        modelFloat.v
     );
 
     if (ImGuizmo::IsUsing()) {
         ImGuizmo::DecomposeMatrixToComponents(modelFloat.v, translation, rotation, scale);
         noeud->position = { translation[0], translation[1], translation[2] };
-        noeud->rotation = { rotation[0], rotation[1], rotation[2] }; 
+        noeud->rotation = { rotation[0], rotation[1], rotation[2] };
         noeud->taille   = { scale[0], scale[1], scale[2] };
-        Les_variables.flag_changements = true; 
+        Les_variables.flag_changements = true;
     }
-    
+
     ImGui::End();
 }
 
 
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D& texture_preview){
     nb_lignes_max_console = &Les_parametres.nb_lignes_max_console;
+    //le theme une seule fois
+    static bool premiere_fois = true;
+    if (premiere_fois){
+        Appliquer_Theme();
+        premiere_fois = false;
+    }
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur);
