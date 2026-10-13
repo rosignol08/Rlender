@@ -70,11 +70,11 @@ std::string SoleilNode::GetUpdateCode(){
     return "";
 }
 
-std::string SoleilNode::GetDrawCode(){
+std::string SoleilNode::GetDrawCode(EditorContext& variables){
     return "";
 }
 
-std::string SoleilNode::GetInitCode(){
+std::string SoleilNode::GetInitCode(EditorContext& variables){
     return "";
 }
 

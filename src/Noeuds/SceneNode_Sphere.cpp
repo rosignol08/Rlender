@@ -63,11 +63,11 @@ std::string SphereNode::GetUpdateCode(){
     return "";
 }
 
-std::string SphereNode::GetDrawCode(){
+std::string SphereNode::GetDrawCode(EditorContext& variables){
     return "";
 }
 
-std::string SphereNode::GetInitCode(){
+std::string SphereNode::GetInitCode(EditorContext& variables){
     return "";
 }
 

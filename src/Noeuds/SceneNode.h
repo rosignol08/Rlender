@@ -37,10 +37,10 @@ class SceneNode {
     virtual void Draw(EditorContext& variables) = 0;
     virtual std::string GetUpdateCode() = 0;
     //avant while (!WindowShouldClose())
-    virtual std::string GetInitCode() { return ""; }//par défaut TODO à changer
+    virtual std::string GetInitCode(EditorContext& variables) { return ""; }//par défaut TODO à changer
 
     //dans le BeginMode3D
-    virtual std::string GetDrawCode() = 0;
+    virtual std::string GetDrawCode(EditorContext& variables) = 0;
 
     //pour dupliquer
     virtual std::unique_ptr<SceneNode> Cloner() = 0;
@@ -77,9 +77,9 @@ class CubeNode : public SceneNode{
     std::string GetUpdateCode(){
         return "";
     }
-    std::string GetDrawCode() override;
+    std::string GetDrawCode(EditorContext& variables) override;
     
-    std::string GetInitCode() override;
+    std::string GetInitCode(EditorContext& variables) override;
     
     BoundingBox GetBoiteCollision() override {
         Vector3 min, max;
@@ -112,8 +112,8 @@ class SphereNode : public SceneNode{
     void Draw(EditorContext& variables) override;
 
     std::string GetUpdateCode()override;
-    std::string GetDrawCode()override;
-    std::string GetInitCode()override;
+    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetInitCode(EditorContext& variables)override;
 
     BoundingBox GetBoiteCollision() override;
     
@@ -134,8 +134,8 @@ public:
     void Draw(EditorContext& variables) override;
     
     std::string GetUpdateCode() override;
-    std::string GetDrawCode() override;
-    std::string GetInitCode() override;
+    std::string GetDrawCode(EditorContext& variables) override;
+    std::string GetInitCode(EditorContext& variables) override;
 
     BoundingBox GetBoiteCollision() override;
 
@@ -155,8 +155,8 @@ class CylinderNode : public SceneNode {
         void Draw(EditorContext& variables) override ;
 
         std::string GetUpdateCode() override;
-        std::string GetDrawCode() override;
-        std::string GetInitCode() override;
+        std::string GetDrawCode(EditorContext& variables) override;
+        std::string GetInitCode(EditorContext& variables) override;
 
         BoundingBox GetBoiteCollision() override;
         
@@ -176,8 +176,8 @@ public:
     void Draw(EditorContext& variables) override;
     
     std::string GetUpdateCode()override;
-    std::string GetDrawCode()override;
-    std::string GetInitCode()override;
+    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetInitCode(EditorContext& variables)override;
     
     BoundingBox GetBoiteCollision() override;
 
@@ -197,10 +197,10 @@ class CameraNode : public SceneNode{
     void Draw(EditorContext& variables) override;
     std::string GetUpdateCode()override;
 
-    std::string GetDrawCode()override;
+    std::string GetDrawCode(EditorContext& variables)override;
     
 
-    std::string GetInitCode()override;
+    std::string GetInitCode(EditorContext& variables)override;
 
     BoundingBox GetBoiteCollision()override;
     std::unique_ptr<SceneNode> Cloner() override;
@@ -222,11 +222,11 @@ class Camera2DNode : public SceneNode{
 
     std::string GetUpdateCode()override;
 
-    std::string GetDrawCode()override;
+    std::string GetDrawCode(EditorContext& variables)override;
     
     std::string GetCleanupCode()override;
 
-    std::string GetInitCode()override;
+    std::string GetInitCode(EditorContext& variables)override;
     std::unique_ptr<SceneNode> Cloner()override;
     std::string GetType() const override { return "Camera2D"; }
 };
@@ -245,9 +245,9 @@ class ModeleNode : public SceneNode{
     }
 
     void ChargerFichier3D(std::string chemin, ManagerModele* manager);
-    std::string GetDrawCode() override;
+    std::string GetDrawCode(EditorContext& variables) override;
     
-    std::string GetInitCode() override;
+    std::string GetInitCode(EditorContext& variables) override;
     //TOTO changer ça
     BoundingBox GetBoiteCollision() override;
 
@@ -255,6 +255,6 @@ class ModeleNode : public SceneNode{
     std::string GetType() const override { return "ModeleNode"; }
 };
 
-std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes);
+std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes, ManagerMateriel* materiaux_managers, ShaderManager *shaders_manager, ManagerModele *modele_manager, EditorContext& Les_variables);
 
 

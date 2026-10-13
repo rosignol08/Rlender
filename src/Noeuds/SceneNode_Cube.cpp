@@ -9,23 +9,42 @@ CubeNode::CubeNode()
     modele = LoadModelFromMesh(GenMeshCube(1.0f, 1.0f, 1.0f));
 }
 
-CubeNode::~CubeNode()
-{
+CubeNode::~CubeNode(){
     // faut decharger le modele
     UnloadModel(modele);
 }
 
-std::string CubeNode::GetDrawCode()
-{
+std::string CubeNode::GetDrawCode(EditorContext& variables){
     std::stringstream code;
     code << "\t\t\t\t\t\t\t\tDrawCube(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " << std::to_string(this->couleur.b) << ", 255" << "}" << ");\n";
     return code.str();
 }
 
-std::string CubeNode::GetInitCode()
-{
+std::string CubeNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
-    code << "\t\t\t\tVector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " << std::to_string(this->position.z) << "};\n";
+    //recuperation nom materiel
+    DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+    std::string nom_mat = mat->nom;
+
+    //la pos
+    code << "    Vector3 pos_" << this->nom << " = { "<< this->position.x << "f, " << this->position.y << "f, " << this->position.z << "f };\n";
+    
+    //gen modele 3D
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCube("<< this->taille.x << "f, " << this->taille.y << "f, " << this->taille.z << "f));\n";
+
+    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
+    code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
+    
+    //texture
+    if (mat->chemins_textures.count("albedo") > 0) {
+        code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].texture = texture_" << nom_mat << ";\n";
+    }
+
+    //shader
+    if (mat->nom_shader_actuel.empty()) {
+        code << "    model_" << this->nom << ".materials[0].shader = shader_" << mat->nom_shader_actuel << ";\n";
+    }
+
     return code.str();
 }
 

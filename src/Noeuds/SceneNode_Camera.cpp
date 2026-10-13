@@ -81,14 +81,14 @@ std::string CameraNode::GetUpdateCode(){
     return "";
 }
 
-std::string CameraNode::GetDrawCode(){
+std::string CameraNode::GetDrawCode(EditorContext& variables){
     // faut ajouter cette ligne dans la boucle de rendu
     std::stringstream code;
     code << "     UpdateCamera(&" << nom << " , " << mode_camera << ");\n";
     return code.str();
 }
 
-std::string CameraNode::GetInitCode(){
+std::string CameraNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
     code << " Camera3D " << nom << " = { 0 };\n";
     code << nom << ".position = {" << position.x << "f, " << position.y << "f, " << position.z << "f};\n";

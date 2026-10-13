@@ -84,10 +84,10 @@ std::string PlaneNode::GetUpdateCode(){
     return "";
 }
 
-std::string PlaneNode::GetDrawCode(){
+std::string PlaneNode::GetDrawCode(EditorContext& variables){
     return "";
 }
 
-std::string PlaneNode::GetInitCode(){
+std::string PlaneNode::GetInitCode(EditorContext& variables){
     return "";
 }

@@ -81,10 +81,10 @@ std::string ConeNode::GetUpdateCode(){
     return "";
 }
 
-std::string ConeNode::GetDrawCode(){
+std::string ConeNode::GetDrawCode(EditorContext& variables){
     return "";
 }
 
-std::string ConeNode::GetInitCode(){
+std::string ConeNode::GetInitCode(EditorContext& variables){
     return "";
 }

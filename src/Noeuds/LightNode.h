@@ -12,8 +12,8 @@ class LightNode : public SceneNode{
         void Draw(EditorContext& variables) override;
         std::unique_ptr<SceneNode> Cloner() override;
         std::string GetUpdateCode() override;
-        std::string GetDrawCode() override;
-        std::string GetInitCode() override;
+        std::string GetDrawCode(EditorContext& variables) override;
+        std::string GetInitCode(EditorContext& variables) override;
         std::string GetType() const {
             return "LightNode";
         }

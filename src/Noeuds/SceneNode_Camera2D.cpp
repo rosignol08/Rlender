@@ -29,7 +29,7 @@ std::string Camera2DNode::GetUpdateCode()
     return "";
 }
 
-std::string Camera2DNode::GetDrawCode()
+std::string Camera2DNode::GetDrawCode(EditorContext& variables)
 {
     return "";
 }
@@ -39,7 +39,7 @@ std::string Camera2DNode::GetCleanupCode()
     return "";
 }
 
-std::string Camera2DNode::GetInitCode()
+std::string Camera2DNode::GetInitCode(EditorContext& variables)
 {
     std::stringstream code;
     code << " Camera2D " << nom << " = { 0 };\n";

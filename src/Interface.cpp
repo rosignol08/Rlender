@@ -90,7 +90,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                 );
             
                 if (cheminChoisi != NULL) {
-                    std::string contenu = GenererCodeComplet(La_scene.GetNodes());
+                    std::string contenu = GenererCodeComplet(La_scene.GetNodes(),&La_scene.banque_materiaux,&La_scene.shaderManager,&La_scene.banque_modeles,Les_variables);
                     Exporter(cheminChoisi, contenu);
                 }
             }
@@ -489,7 +489,7 @@ void Dessiner_ApercuCode(SceneManager& La_scene, EditorContext& Les_variables, P
         //si on a eu un changement on augmente le compteur
         Les_variables.compteurModifs++;
         std::cout << "Modifications : " << Les_variables.compteurModifs << "/" << Les_parametres.limiteSauvgarde << std::endl;    //faut regenerer le code
-        Les_variables.code_preview = GenererCodeComplet(La_scene.SceneManager::GetNodes());//on donne à manger tous les noeuds de la scene
+        Les_variables.code_preview = GenererCodeComplet(La_scene.GetNodes(),&La_scene.banque_materiaux,&La_scene.shaderManager,&La_scene.banque_modeles,Les_variables);//on donne à manger tous les noeuds de la scene
         Les_variables.flag_changements = false; //faut penser à le rebaisser le flag hein
     }
     if(Les_variables.compteurModifs >= Les_parametres.limiteSauvgarde){
@@ -539,15 +539,80 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
             "",                 //chemin par défaut
             2, filtres,        //filtres d'extension
             "ShadeFichiers Shader (.fs, .vs)",   //fescription
-            1                  //sélection multiple activéé
+            0                  //sélection multiple desactivée pour simplifier pour l'instant TODO
         );
+
         if (cheminChoisi != NULL) {
-            std::string chemins(cheminChoisi);
-            size_t position_separateur = chemins.find('|');//le separateur c'est | en cas de plusieurs fichiers
+            std::string chemin(cheminChoisi);
+            
+            //lecture fichier shader
+            std::ifstream fichier(chemin);
+            if(fichier.is_open()){
+                std::stringstream buffer;
+                buffer << fichier.rdbuf();
+
+                if(chemin.find(".fs") != std::string::npos){
+                    Les_variables.codeFragmentShader = buffer.str();
+                }else if(chemin.find(".vs") != std::string::npos){
+                    Les_variables.codeVertexShader = buffer.str();
+                }
+                size_t position_separateur = chemin.find_last_of('/\\|');//le separateur c'est pour choper le nom du fichier
+                if (position_separateur == std::string::npos){
+                    Les_variables.nom_nouveau_shader = chemin;
+                }else{
+                    Les_variables.nom_nouveau_shader = chemin.substr(position_separateur + 1);
+                }
+            }
+        }
+    }
+            
+    ImGui::Text("Nom du shader dans la banque :");
+    //secu place dans les scting
+    Les_variables.nom_nouveau_shader.resize(64); 
+    ImGui::InputText("###nom_shader", &Les_variables.nom_nouveau_shader[0], 64);
+    ImGui::Text("Code Fragment Shader :");
+    Les_variables.codeFragmentShader.resize(8192); //alloc 8Ko pour le texte shader TODO voir pour augmenter
+    ImGui::InputTextMultiline("###code_fs", &Les_variables.codeFragmentShader[0], 8192, ImVec2(-1, 300)); 
+    //compil
+    if(ImGui::Button("Compiler et Appliquer", ImVec2(-1, 30))){
+        //clean la string
+        std::string nom_propre = std::string(Les_variables.nom_nouveau_shader.c_str());
+        //def chemin de sauvgarde
+        std::string chemin_sauvegarde_fs = "Assets/" + nom_propre + ".fs";
+        //Secu
+        if (chemin_sauvegarde_fs.find(".fs") == std::string::npos){
+            chemin_sauvegarde_fs += ".fs";
+        }
+        //ecriture fichier sur ordinateur
+        std::ofstream fichier_fs(chemin_sauvegarde_fs);
+        if (fichier_fs.is_open()) {
+            //insersion code shader dans fichier
+            fichier_fs << Les_variables.codeFragmentShader.c_str();
+            fichier_fs.close();
+            std::cout << "Fichier physique créé/mis à jour : " << chemin_sauvegarde_fs << std::endl;
+        } else {
+            std::cout << "Erreur : Impossible de créer le fichier " << chemin_sauvegarde_fs << " (Le dossier 'Assets' existe ?)" << std::endl;
+        }
+        //compil shader dans RAM
+        if(La_scene.shaderManager.ChargerShaderDepuisTexte( nom_propre, Les_variables.codeVertexShader.c_str(), Les_variables.codeFragmentShader.c_str())){
+            for(auto & noeud : La_scene.GetSelection()){
+                DataMateriel* mat = La_scene.banque_materiaux.GetMateriau(noeud->id_materiau);
+                if(mat != nullptr){
+                    mat->nom_shader_actuel = nom_propre;
+                }
+            }
+        }
+    }
+    ImGui::End();
+}
+
+//ancien : 
+/*
+            Les_variables.nom_nouveau_shader =
             if (position_separateur != std::string::npos) {
             //si un '|', on a plusieurs fichiers
-            std::string fichier1 = chemins.substr(0, position_separateur);
-            std::string fichier2 = chemins.substr(position_separateur + 1);
+            std::string fichier1 = chemin.substr(0, position_separateur);
+            std::string fichier2 = chemin.substr(position_separateur + 1);
                     
             //tinyfd garantit pas l'ordre des fichiers fonc faut check lequel est le .vs et lequel est le .fs
             std::string cheminVS = (fichier1.find(".vs") != std::string::npos) ? fichier1 : fichier2;//un ternaire pour voir si il est dedans
@@ -574,6 +639,7 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
     
     ImGui::InputTextMultiline("###code_fs",&Les_variables.codeFragmentShader[0],4096,ImVec2(ImGui::GetContentRegionAvail().x,200)); //TODO voir si on peut pas augmenter la limite
     
+    
     //rendu du champ de text
     ImGui::InputText("Nom du shader", &Les_variables.nom_nouveau_shader[0], 64);
     //si on clique sur le bouton :
@@ -589,25 +655,10 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
                 mat->nom_shader_actuel = Les_variables.nom_nouveau_shader;
                 std::cout << "shader applique au elements selectione" << std::endl;
             }
-            /*
-            for(auto & element : La_scene.GetNodes()){//mise a jours de tous les obj avec ce shader
-                //std::cout << "objets selectionne : " << element << "nom shader objet :" << element->nom_shader_actuel << "nouveau nom shader " << Les_variables.nom_nouveau_shader << std::endl;
-                if(element->nom_shader_actuel == Les_variables.nom_nouveau_shader){
-                    element->AppliquerShader(Les_variables.nom_nouveau_shader, La_scene.shaderManager.dictionnaire_shaders[Les_variables.nom_nouveau_shader]);
-                    std::cout << "shader applique" << std::endl;
-                }
-            }
-                    
-        for(auto & element : La_scene.GetSelection()){//pour les objets selectione
-            element->AppliquerShader(Les_variables.nom_nouveau_shader, le_nouveau_shader);
-            std::cout << "shader applique au elements selectione" << std::endl;
-        }
-        */
-        
         }
     }
     ImGui::End();
-}
+    */
 
 void Initialiser_Logs(EditorContext* contexte_cible){
     contexte_global_pour_les_logs = contexte_cible;

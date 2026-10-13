@@ -80,10 +80,10 @@ std::string CylinderNode::GetUpdateCode(){
     return "";
 }
 
-std::string CylinderNode::GetDrawCode(){
+std::string CylinderNode::GetDrawCode(EditorContext& variables){
     return "";
 }
 
-std::string CylinderNode::GetInitCode(){
+std::string CylinderNode::GetInitCode(EditorContext& variables){
     return "";
 }
