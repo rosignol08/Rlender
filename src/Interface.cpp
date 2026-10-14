@@ -60,6 +60,55 @@ void Appliquer_Theme(){
     c[ImGuiCol_TextSelectedBg]       = {0.32f, 0.52f, 0.65f, 0.5f};
 }
 
+//l'outil du gizmo (Z deplacer, E tourner, R echelle)
+ImGuizmo::OPERATION operation_gizmo = ImGuizmo::TRANSLATE; // TO:DO rajouter universale avec un buton si on veut utiliser tout les gizmo
+ImGuizmo::MODE mode_gizmo = ImGuizmo::LOCAL;
+
+//hauteur de la barre d'outils sous le menu
+const float HAUTEUR_BARRE = 34.0f;
+
+//bouton qui reste bleu quand il est actif + bulle aide
+bool Bouton_Outil(const char* label, bool actif, const char* aide){
+    if (actif) ImGui::PushStyleColor(ImGuiCol_Button, ACCENT);
+    bool clic = ImGui::Button(label);
+    if (actif) ImGui::PopStyleColor();
+    if (ImGui::IsItemHovered()) ImGui::SetTooltip("%s", aide);
+    ImGui::SameLine();
+    return clic;
+}
+
+//la barre fixe sous le menu avec les outils du gizmo
+void Dessiner_BarreOutils(){
+    ImGui::SetNextWindowPos({0, ImGui::GetFrameHeight()});
+    ImGui::SetNextWindowSize({(float)GetScreenWidth(), HAUTEUR_BARRE});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {8, 4});
+    ImGui::Begin("BarreOutils", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoCollapse);
+    ImGui::PopStyleVar();
+
+    if (Bouton_Outil("Déplacer", operation_gizmo == ImGuizmo::TRANSLATE, "Déplacer (Z)")) operation_gizmo = ImGuizmo::TRANSLATE;
+    if (Bouton_Outil("Tourner",  operation_gizmo == ImGuizmo::ROTATE,    "Tourner (E)"))  operation_gizmo = ImGuizmo::ROTATE;
+    if (Bouton_Outil("Échelle",  operation_gizmo == ImGuizmo::SCALE,     "Échelle (R)"))  operation_gizmo = ImGuizmo::SCALE;
+    ImGui::TextDisabled("|");
+    ImGui::SameLine();
+    if (Bouton_Outil("Local", mode_gizmo == ImGuizmo::LOCAL, "Axes de l'objet")) mode_gizmo = ImGuizmo::LOCAL;
+    if (Bouton_Outil("Monde", mode_gizmo == ImGuizmo::WORLD, "Axes du monde"))   mode_gizmo = ImGuizmo::WORLD;
+
+    ImGui::End();
+}
+
+//raccourcis pour changer d'outil
+void Gerer_Raccourcis(EditorContext& Les_variables){
+    if (Les_variables.modeFlyActif) return;    //en vol le clavier sert a bouger
+    if (ImGui::GetIO().WantTextInput) return;  //si on ecrit dans un champ on ignore
+    //sur azerty c'est Z E R
+    if (IsKeyPressed(KEY_W)) operation_gizmo = ImGuizmo::TRANSLATE;
+    if (IsKeyPressed(KEY_E)) operation_gizmo = ImGuizmo::ROTATE;
+    if (IsKeyPressed(KEY_R)) operation_gizmo = ImGuizmo::SCALE;
+}
+
 //pour ranger les fenetres
 bool ranger_fenetres = true; //true au lancement pour tout ranger direct
 
@@ -69,7 +118,7 @@ void Ranger_Fenetres(){
     float H = (float)GetScreenHeight();
     float menu = ImGui::GetFrameHeight(); //hauteur de la barre de menu
     float hauteur_ajouts = 80.0f;         //la barre des boutons d'ajout en haut
-    float haut = menu + hauteur_ajouts;   //la ou commencent les colonnes
+    float haut = menu + HAUTEUR_BARRE + hauteur_ajouts; //la ou commencent les colonnes
     float reste = H - haut;               //la hauteur qui reste en dessous
 
     float gauche = W * 0.18f;             //largeur colonne gauche
@@ -78,7 +127,7 @@ void Ranger_Fenetres(){
     float bas = H * 0.25f;                //hauteur console / code
 
     //en haut sur toute la largeur
-    ImGui::SetWindowPos ("Ajouts", {0, menu});
+    ImGui::SetWindowPos ("Ajouts", {0, menu + HAUTEUR_BARRE});
     ImGui::SetWindowSize("Ajouts", {W, hauteur_ajouts});
 
     //colonne de gauche
@@ -838,13 +887,14 @@ void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_va
 
     float16 modelFloat;
     ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, modelFloat.v);
-    Les_variables.gizmo_operation = ImGuizmo::TRANSLATE;
-    Les_variables.gizmo_mode = ImGuizmo::LOCAL;
+    //l'outil choisi dans la barre
+    Les_variables.gizmo_operation = operation_gizmo;
+    Les_variables.gizmo_mode = mode_gizmo;
     ImGuizmo::Manipulate(
         viewFloat.v,
         projFloat.v,
-        Les_variables.gizmo_operation, // Ta variable (TRANSLATE, ROTATE, SCALE)
-        Les_variables.gizmo_mode, // Ta variable (WORLD, LOCAL)
+        Les_variables.gizmo_operation, // (TRANSLATE, ROTATE, SCALE)
+        Les_variables.gizmo_mode, // (WORLD, LOCAL)
         modelFloat.v
     );
 
@@ -871,8 +921,10 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur);
+    Gerer_Raccourcis(Les_variables);
     Gerer_gizmo(cameraEditeur, La_scene, Les_variables);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
+    Dessiner_BarreOutils();
     Dessiner_Hierarchie(La_scene, Les_variables);
     Dessiner_Inspecteur(La_scene, Les_variables, Les_parametres, texture_preview);
     Dessiner_ControlesCamera(cameraEditeur, Les_variables);
