@@ -158,8 +158,8 @@ void Ranger_Fenetres(){
     ImGui::SetWindowSize("Ajouts", {W, hauteur_ajouts});
 
     //colonne de gauche
-    ImGui::SetWindowPos ("Hierarchie", {0, haut});
-    ImGui::SetWindowSize("Hierarchie", {gauche, reste * 0.5f});
+    ImGui::SetWindowPos ("Outliner", {0, haut});
+    ImGui::SetWindowSize("Outliner", {gauche, reste * 0.5f});
     ImGui::SetWindowPos ("Contrôle Caméra", {0, haut + reste * 0.5f});
     ImGui::SetWindowSize("Contrôle Caméra", {gauche, reste * 0.3f});
     ImGui::SetWindowPos ("Type de caméra", {0, haut + reste * 0.8f});
@@ -357,26 +357,70 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
     }
 }
 
+//une couleur et un nom pour chaque type d'objet
+ImU32 Couleur_Type(const std::string& type){
+    if (type == "Camera3D")   return IM_COL32(120, 200, 140, 255); //vert
+    if (type == "LightNode")  return IM_COL32(240, 200,  90, 255); //jaune
+    if (type == "SoleilNode") return IM_COL32(250, 150,  70, 255); //orange
+    if (type == "ModeleNode") return IM_COL32(180, 140, 230, 255); //violet
+    return IM_COL32(110, 170, 210, 255);                           //bleu pour le reste (cube...)
+}
+
+const char* Nom_Type(const std::string& type){
+    if (type == "Camera3D")   return "Caméra";
+    if (type == "LightNode")  return "Lumière";
+    if (type == "SoleilNode") return "Soleil";
+    if (type == "ModeleNode") return "Modèle";
+    return "Mesh";
+}
+
 void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
-    ImGui::Begin("Hierarchie");
+    ImGui::Begin("Outliner");
+        //recherche par nom
+        static ImGuiTextFilter filtre;
+        ImGui::SetNextItemWidth(-1);
+        if (ImGui::InputTextWithHint("##filtre", "Rechercher...", filtre.InputBuf, IM_ARRAYSIZE(filtre.InputBuf))){
+            filtre.Build();
+        }
+        ImGui::Spacing();
+
+        if (La_scene.GetNodes().empty()){
+            ImGui::TextDisabled("Scène vide.");
+            ImGui::TextDisabled("Ajoute un objet avec Ajouts ou Créer.");
+        }
+
         bool est_selectione = false;
         std::vector<SceneNode*> selection = La_scene.GetSelection();//variable temporaire
         for (size_t i = 0; i < La_scene.GetNodes().size(); i++){
-            // un label unique pour chaque objet
-            std::string label = La_scene.GetNodes()[i]->nom + "##" + std::to_string(i);
-            auto it = std::find(selection.begin(), selection.end(), La_scene.GetNodes()[i].get());
+            SceneNode* noeud = La_scene.GetNodes()[i].get();
+            if (!filtre.PassFilter(noeud->nom.c_str())) continue; //on saute ceux qui correspondent pas a la recherche
+
+            // un label unique pour chaque objet (les espaces c'est pour laisser la place au rond de couleur)
+            std::string label = "      " + noeud->nom + "##" + std::to_string(i);
+            auto it = std::find(selection.begin(), selection.end(), noeud);
 
             est_selectione = (it != selection.end());
             // faut mettre a jour le pointeur selectioneur
             if (ImGui::Selectable(label.c_str(), est_selectione)){
                 if(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
-                    La_scene.SceneManager::ToggleSelection(La_scene.GetNodes()[i].get());
+                    La_scene.SceneManager::ToggleSelection(noeud);
                 }else{
                     // faut désélectionner l'ancien et selectionner le nouveau mais c'est fait par la fonction setseleciton
-                    La_scene.SceneManager::SetSelection(La_scene.GetNodes()[i].get());
+                    La_scene.SceneManager::SetSelection(noeud);
                     Les_variables.flag_changements = true;
                 }
             }
+
+            //le rond de couleur a gauche et le type a droite, dessinés par dessus la ligne
+            ImVec2 coin_haut = ImGui::GetItemRectMin();
+            ImVec2 coin_bas  = ImGui::GetItemRectMax();
+            ImDrawList* dessin = ImGui::GetWindowDrawList();
+            std::string type = noeud->GetType();
+            dessin->AddCircleFilled({coin_haut.x + 10, (coin_haut.y + coin_bas.y) * 0.5f}, 4.0f, Couleur_Type(type));
+            const char* nom_type = Nom_Type(type);
+            ImVec2 taille_texte = ImGui::CalcTextSize(nom_type);
+            dessin->AddText({coin_bas.x - taille_texte.x - 6, coin_haut.y + (coin_bas.y - coin_haut.y - taille_texte.y) * 0.5f},
+                            ImGui::GetColorU32(est_selectione ? ImGuiCol_Text : ImGuiCol_TextDisabled), nom_type);
         }
     ImGui::End();
 }
