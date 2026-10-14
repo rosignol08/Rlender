@@ -60,6 +60,48 @@ void Appliquer_Theme(){
     c[ImGuiCol_TextSelectedBg]       = {0.32f, 0.52f, 0.65f, 0.5f};
 }
 
+//pour ranger les fenetres
+bool ranger_fenetres = true; //true au lancement pour tout ranger direct
+
+//place chaque fenetre selon la taille de l'ecran
+void Ranger_Fenetres(){
+    float W = (float)GetScreenWidth();
+    float H = (float)GetScreenHeight();
+    float menu = ImGui::GetFrameHeight(); //hauteur de la barre de menu
+    float hauteur_ajouts = 80.0f;         //la barre des boutons d'ajout en haut
+    float haut = menu + hauteur_ajouts;   //la ou commencent les colonnes
+    float reste = H - haut;               //la hauteur qui reste en dessous
+
+    float gauche = W * 0.18f;             //largeur colonne gauche
+    float droite = W * 0.25f;             //largeur colonne droite
+    float milieu = W - gauche - droite;   //le centre reste libre pour la 3D
+    float bas = H * 0.25f;                //hauteur console / code
+
+    //en haut sur toute la largeur
+    ImGui::SetWindowPos ("Ajouts", {0, menu});
+    ImGui::SetWindowSize("Ajouts", {W, hauteur_ajouts});
+
+    //colonne de gauche
+    ImGui::SetWindowPos ("Hierarchie", {0, haut});
+    ImGui::SetWindowSize("Hierarchie", {gauche, reste * 0.5f});
+    ImGui::SetWindowPos ("Contrôle Caméra", {0, haut + reste * 0.5f});
+    ImGui::SetWindowSize("Contrôle Caméra", {gauche, reste * 0.3f});
+    ImGui::SetWindowPos ("Type de caméra", {0, haut + reste * 0.8f});
+    ImGui::SetWindowSize("Type de caméra", {gauche, reste * 0.2f});
+
+    //colonne de droite
+    ImGui::SetWindowPos ("Inspecteur", {W - droite, haut});
+    ImGui::SetWindowSize("Inspecteur", {droite, reste * 0.55f});
+    ImGui::SetWindowPos ("Shader", {W - droite, haut + reste * 0.55f});
+    ImGui::SetWindowSize("Shader", {droite, reste * 0.45f});
+
+    //en bas au milieu cote a cote
+    ImGui::SetWindowPos ("Console", {gauche, H - bas});
+    ImGui::SetWindowSize("Console", {milieu * 0.5f, bas});
+    ImGui::SetWindowPos ("Appercu code", {gauche + milieu * 0.5f, H - bas});
+    ImGui::SetWindowSize("Appercu code", {milieu * 0.5f, bas});
+}
+
 void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variables){
     ImGui::Begin("Ajouts");
     //exemple d'ajout de bouton
@@ -67,14 +109,17 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
             La_scene.AjouterCamera3D();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
+        ImGui::SameLine();//les boutons sur une seule ligne
         if(ImGui::Button("Light",{50.0f,50.0f})){
             La_scene.AjouterLight();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
+        ImGui::SameLine();
         if(ImGui::Button("Cube",{50.0f,50.0f})){
             La_scene.AjouterCube();
             Les_variables.flag_changements = true; //pour mettre à jour le code
         }
+        ImGui::SameLine();
         if(ImGui::Button("Modele",{50.0f,50.0f})){
             La_scene.AjouterModele();
             Les_variables.flag_changements = true; //pour mettre à jour le code
@@ -201,6 +246,13 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             }
             ImGui::EndMenu();
 
+        }
+        //pour remettre les fenetres a leur place si on les a bougées
+        if (ImGui::BeginMenu("Fenêtres")) {
+            if (ImGui::MenuItem("Ranger les fenêtres")) {
+                ranger_fenetres = true;
+            }
+            ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
@@ -828,5 +880,19 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     Dessiner_EditeurShader(La_scene,Les_variables);
     Dessiner_Console(La_scene, Les_variables);
     Dessiner_Boutons_Ajouts(La_scene, Les_variables);
+
+    //si la taille de la fenetre change (plein ecran etc) on range tout
+    static int ancienne_largeur = 0;
+    static int ancienne_hauteur = 0;
+    if (GetScreenWidth() != ancienne_largeur || GetScreenHeight() != ancienne_hauteur) {
+        ancienne_largeur = GetScreenWidth();
+        ancienne_hauteur = GetScreenHeight();
+        ranger_fenetres = true;
+    }
+    //a la fin car les fenetres doivent deja exister
+    if (ranger_fenetres) {
+        Ranger_Fenetres();
+        ranger_fenetres = false;
+    }
     rlImGuiEnd();
 }
