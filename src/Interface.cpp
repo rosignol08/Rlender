@@ -61,7 +61,7 @@ void Appliquer_Theme(){
 }
 
 //l'outil du gizmo (Z deplacer, E tourner, R echelle)
-ImGuizmo::OPERATION operation_gizmo = ImGuizmo::TRANSLATE; // TO:DO rajouter universale avec un buton si on veut utiliser tout les gizmo
+ImGuizmo::OPERATION operation_gizmo = ImGuizmo::TRANSLATE;
 ImGuizmo::MODE mode_gizmo = ImGuizmo::LOCAL;
 
 //hauteur de la barre d'outils sous le menu
@@ -91,6 +91,8 @@ void Dessiner_BarreOutils(){
     if (Bouton_Outil("Déplacer", operation_gizmo == ImGuizmo::TRANSLATE, "Déplacer (Z)")) operation_gizmo = ImGuizmo::TRANSLATE;
     if (Bouton_Outil("Tourner",  operation_gizmo == ImGuizmo::ROTATE,    "Tourner (E)"))  operation_gizmo = ImGuizmo::ROTATE;
     if (Bouton_Outil("Échelle",  operation_gizmo == ImGuizmo::SCALE,     "Échelle (R)"))  operation_gizmo = ImGuizmo::SCALE;
+    //les 3 gizmo en meme temps
+    if (Bouton_Outil("Universel", operation_gizmo == ImGuizmo::UNIVERSAL, "Déplacer, tourner et échelle en même temps")) operation_gizmo = ImGuizmo::UNIVERSAL;
     ImGui::TextDisabled("|");
     ImGui::SameLine();
     if (Bouton_Outil("Local", mode_gizmo == ImGuizmo::LOCAL, "Axes de l'objet")) mode_gizmo = ImGuizmo::LOCAL;
@@ -99,10 +101,35 @@ void Dessiner_BarreOutils(){
     ImGui::End();
 }
 
-//raccourcis pour changer d'outil
-void Gerer_Raccourcis(EditorContext& Les_variables){
+//pour le clic droit, le menu Édition et les raccourcis
+void Dupliquer_Selection(SceneManager& La_scene, EditorContext& Les_variables){
+    for (auto & element : La_scene.GetSelection()){
+        //faut dupliquer tout les elements selectionnées
+        La_scene.AjouterNoeud(element->Cloner());
+    }
+    Les_variables.flag_changements = true;
+}
+
+void Supprimer_Selection(SceneManager& La_scene, EditorContext& Les_variables){
+    std::vector<SceneNode*> selection = La_scene.GetSelection(); //copie car on supprime pendant la boucle
+    for (auto & element : selection){
+        La_scene.SupprimerNoeud(element);
+    }
+    La_scene.Deselectionne();
+    Les_variables.flag_changements = true;
+}
+
+//raccourcis clavier
+void Gerer_Raccourcis(SceneManager& La_scene, EditorContext& Les_variables){
     if (Les_variables.modeFlyActif) return;    //en vol le clavier sert a bouger
     if (ImGui::GetIO().WantTextInput) return;  //si on ecrit dans un champ on ignore
+
+    bool a_selection = !La_scene.GetSelection().empty();
+    if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)){
+        if (IsKeyPressed(KEY_D) && a_selection) Dupliquer_Selection(La_scene, Les_variables);
+        return; //avec ctrl on change pas d'outil
+    }
+    if (IsKeyPressed(KEY_DELETE) && a_selection) Supprimer_Selection(La_scene, Les_variables);
     //sur azerty c'est Z E R
     if (IsKeyPressed(KEY_W)) operation_gizmo = ImGuizmo::TRANSLATE;
     if (IsKeyPressed(KEY_E)) operation_gizmo = ImGuizmo::ROTATE;
@@ -151,28 +178,39 @@ void Ranger_Fenetres(){
     ImGui::SetWindowSize("Appercu code", {milieu * 0.5f, bas});
 }
 
+//les boutons d'ajout rangés par onglets
 void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variables){
-    ImGui::Begin("Ajouts");
-    //exemple d'ajout de bouton
-        if(ImGui::Button("Camera3D",{50.0f,50.0f})){
-            La_scene.AjouterCamera3D();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
+    ImGui::Begin("Ajouts", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+    ImVec2 taille_bouton = {78.0f, 28.0f};
+    if (ImGui::BeginTabBar("OngletsAjouts")){
+        if (ImGui::BeginTabItem("Objets")){
+            if(ImGui::Button("Cube", taille_bouton)){
+                La_scene.AjouterCube();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
+            ImGui::SameLine();
+            if(ImGui::Button("Modele", taille_bouton)){
+                La_scene.AjouterModele();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
+            ImGui::EndTabItem();
         }
-        ImGui::SameLine();//les boutons sur une seule ligne
-        if(ImGui::Button("Light",{50.0f,50.0f})){
-            La_scene.AjouterLight();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
+        if (ImGui::BeginTabItem("Lumières")){
+            if(ImGui::Button("Light", taille_bouton)){
+                La_scene.AjouterLight();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
+            ImGui::EndTabItem();
         }
-        ImGui::SameLine();
-        if(ImGui::Button("Cube",{50.0f,50.0f})){
-            La_scene.AjouterCube();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
+        if (ImGui::BeginTabItem("Caméras")){
+            if(ImGui::Button("Camera3D", taille_bouton)){
+                La_scene.AjouterCamera3D();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
+            ImGui::EndTabItem();
         }
-        ImGui::SameLine();
-        if(ImGui::Button("Modele",{50.0f,50.0f})){
-            La_scene.AjouterModele();
-            Les_variables.flag_changements = true; //pour mettre à jour le code
-        }
+        ImGui::EndTabBar();
+    }
     ImGui::End();
 }
 
@@ -183,17 +221,11 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
     if(!noeuds_selectione.empty()){
         if(ImGui::BeginPopupContextVoid("MenuActions", ImGuiPopupFlags_MouseButtonRight)){
 
-            if(ImGui::MenuItem("Supprimer")){
-                for (auto & element : noeuds_selectione){
-                    La_scene.SupprimerNoeud(element);
-                }
-                La_scene.Deselectionne();
+            if(ImGui::MenuItem("Supprimer", "Suppr")){
+                Supprimer_Selection(La_scene, Les_variables);
             }
-            if(ImGui::MenuItem("Dupliquer")){
-                for (auto & element : noeuds_selectione){
-                    //faut dupliquer tout les elements selectionnées
-                    La_scene.AjouterNoeud(element->Cloner());
-                }
+            if(ImGui::MenuItem("Dupliquer", "Ctrl+D")){
+                Dupliquer_Selection(La_scene, Les_variables);
             }
 
             ImGui::EndPopup();
@@ -246,6 +278,24 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                 }
             }
 
+            ImGui::EndMenu();
+        }
+        //grisé si rien de selectionné
+        if (ImGui::BeginMenu("Édition")) {
+            bool a_selection = !noeuds_selectione.empty();
+            if (ImGui::MenuItem("Dupliquer", "Ctrl+D", false, a_selection)) Dupliquer_Selection(La_scene, Les_variables);
+            if (ImGui::MenuItem("Supprimer", "Suppr",  false, a_selection)) Supprimer_Selection(La_scene, Les_variables);
+            ImGui::Separator();
+            if (ImGui::MenuItem("Tout désélectionner", nullptr, false, a_selection)) La_scene.Deselectionne();
+            ImGui::EndMenu();
+        }
+        //les memes que dans la fenetre Ajouts
+        if (ImGui::BeginMenu("Créer")) {
+            if (ImGui::MenuItem("Cube"))    { La_scene.AjouterCube();     Les_variables.flag_changements = true; }
+            if (ImGui::MenuItem("Modèle"))  { La_scene.AjouterModele();   Les_variables.flag_changements = true; }
+            ImGui::Separator();
+            if (ImGui::MenuItem("Lumière")) { La_scene.AjouterLight();    Les_variables.flag_changements = true; }
+            if (ImGui::MenuItem("Caméra"))  { La_scene.AjouterCamera3D(); Les_variables.flag_changements = true; }
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Paramètres")) {
@@ -921,7 +971,7 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     rlImGuiBegin();
     //raycasting
     La_scene.Gerer_pointeur(cameraEditeur);
-    Gerer_Raccourcis(Les_variables);
+    Gerer_Raccourcis(La_scene, Les_variables);
     Gerer_gizmo(cameraEditeur, La_scene, Les_variables);
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_BarreOutils();
