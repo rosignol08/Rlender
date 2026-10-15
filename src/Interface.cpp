@@ -419,8 +419,14 @@ void Dessiner_Hierarchie(SceneManager& La_scene, EditorContext& Les_variables){
             dessin->AddCircleFilled({coin_haut.x + 10, (coin_haut.y + coin_bas.y) * 0.5f}, 4.0f, Couleur_Type(type));
             const char* nom_type = Nom_Type(type);
             ImVec2 taille_texte = ImGui::CalcTextSize(nom_type);
-            dessin->AddText({coin_bas.x - taille_texte.x - 6, coin_haut.y + (coin_bas.y - coin_haut.y - taille_texte.y) * 0.5f},
-                            ImGui::GetColorU32(est_selectione ? ImGuiCol_Text : ImGuiCol_TextDisabled), nom_type);
+            ImVec2 pos = {coin_bas.x - taille_texte.x - 6, coin_haut.y + (coin_bas.y - coin_haut.y - taille_texte.y) * 0.5f};
+            ImU32 couleur;
+            if(est_selectione){
+                couleur = ImGui::GetColorU32(ImGuiCol_Text);
+            }else{
+                couleur = ImGui::GetColorU32(ImGuiCol_TextDisabled);
+            }
+            dessin->AddText(pos, couleur, nom_type);
         }
     ImGui::End();
 }
