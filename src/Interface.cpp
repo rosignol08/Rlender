@@ -165,11 +165,9 @@ void Ranger_Fenetres(){
     ImGui::SetWindowPos ("Type de caméra", {0, haut + reste * 0.8f});
     ImGui::SetWindowSize("Type de caméra", {gauche, reste * 0.2f});
 
-    //colonne de droite
+    //colonne de droite (inspecteur + shader en onglets)
     ImGui::SetWindowPos ("Inspecteur", {W - droite, haut});
-    ImGui::SetWindowSize("Inspecteur", {droite, reste * 0.55f});
-    ImGui::SetWindowPos ("Shader", {W - droite, haut + reste * 0.55f});
-    ImGui::SetWindowSize("Shader", {droite, reste * 0.45f});
+    ImGui::SetWindowSize("Inspecteur", {droite, reste});
 
     //en bas au milieu cote a cote
     ImGui::SetWindowPos ("Console", {gauche, H - bas});
@@ -545,7 +543,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
 void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D &texture_preview){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
-    ImGui::Begin("Inspecteur");
+    //plus de Begin ici, c'est dessiné dans l'onglet Attributs du panneau de droite
     if (!noeuds_selectione.empty()){
         //affiche le ou les noms des objets tout en haut
         //faut voir on fait quoi si on a plusieurs objets on affiche la propriété d'un seul ?
@@ -660,7 +658,6 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
     {
         ImGui::Text("Aucun objet selectionné");
     }
-    ImGui::End();
 }
 
 void Dessiner_ControlesCamera(Camera3D& cameraEditeur, EditorContext& Les_variables){
@@ -788,7 +785,7 @@ void Dessiner_Materiaux_Manager(SceneManager& La_scene, EditorContext& Les_varia
 }
 
 void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables){
-    ImGui::Begin("Shader");
+    //plus de Begin ici, c'est dessiné dans l'onglet Shader du panneau de droite
 
     if (ImGui::Button("ouvrir dossier shader",ImVec2(-1,20))) {
         const char* filtres[2] = { "*.fs","*.vs" };//voir pour envoyer 2 fichier en meme temps ou 1 si besoin
@@ -860,6 +857,22 @@ void Dessiner_EditeurShader(SceneManager& La_scene, EditorContext& Les_variables
                 }
             }
         }
+    }
+}
+
+//panneau de droite : l'inspecteur et le shader dans des onglets
+void Dessiner_PanneauDroite(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres, RenderTexture2D& texture_preview){
+    ImGui::Begin("Inspecteur");
+    if (ImGui::BeginTabBar("OngletsDroite")){
+        if (ImGui::BeginTabItem("Attributs")){
+            Dessiner_Inspecteur(La_scene, Les_variables, Les_parametres, texture_preview);
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Shader")){
+            Dessiner_EditeurShader(La_scene, Les_variables);
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
     ImGui::End();
 }
@@ -1026,10 +1039,9 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
     Dessiner_MenuPrincipale(La_scene, Les_variables, Les_parametres);
     Dessiner_BarreOutils();
     Dessiner_Hierarchie(La_scene, Les_variables);
-    Dessiner_Inspecteur(La_scene, Les_variables, Les_parametres, texture_preview);
+    Dessiner_PanneauDroite(La_scene, Les_variables, Les_parametres, texture_preview);
     Dessiner_ControlesCamera(cameraEditeur, Les_variables);
     Dessiner_ApercuCode(La_scene, Les_variables, Les_parametres);
-    Dessiner_EditeurShader(La_scene,Les_variables);
     Dessiner_Console(La_scene, Les_variables);
     Dessiner_Boutons_Ajouts(La_scene, Les_variables);
 
