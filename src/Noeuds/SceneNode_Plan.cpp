@@ -84,7 +84,7 @@ std::string PlaneNode::GetUpdateCode(){
     return "";
 }
 
-std::string PlaneNode::GetDrawCode(EditorContext& variables){
+std::string PlaneNode::GetDrawCode(){
     return "";
 }
 

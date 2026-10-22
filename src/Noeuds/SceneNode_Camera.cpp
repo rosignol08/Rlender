@@ -81,7 +81,7 @@ std::string CameraNode::GetUpdateCode(){
     return "";
 }
 
-std::string CameraNode::GetDrawCode(EditorContext& variables){
+std::string CameraNode::GetDrawCode(){
     // faut ajouter cette ligne dans la boucle de rendu
     std::stringstream code;
     code << "     UpdateCamera(&" << nom << " , " << mode_camera << ");\n";

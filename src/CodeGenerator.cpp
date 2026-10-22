@@ -76,7 +76,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
 
     //dessin noeuds
     for (const auto& node : nodes) {
-        code << node->GetDrawCode(Les_variables);
+        code << node->GetDrawCode();
     }
 
     //fermeture

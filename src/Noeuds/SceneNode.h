@@ -117,6 +117,7 @@ class SphereNode : public SceneNode{
     }
     std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
+    std::string GetCleanupCode() override;
 
     BoundingBox GetBoiteCollision() override;
     
@@ -136,7 +137,7 @@ public:
 
     void Draw(EditorContext& variables) override;
     
-    std::string GetUpdateCode() {return "";}
+    std::string GetUpdateCode()override;
     
     std::string GetDrawCode() override;
     std::string GetInitCode(EditorContext& variables) override;
@@ -158,7 +159,7 @@ class CylinderNode : public SceneNode {
 
         void Draw(EditorContext& variables) override ;
 
-        std::string GetUpdateCode() {return "";}
+        std::string GetUpdateCode()override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
 
@@ -179,7 +180,7 @@ public:
     
     void Draw(EditorContext& variables) override;
     
-    std::string GetUpdateCode() {return "";}
+    std::string GetUpdateCode()override;
     std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
     

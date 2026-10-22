@@ -59,13 +59,13 @@ void SphereNode::Draw(EditorContext& variables){
     }
 }
 
-std::string CubeNode::GetDrawCode(){
+std::string SphereNode::GetDrawCode(){
     std::stringstream code;
     code << "            DrawModel(model_" << this->nom << ", pos_" << this->nom << ", 1.0f, WHITE);\n";
     return code.str();
 }
 
-std::string CubeNode::GetInitCode(EditorContext& variables){
+std::string SphereNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
     //recuperation nom materiel
     DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
@@ -75,9 +75,9 @@ std::string CubeNode::GetInitCode(EditorContext& variables){
     code << "    Vector3 pos_" << this->nom << " = { "<< this->position.x << "f, " << this->position.y << "f, " << this->position.z << "f };\n";
     
     //gen modele 3D
-    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCube("<< this->taille.x << "f, " << this->taille.y << "f, " << this->taille.z << "f));\n";
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshSphere("<< this->taille.x << "f, 16, 16));\n";
 
-    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
+    //couleur genre "model_Sphere_1.materials[0]...color = couleur_Bois;"
     code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
     
     //texture
@@ -93,7 +93,7 @@ std::string CubeNode::GetInitCode(EditorContext& variables){
     return code.str();
 }
 
-std::string CubeNode::GetCleanupCode() {
+std::string SphereNode::GetCleanupCode() {
     std::stringstream code;
     code << "    UnloadModel(model_"<< this->nom<<");\n";
     return code.str();

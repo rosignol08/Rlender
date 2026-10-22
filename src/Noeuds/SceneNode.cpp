@@ -1,4 +1,21 @@
 #include "SceneNode.h"
+
+std::string SceneNode::GetInitCode(EditorContext& variables){
+    return "";
+}
+
+std::string SceneNode::GetDrawCode(){
+    return "";
+}
+
+std::unique_ptr<SceneNode> SceneNode::Cloner(){
+    return nullptr;
+}
+
+std::string SceneNode::GetCleanupCode(){
+    return "";
+}
+
 void SceneNode::AppliquerVariablesGlobales(EditorContext& variables, Shader shader_cible){
     int loc = 0; //pour les locs
     static int cpt = 0;

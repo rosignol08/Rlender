@@ -81,7 +81,7 @@ std::string ConeNode::GetUpdateCode(){
     return "";
 }
 
-std::string ConeNode::GetDrawCode(EditorContext& variables){
+std::string ConeNode::GetDrawCode(){
     return "";
 }
 

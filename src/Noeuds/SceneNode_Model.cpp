@@ -19,7 +19,7 @@ void ModeleNode::ChargerFichier3D(std::string chemin, ManagerModele* manager){
     this->modele = manager->Charger_modele(chemin);
 }
 
-std::string ModeleNode::GetDrawCode(EditorContext& variables){
+std::string ModeleNode::GetDrawCode(){
     std::stringstream code;
     code << "\t\t\t\t\t\t\t\tDrawModele(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " << std::to_string(this->couleur.b) << ", 255" << "}" << ");\n";
     return code.str();

@@ -54,7 +54,7 @@ std::string LightNode::GetUpdateCode(){
     return "";
 }
 
-std::string LightNode::GetDrawCode(EditorContext& variables){
+std::string LightNode::GetDrawCode(){
     return "";
 }
 
