@@ -14,9 +14,9 @@ CubeNode::~CubeNode(){
     UnloadModel(modele);
 }
 
-std::string CubeNode::GetDrawCode(EditorContext& variables){
+std::string CubeNode::GetDrawCode(){
     std::stringstream code;
-    code << "\t\t\t\t\t\t\t\tDrawCube(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " << std::to_string(this->couleur.b) << ", 255" << "}" << ");\n";
+    code << "            DrawModel(model_" << this->nom << ", pos_" << this->nom << ", 1.0f, WHITE);\n";
     return code.str();
 }
 
@@ -41,10 +41,16 @@ std::string CubeNode::GetInitCode(EditorContext& variables){
     }
 
     //shader
-    if (mat->nom_shader_actuel.empty()) {
+    if (!mat->nom_shader_actuel.empty()) {
         code << "    model_" << this->nom << ".materials[0].shader = shader_" << mat->nom_shader_actuel << ";\n";
     }
 
+    return code.str();
+}
+
+std::string CubeNode::GetCleanupCode() {
+    std::stringstream code;
+    code << "    UnloadModel(model_"<< this->nom<<");\n";
     return code.str();
 }
 

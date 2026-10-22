@@ -1,0 +1,1 @@
+//g++ test.cpp -o JeuGenere -lraylib -lopengl32 -lgdi32 -lwinmm

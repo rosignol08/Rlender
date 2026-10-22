@@ -37,16 +37,16 @@ class SceneNode {
     virtual void Draw(EditorContext& variables) = 0;
     virtual std::string GetUpdateCode() = 0;
     //avant while (!WindowShouldClose())
-    virtual std::string GetInitCode(EditorContext& variables) { return ""; }//par défaut TODO à changer
+    virtual std::string GetInitCode(EditorContext& variables);//par défaut TODO à changer
 
     //dans le BeginMode3D
-    virtual std::string GetDrawCode(EditorContext& variables) = 0;
+    virtual std::string GetDrawCode();
 
     //pour dupliquer
-    virtual std::unique_ptr<SceneNode> Cloner() = 0;
+    virtual std::unique_ptr<SceneNode> Cloner();
 
     //la boucle les unloads
-    virtual std::string GetCleanupCode() { return "";}
+    virtual std::string GetCleanupCode();
 
     //update
     virtual void Update(EditorContext& variables) {}
@@ -74,13 +74,14 @@ class CubeNode : public SceneNode{
     ~CubeNode() override;
 
     void Draw(EditorContext& variables) override;
-    std::string GetUpdateCode(){
+    std::string GetUpdateCode(){//pour apres ? TODO
         return "";
     }
-    std::string GetDrawCode(EditorContext& variables) override;
+    std::string GetDrawCode() override;
     
     std::string GetInitCode(EditorContext& variables) override;
     
+    std::string GetCleanupCode() override;
     BoundingBox GetBoiteCollision() override {
         Vector3 min, max;
         BoundingBox ma_bounding_box;
@@ -111,8 +112,10 @@ class SphereNode : public SceneNode{
 
     void Draw(EditorContext& variables) override;
 
-    std::string GetUpdateCode()override;
-    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetUpdateCode(){
+        return "";
+    }
+    std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
 
     BoundingBox GetBoiteCollision() override;
@@ -133,8 +136,9 @@ public:
 
     void Draw(EditorContext& variables) override;
     
-    std::string GetUpdateCode() override;
-    std::string GetDrawCode(EditorContext& variables) override;
+    std::string GetUpdateCode() {return "";}
+    
+    std::string GetDrawCode() override;
     std::string GetInitCode(EditorContext& variables) override;
 
     BoundingBox GetBoiteCollision() override;
@@ -154,8 +158,8 @@ class CylinderNode : public SceneNode {
 
         void Draw(EditorContext& variables) override ;
 
-        std::string GetUpdateCode() override;
-        std::string GetDrawCode(EditorContext& variables) override;
+        std::string GetUpdateCode() {return "";}
+        std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
 
         BoundingBox GetBoiteCollision() override;
@@ -175,8 +179,8 @@ public:
     
     void Draw(EditorContext& variables) override;
     
-    std::string GetUpdateCode()override;
-    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetUpdateCode() {return "";}
+    std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
     
     BoundingBox GetBoiteCollision() override;
@@ -197,7 +201,7 @@ class CameraNode : public SceneNode{
     void Draw(EditorContext& variables) override;
     std::string GetUpdateCode()override;
 
-    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetDrawCode()override;
     
 
     std::string GetInitCode(EditorContext& variables)override;
@@ -222,7 +226,7 @@ class Camera2DNode : public SceneNode{
 
     std::string GetUpdateCode()override;
 
-    std::string GetDrawCode(EditorContext& variables)override;
+    std::string GetDrawCode()override;
     
     std::string GetCleanupCode()override;
 
@@ -245,7 +249,7 @@ class ModeleNode : public SceneNode{
     }
 
     void ChargerFichier3D(std::string chemin, ManagerModele* manager);
-    std::string GetDrawCode(EditorContext& variables) override;
+    std::string GetDrawCode() override;
     
     std::string GetInitCode(EditorContext& variables) override;
     //TOTO changer ça

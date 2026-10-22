@@ -59,16 +59,44 @@ void SphereNode::Draw(EditorContext& variables){
     }
 }
 
-std::string SphereNode::GetUpdateCode(){
-    return "";
+std::string CubeNode::GetDrawCode(){
+    std::stringstream code;
+    code << "            DrawModel(model_" << this->nom << ", pos_" << this->nom << ", 1.0f, WHITE);\n";
+    return code.str();
 }
 
-std::string SphereNode::GetDrawCode(EditorContext& variables){
-    return "";
+std::string CubeNode::GetInitCode(EditorContext& variables){
+    std::stringstream code;
+    //recuperation nom materiel
+    DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+    std::string nom_mat = mat->nom;
+
+    //la pos
+    code << "    Vector3 pos_" << this->nom << " = { "<< this->position.x << "f, " << this->position.y << "f, " << this->position.z << "f };\n";
+    
+    //gen modele 3D
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCube("<< this->taille.x << "f, " << this->taille.y << "f, " << this->taille.z << "f));\n";
+
+    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
+    code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
+    
+    //texture
+    if (mat->chemins_textures.count("albedo") > 0) {
+        code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].texture = texture_" << nom_mat << ";\n";
+    }
+
+    //shader
+    if (!mat->nom_shader_actuel.empty()) {
+        code << "    model_" << this->nom << ".materials[0].shader = shader_" << mat->nom_shader_actuel << ";\n";
+    }
+
+    return code.str();
 }
 
-std::string SphereNode::GetInitCode(EditorContext& variables){
-    return "";
+std::string CubeNode::GetCleanupCode() {
+    std::stringstream code;
+    code << "    UnloadModel(model_"<< this->nom<<");\n";
+    return code.str();
 }
 
 BoundingBox SphereNode::GetBoiteCollision(){
