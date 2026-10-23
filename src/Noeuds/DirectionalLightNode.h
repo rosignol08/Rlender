@@ -11,7 +11,7 @@ class SoleilNode : public SceneNode {
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
         std::unique_ptr<SceneNode> Cloner() override;
-        std::string GetUpdateCode() override;
+        std::string GetUpdateCode(EditorContext& variables) override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
         std::string GetType() const override{

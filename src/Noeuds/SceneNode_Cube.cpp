@@ -27,10 +27,10 @@ std::string CubeNode::GetInitCode(EditorContext& variables){
     std::string nom_mat = mat->nom;
 
     //la pos
-    code << "    Vector3 pos_" << this->nom << " = { "<< this->position.x << "f, " << this->position.y << "f, " << this->position.z << "f };\n";
+    code << "    Vector3 pos_" << this->nom << " = { "<< std::to_string(this->position.x) << "f, " << std::to_string(this->position.y) << "f, " << std::to_string(this->position.z) << "f };\n";
     
     //gen modele 3D
-    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCube("<< this->taille.x << "f, " << this->taille.y << "f, " << this->taille.z << "f));\n";
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCube("<< std::to_string(this->taille.x) << "f, " << std::to_string(this->taille.y) << "f, " << std::to_string(this->taille.z) << "f));\n";
 
     //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
     code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
@@ -42,7 +42,9 @@ std::string CubeNode::GetInitCode(EditorContext& variables){
 
     //shader
     if (!mat->nom_shader_actuel.empty()) {
-        code << "    model_" << this->nom << ".materials[0].shader = shader_" << mat->nom_shader_actuel << ";\n";
+        std::string nom_shader_cle = mat->nom_shader_actuel;
+        std::string nom_shader_var = FormaterNomVariableShader(nom_shader_cle);
+        code << "    model_" << this->nom << ".materials[0].shader = " << nom_shader_var << ";\n";
     }
 
     return code.str();

@@ -66,7 +66,7 @@ std::unique_ptr<SceneNode> SoleilNode::Cloner(){
     return clone;
 }
 
-std::string SoleilNode::GetUpdateCode(){
+std::string SoleilNode::GetUpdateCode(EditorContext& variables){
     return "";
 }
 

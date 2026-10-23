@@ -77,7 +77,7 @@ std::unique_ptr<SceneNode> ConeNode::Cloner(){
     return clone;
 }
 
-std::string ConeNode::GetUpdateCode(){
+std::string ConeNode::GetUpdateCode(EditorContext& variables){
     return "";
 }
 

@@ -1,5 +1,7 @@
 #include "LightNode.h"
 
+static unsigned int compteur_Light_clones = 0; //compteur pour les lumières
+
 LightNode::LightNode(){
     position = {0.0f, 0.0f, 0.0f};
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
@@ -7,7 +9,14 @@ LightNode::LightNode(){
     puissance = 5.0f;
     taille = 1.0f;
     type = "LightNode";
+    //index et du nom par défaut
+    this->index = compteur_Light_clones;
+    this->nom = "Light_" + std::to_string(this->index);
+    
+    compteur_Light_clones++;
 }
+
+
 
 void LightNode::Update(EditorContext& variables){
     //limite de 4 lumières differentes
@@ -44,14 +53,35 @@ std::unique_ptr<SceneNode> LightNode::Cloner(){
     clone->puissance = this->puissance;
     clone->est_allume = this->est_allume;
     clone->isSelected = true;
-    static unsigned int compteur_Light_clones = 0; //logiquement on a un compteur pour les clones
     clone->nom = this->nom + "_" + std::to_string(compteur_Light_clones); // nouveau nom
-    compteur_Light_clones++;
     return clone;
 }
 
-std::string LightNode::GetUpdateCode(){
-    return "";
+std::string LightNode::GetUpdateCode(EditorContext& variables){
+    std::stringstream code;
+
+    //maj position et couleur
+    code << "    pos_" << nom << " = { " 
+         << std::to_string(position.x) << "f, " 
+         << std::to_string(position.y) << "f, " 
+         << std::to_string(position.z) << "f };\n";
+    
+    code << "    couleur_" << nom << " = { " 
+         << std::to_string(couleur_lumiere.x) << "f, " 
+         << std::to_string(couleur_lumiere.y) << "f, " 
+         << std::to_string(couleur_lumiere.z) << "f };\n";
+
+    //check les shaders enregistrés pour générer l'envoi vers CHACUN
+    for (const auto& [nom_shader, shader_raylib] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        //std::string s_var = "shader_" + nom_shader;
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+        code << "    SetShaderValue(" << s_var << ", loc_pos_" << this->nom << "_" << nom_shader << ", &pos_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_col_" << this->nom << "_" << nom_shader << ", &couleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_int_" << this->nom << "_" << nom_shader << ", &intensite_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_pow_" << this->nom << "_" << nom_shader << ", &puissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+    }
+
+    return code.str();
 }
 
 std::string LightNode::GetDrawCode(){
@@ -59,7 +89,25 @@ std::string LightNode::GetDrawCode(){
 }
 
 std::string LightNode::GetInitCode(EditorContext& variables){
-    return "";
+    std::stringstream code;
+    //on donne nos loc ? je sais pas si c'est pas dans le shader qu'on fait ça plutot
+    code << "Vector3 pos_"<< nom << "= {" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
+    code << "Vector3 couleur_"<< nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
+    code << "float intensite_" << this->nom << " = 10.0f;\n";
+    code << "float puissance_" << this->nom << " = 1.0f;\n";
+
+    //les locs pour chaque shader de la banque
+    std::string idx = std::to_string(this->index);
+    for (const auto& [nom_shader, _] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+
+        code << "    int loc_pos_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightPos[" << idx << "]\");\n";
+        code << "    int loc_col_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightColor[" << idx << "]\");\n";
+        code << "    int loc_int_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightIntensity[" << idx << "]\");\n";
+        code << "    int loc_pow_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightPower[" << idx << "]\");\n";
+    }
+
+    return code.str();
 }
 
 BoundingBox LightNode::GetBoiteCollision(){

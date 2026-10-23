@@ -77,26 +77,30 @@ Camera3D CameraNode::ObtenirCameraRaylib() const {
     return cam;
 }
 
-std::string CameraNode::GetUpdateCode(){
-    return "";
-}
-
-std::string CameraNode::GetDrawCode(){
+std::string CameraNode::GetUpdateCode(EditorContext& variables){
     // faut ajouter cette ligne dans la boucle de rendu
     std::stringstream code;
     code << "     UpdateCamera(&" << nom << " , " << mode_camera << ");\n";
     return code.str();
 }
 
+std::string CameraNode::GetDrawCode(){
+    return "";
+}
+
 std::string CameraNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
     code << " Camera3D " << nom << " = { 0 };\n";
-    code << nom << ".position = {" << position.x << "f, " << position.y << "f, " << position.z << "f};\n";
-    code << nom << ".target = {" << target.x << "f, " << target.y << "f, " << target.z << "f};\n";
+    code << nom << ".position = {" << std::to_string(position.x) << "f, " << std::to_string(position.y) << "f, " << std::to_string(position.z) << "f};\n";
+    code << nom << ".target = {" << std::to_string(target.x) << "f, " << std::to_string(target.y) << "f, " << std::to_string(target.z) << "f};\n";
     code << nom << ".up = { 0.0f, 1.0f, 0.0f };\n";
-    code << nom << ".fovy = " << fovy << ";\n";
+    code << nom << ".fovy = " << std::to_string(fovy)<<"f" << ";\n";
     code << nom << ".projection = " << projetction_cam << ";\n";
     return code.str();
+}
+
+std::string CameraNode::GetCleanupCode(){
+    return "";
 }
 
 BoundingBox CameraNode::GetBoiteCollision() {

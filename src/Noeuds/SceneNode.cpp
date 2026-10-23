@@ -68,3 +68,17 @@ void SceneNode::AppliquerVariablesGlobales(EditorContext& variables, Shader shad
         }
     }
 }
+
+std::string SceneNode::FormaterNomVariableShader(const std::string& nomBrut) {
+    std::string nomNettoye = nomBrut;
+    
+    //faut enlever "Shader_" ou "shader_" si c'est là
+    if (nomNettoye.rfind("Shader_", 0) == 0) nomNettoye = nomNettoye.substr(7);
+    if (nomNettoye.rfind("shader_", 0) == 0) nomNettoye = nomNettoye.substr(7);
+    
+    //minuscules pour coherence
+    for (char &c : nomNettoye) c = std::tolower(c);
+
+    //return un nom unique et propre : "shader_defaut"
+    return "shader_" + nomNettoye;
+}
