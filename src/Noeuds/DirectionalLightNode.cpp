@@ -67,7 +67,27 @@ std::unique_ptr<SceneNode> SoleilNode::Cloner(){
 }
 
 std::string SoleilNode::GetUpdateCode(EditorContext& variables){
-    return "";
+    std::stringstream code;
+    //maj direction et couleur
+    code << "    dir_" << nom << " = { " 
+         << std::to_string(direction.x) << "f, " 
+         << std::to_string(direction.y) << "f, " 
+         << std::to_string(direction.z) << "f };\n";
+    
+    code << "    couleur_" << nom << " = { " 
+         << std::to_string(couleur_lumiere.x) << "f, " 
+         << std::to_string(couleur_lumiere.y) << "f, " 
+         << std::to_string(couleur_lumiere.z) << "f };\n";
+
+    //check les shaders enregistrés pour générer l'envoi vers chacun
+    for (const auto& [nom_shader, shader_raylib] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+        code << "    SetShaderValue(" << s_var << ", loc_dir_" << this->nom << "_" << s_var << ", &dir_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_col_" << this->nom << "_" << s_var << ", &couleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_pow_" << this->nom << "_" << s_var << ", &puissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+    }
+
+    return code.str();
 }
 
 std::string SoleilNode::GetDrawCode(){
@@ -75,7 +95,23 @@ std::string SoleilNode::GetDrawCode(){
 }
 
 std::string SoleilNode::GetInitCode(EditorContext& variables){
-    return "";
+    std::stringstream code;
+    //on donne nos loc ? je sais pas si c'est pas dans le shader qu'on fait ça plutot
+    code << "Vector3 dir_"<< nom << "= Vector3{" << std::to_string(direction.x) <<"f,"<< std::to_string(direction.y) <<"f,"<< std::to_string(direction.z)<<"f};\n";
+    code << "Vector3 couleur_"<< nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
+        code << "float puissance_" << this->nom << " = " << std::to_string(puissance) <<"f;\n";
+
+    //les locs pour chaque shader de la banque
+    //std::string idx = std::to_string(this->index); pas besoin on en a qu'un seul soleil
+    for (const auto& [nom_shader, _] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+
+        code << "    int loc_dir_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"sunDirection\");\n";
+        code << "    int loc_col_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"sunColor\");\n";
+        code << "    int loc_pow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"sunPower\");\n";
+    }
+
+    return code.str();
 }
 
 BoundingBox SoleilNode::GetBoiteCollision(){

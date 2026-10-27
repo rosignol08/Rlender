@@ -93,18 +93,18 @@ std::string LightNode::GetInitCode(EditorContext& variables){
     //on donne nos loc ? je sais pas si c'est pas dans le shader qu'on fait ça plutot
     code << "Vector3 pos_"<< nom << "= {" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
     code << "Vector3 couleur_"<< nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
-    code << "float intensite_" << this->nom << " = 10.0f;\n";
-    code << "float puissance_" << this->nom << " = 1.0f;\n";
+    code << "float intensite_" << this->nom << " = " << std::to_string(intensite) << "f;\n";
+    code << "float puissance_" << this->nom << " = " << std::to_string(puissance) << "f;\n";
 
     //les locs pour chaque shader de la banque
     std::string idx = std::to_string(this->index);
     for (const auto& [nom_shader, _] : variables.gestionnaire_shaders->dictionnaire_shaders) {
         std::string s_var = FormaterNomVariableShader(nom_shader);
 
-        code << "    int loc_pos_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightPos[" << idx << "]\");\n";
-        code << "    int loc_col_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightColor[" << idx << "]\");\n";
-        code << "    int loc_int_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightIntensity[" << idx << "]\");\n";
-        code << "    int loc_pow_" << nom << "_" << nom_shader << " = GetShaderLocation(" << s_var << ", \"lightPower[" << idx << "]\");\n";
+        code << "    int loc_pos_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightPos[" << idx << "]\");\n";
+        code << "    int loc_col_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightColor[" << idx << "]\");\n";
+        code << "    int loc_int_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightIntensity[" << idx << "]\");\n";
+        code << "    int loc_pow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightPower[" << idx << "]\");\n";
     }
 
     return code.str();
