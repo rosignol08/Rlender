@@ -4,9 +4,10 @@
 SphereNode::SphereNode(){
     nom = "Sphere";
     taille = {2.0f, 2.0f, 2.0f};
+    rayon = 1.0f;
     type = "sphere";
     // ça contient automatiquement un Material par défaut
-    modele = LoadModelFromMesh(GenMeshSphere(1.0f, 16.0f, 16.0f));
+    modele = LoadModelFromMesh(GenMeshSphere(rayon, 16.0f, 16.0f));
 }
 
 SphereNode::~SphereNode(){
@@ -44,6 +45,7 @@ void SphereNode::Draw(EditorContext& variables){
         }
     }
     Shader le_shader = modele.materials[0].shader;//pour limiter les acces mémoire
+    AppliquerVariablesGlobales(variables, le_shader);//fonction utilitaire de gestion des uniformes de shaders
     Matrix matTransform = MatrixIdentity();
     matTransform = MatrixMultiply(matTransform, MatrixScale(taille.x, taille.y, taille.z));
     matTransform = MatrixMultiply(matTransform, MatrixRotateXYZ((Vector3){rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
@@ -72,12 +74,12 @@ std::string SphereNode::GetInitCode(EditorContext& variables){
     std::string nom_mat = mat->nom;
 
     //la pos
-    code << "    Vector3 pos_" << this->nom << " = { "<< this->position.x << "f, " << this->position.y << "f, " << this->position.z << "f };\n";
+    code << "    Vector3 pos_" << this->nom << " = { "<< std::to_string(this->position.x) << "f, " << std::to_string(this->position.y) << "f, " << std::to_string(this->position.z) << "f };\n";
     
     //gen modele 3D
-    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshSphere("<< this->taille.x << "f, 16, 16));\n";
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshSphere(" << std::to_string(this->rayon) << "f, 16, 16));\n";
 
-    //couleur genre "model_Sphere_1.materials[0]...color = couleur_Bois;"
+    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
     code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
     
     //texture
@@ -87,7 +89,9 @@ std::string SphereNode::GetInitCode(EditorContext& variables){
 
     //shader
     if (!mat->nom_shader_actuel.empty()) {
-        code << "    model_" << this->nom << ".materials[0].shader = shader_" << mat->nom_shader_actuel << ";\n";
+        std::string nom_shader_cle = mat->nom_shader_actuel;
+        std::string nom_shader_var = FormaterNomVariableShader(nom_shader_cle);
+        code << "    model_" << this->nom << ".materials[0].shader = " << nom_shader_var << ";\n";
     }
 
     return code.str();
@@ -98,6 +102,7 @@ std::string SphereNode::GetCleanupCode() {
     code << "    UnloadModel(model_"<< this->nom<<");\n";
     return code.str();
 }
+
 
 BoundingBox SphereNode::GetBoiteCollision(){
     Vector3 min, max;

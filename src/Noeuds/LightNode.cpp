@@ -75,10 +75,10 @@ std::string LightNode::GetUpdateCode(EditorContext& variables){
     for (const auto& [nom_shader, shader_raylib] : variables.gestionnaire_shaders->dictionnaire_shaders) {
         //std::string s_var = "shader_" + nom_shader;
         std::string s_var = FormaterNomVariableShader(nom_shader);
-        code << "    SetShaderValue(" << s_var << ", loc_pos_" << this->nom << "_" << nom_shader << ", &pos_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
-        code << "    SetShaderValue(" << s_var << ", loc_col_" << this->nom << "_" << nom_shader << ", &couleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
-        code << "    SetShaderValue(" << s_var << ", loc_int_" << this->nom << "_" << nom_shader << ", &intensite_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
-        code << "    SetShaderValue(" << s_var << ", loc_pow_" << this->nom << "_" << nom_shader << ", &puissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_pos_" << this->nom << "_" << s_var << ", &pos_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_col_" << this->nom << "_" << s_var << ", &couleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_int_" << this->nom << "_" << s_var << ", &intensite_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_pow_" << this->nom << "_" << s_var << ", &puissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
     }
 
     return code.str();

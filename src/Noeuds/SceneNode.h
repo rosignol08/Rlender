@@ -108,6 +108,7 @@ class SphereNode : public SceneNode{
     private:
         Model modele;
     public :
+        float rayon;
     SphereNode();
     ~SphereNode() override;
 

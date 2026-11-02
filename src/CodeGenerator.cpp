@@ -106,6 +106,14 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << "    SetShaderValue("<< varName << ", locCount_" << nom_shader << ", &count_" << nom_shader << ", SHADER_UNIFORM_INT);\n";
     }
 
+    if (est3D){    
+        for (const auto& [nom_shader, _] : shaders_manager->dictionnaire_shaders) {
+            std::string varName = FormaterNomVariableShader(nom_shader);
+            code << "        int locViewPos_" << varName << " = GetShaderLocation(" << varName << ", \"viewPos\");\n";
+            code << "        SetShaderValue(" << varName << ", locViewPos_" << varName << ", &camera_active->position, SHADER_UNIFORM_VEC3);\n";
+        }
+    }
+    
     //boucle
     code << "\n    while (!WindowShouldClose()) {\n";
     
@@ -114,13 +122,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << node->GetUpdateCode(Les_variables);
     }
     
-    if (est3D){    
-        for (const auto& [nom_shader, _] : shaders_manager->dictionnaire_shaders) {
-            std::string varName = FormaterNomVariableShader(nom_shader);
-            code << "        int locViewPos_" << varName << " = GetShaderLocation(" << varName << ", \"viewPos\");\n";
-            code << "        SetShaderValue(" << varName << ", locViewPos_" << varName << ", &camera_active->position, SHADER_UNIFORM_VEC3);\n";
-        }
-    }
+    
         
     code << "          BeginDrawing();\n";
     code << "          ClearBackground(SKYBLUE);\n";

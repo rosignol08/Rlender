@@ -191,11 +191,20 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
                 La_scene.AjouterModele();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
+            ImGui::SameLine();
+            if(ImGui::Button("Sphere", taille_bouton)){
+                La_scene.AjouterSphere();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lumières")){
             if(ImGui::Button("Light", taille_bouton)){
                 La_scene.AjouterLight();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
+            if(ImGui::Button("Soleil", taille_bouton)){
+                La_scene.AjouterSoleil();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
             ImGui::EndTabItem();
