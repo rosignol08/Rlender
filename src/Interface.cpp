@@ -203,6 +203,7 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
                 La_scene.AjouterLight();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
+            ImGui::SameLine();
             if(ImGui::Button("Soleil", taille_bouton)){
                 La_scene.AjouterSoleil();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
