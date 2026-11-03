@@ -177,9 +177,12 @@ class ConeNode : public SceneNode {
 private:
     Model modele;
 public:
+    float radius;
+    float height;
+    int slices;
     ConeNode();
     ~ConeNode() override;
-    
+    void ReconstruireMesh();
     void Draw(EditorContext& variables) override;
     
     std::string GetUpdateCode(EditorContext& variables)override;

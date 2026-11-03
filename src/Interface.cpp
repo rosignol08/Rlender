@@ -196,6 +196,11 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
                 La_scene.AjouterSphere();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
+            ImGui::SameLine();
+            if(ImGui::Button("Cone", taille_bouton)){
+                La_scene.AjouterCone();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lumières")){
@@ -574,7 +579,30 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
             if (ImGui::DragFloat3("Rotation", &noeuds_selectione[0]->rotation.x, 1.0f)) Les_variables.flag_changements = true;
             if (ImGui::DragFloat3("Taille",   &noeuds_selectione[0]->taille.x,   0.1f)) Les_variables.flag_changements = true;
             ImGui::Separator();
-            if(noeuds_selectione[0]->GetType() == "ModeleNode"){
+
+            if (noeuds_selectione[0]->GetType() == "ConeNode") {
+                ConeNode* objet = static_cast<ConeNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés du Cône");
+
+                if (ImGui::DragFloat("Rayon", &objet->radius, 0.05f, 0.01f, 100.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragFloat("Hauteur", &objet->height, 0.05f, 0.01f, 100.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragInt("Faces", &objet->slices, 0.2f, 3, 128)) {
+                    //secu
+                    if (objet->slices < 3) objet->slices = 3;
+                
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            }
+            else if(noeuds_selectione[0]->GetType() == "ModeleNode"){
                 ModeleNode* objet = static_cast<ModeleNode*>(noeuds_selectione[0]);
                 ImGui::Text("Propriétés du Modèle");
                     if (ImGui::Button("Ouvrir modele 3D")) {
@@ -604,7 +632,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 }
 
                 // Le slider d'intensité
-                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, 10.0f)) {
+                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, MAXFLOAT)) {
                     Les_variables.flag_changements = true;
                 }
 
@@ -612,7 +640,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     Les_variables.flag_changements = true;
                 }
 
-                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, MAXFLOAT)){
                     Les_variables.flag_changements = true;
                 }
 
