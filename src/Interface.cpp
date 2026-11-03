@@ -201,6 +201,11 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
                 La_scene.AjouterCone();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
+            ImGui::SameLine();
+            if(ImGui::Button("Cylindre", taille_bouton)){
+                La_scene.AjouterCylindre();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lumières")){
@@ -583,6 +588,27 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
             if (noeuds_selectione[0]->GetType() == "ConeNode") {
                 ConeNode* objet = static_cast<ConeNode*>(noeuds_selectione[0]);
                 ImGui::Text("Propriétés du Cône");
+
+                if (ImGui::DragFloat("Rayon", &objet->radius, 0.05f, 0.01f, 100.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragFloat("Hauteur", &objet->height, 0.05f, 0.01f, 100.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragInt("Faces", &objet->slices, 0.2f, 3, 128)) {
+                    //secu
+                    if (objet->slices < 3) objet->slices = 3;
+                
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            }else if (noeuds_selectione[0]->GetType() == "CylinderNode") {
+                CylinderNode* objet = static_cast<CylinderNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés du Cylindre");
 
                 if (ImGui::DragFloat("Rayon", &objet->radius, 0.05f, 0.01f, 100.0f, "%.2f")) {
                     objet->ReconstruireMesh();

@@ -156,6 +156,10 @@ class CylinderNode : public SceneNode {
     private:
         Model modele;
     public:
+        float radius;
+        float height;
+        int slices;
+        void ReconstruireMesh();
         CylinderNode();
         ~CylinderNode() override;
 

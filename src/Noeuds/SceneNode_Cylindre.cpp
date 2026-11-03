@@ -5,11 +5,66 @@ CylinderNode::CylinderNode(){
     nom = "Cylinder";
     type = "cylinder";
     taille = {1.0f, 2.0f, 1.0f};
-    modele = LoadModelFromMesh(GenMeshCylinder(1.0f, 1.0f, 16));
+    radius = 1.0f;
+    height = 1.0f;
+    slices = 16;
+    modele = LoadModelFromMesh(GenMeshCylinder(radius, height, slices));
 }
 
 CylinderNode::~CylinderNode(){
     UnloadModel(modele);
+}
+
+void CylinderNode::ReconstruireMesh() {
+    UnloadModel(modele);
+    modele = LoadModelFromMesh(GenMeshCylinder(radius, height, slices));
+}
+
+
+std::string CylinderNode::GetUpdateCode(EditorContext& variables){
+    return "";
+}
+
+std::string CylinderNode::GetDrawCode(){
+    std::stringstream code;
+    code << "            DrawModel(model_" << this->nom << ", pos_" << this->nom << ", 1.0f, WHITE);\n";
+    return code.str();
+}
+
+std::string CylinderNode::GetInitCode(EditorContext& variables){
+    std::stringstream code;
+    //recuperation nom materiel
+    DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+    std::string nom_mat = "Defaut";
+    if (mat != nullptr) {
+        nom_mat = mat->nom;
+    } else {
+        //securite
+        mat = variables.banque_materiaux->GetMateriau(0);
+    }
+
+    //la pos
+    code << "    Vector3 pos_" << this->nom << " = { "<< std::to_string(this->position.x) << "f, " << std::to_string(this->position.y) << "f, " << std::to_string(this->position.z) << "f };\n";
+    
+    //gen modele 3D
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshCylinder("<< std::to_string(this->radius) << "f, " << std::to_string(this->height) << "f, " << std::to_string(this->slices) << "));\n";
+
+    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
+    code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
+    
+    //texture
+    if (mat->chemins_textures.count("albedo") > 0) {
+        code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].texture = texture_" << nom_mat << ";\n";
+    }
+
+    //shader
+    if (!mat->nom_shader_actuel.empty()) {
+        std::string nom_shader_cle = mat->nom_shader_actuel;
+        std::string nom_shader_var = FormaterNomVariableShader(nom_shader_cle);
+        code << "    model_" << this->nom << ".materials[0].shader = " << nom_shader_var << ";\n";
+    }
+
+    return code.str();
 }
 
 void CylinderNode::Draw(EditorContext& variables){
@@ -74,16 +129,4 @@ std::unique_ptr<SceneNode> CylinderNode::Cloner(){
     clone->nom = this->nom + "_" + std::to_string(compteur_Cyl_clones); // nouveau nom
     compteur_Cyl_clones++;
     return clone;
-}
-
-std::string CylinderNode::GetUpdateCode(EditorContext& variables){
-    return "";
-}
-
-std::string CylinderNode::GetDrawCode(){
-    return "";
-}
-
-std::string CylinderNode::GetInitCode(EditorContext& variables){
-    return "";
 }

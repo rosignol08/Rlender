@@ -94,7 +94,7 @@ void SceneManager::AjouterPlan(){
     SetSelection(sceneNodes.back().get());
 }
 
-void SceneManager::AjouterCyl(){
+void SceneManager::AjouterCylindre(){
     unsigned int compteur_cyl = 0;
     bool nom_deja_pris = true;
     std::string nom_test;
