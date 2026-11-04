@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <fstream>
+#include <cmath> //pour les bounding box
 #include "raylib.h"
 #include "raymath.h"
 #include "../utils.h"
@@ -31,6 +32,15 @@ class SceneNode {
             //pour la selectioner avec la souris l'objet a une bounding box
             return BoundingBox{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
         }
+    virtual Matrix GetMatriceMonde() const {
+        Matrix m = MatrixScale(taille.x, taille.y, taille.z);
+        m = MatrixMultiply(m, MatrixRotateXYZ({rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD}));
+        m = MatrixMultiply(m, MatrixTranslate(position.x, position.y, position.z));
+        return m;
+    }
+    virtual BoundingBox GetBoiteLocale() const {
+        return BoundingBox{ {-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f} };
+    }
     
     //virtual parce que on les définies dans les classe qui hérite d'elle
     virtual ~SceneNode() = default;
@@ -83,21 +93,9 @@ class CubeNode : public SceneNode{
     std::string GetInitCode(EditorContext& variables) override;
     
     std::string GetCleanupCode() override;
-    BoundingBox GetBoiteCollision() override {
-        Vector3 min, max;
-        BoundingBox ma_bounding_box;
-
-        min.x = position.x - taille.x/2.0f;
-        min.y = position.y - taille.y/2.0f;
-        min.z = position.z - taille.z/2.0f;
-
-        max.x = position.x + taille.x/2.0f;
-        max.y = position.y + taille.y/2.0f;
-        max.z = position.z + taille.z/2.0f;
-        ma_bounding_box.max = max;
-        ma_bounding_box.min = min;
-        return ma_bounding_box;
-    }
+    
+    BoundingBox GetBoiteLocale() const;
+    BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
     std::string GetType() const override { return "CubeNode"; }
@@ -121,6 +119,7 @@ class SphereNode : public SceneNode{
     std::string GetInitCode(EditorContext& variables)override;
     std::string GetCleanupCode() override;
 
+    BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
     
     std::unique_ptr<SceneNode> Cloner() override;
@@ -134,9 +133,13 @@ class PlaneNode : public SceneNode {
 private:
     Model modele;
 public:
+    float width;
+    float length;
+    int resX;
+    int resZ;
     PlaneNode();
     ~PlaneNode() override ;
-
+    void ReconstruireMesh();
     void Draw(EditorContext& variables) override;
     
     std::string GetUpdateCode(EditorContext& variables)override;
@@ -144,6 +147,7 @@ public:
     std::string GetDrawCode() override;
     std::string GetInitCode(EditorContext& variables) override;
 
+    BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
@@ -169,6 +173,7 @@ class CylinderNode : public SceneNode {
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
 
+        BoundingBox GetBoiteLocale() const;
         BoundingBox GetBoiteCollision() override;
         
         std::unique_ptr<SceneNode> Cloner() override;
@@ -193,6 +198,7 @@ public:
     std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
     
+    BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;
@@ -217,7 +223,9 @@ class CameraNode : public SceneNode{
     std::string GetInitCode(EditorContext& variables)override;
     std::string GetCleanupCode() override;
 
-    BoundingBox GetBoiteCollision()override;
+    BoundingBox GetBoiteLocale() const;
+    BoundingBox GetBoiteCollision() override;
+
     std::unique_ptr<SceneNode> Cloner() override;
     std::string GetType() const override { return "Camera3D"; }
     Camera3D ObtenirCameraRaylib() const;
@@ -264,6 +272,7 @@ class ModeleNode : public SceneNode{
     
     std::string GetInitCode(EditorContext& variables) override;
     //TOTO changer ça
+    BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
 
     std::unique_ptr<SceneNode> Cloner() override;

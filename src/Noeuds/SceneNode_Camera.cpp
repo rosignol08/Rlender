@@ -110,6 +110,10 @@ BoundingBox CameraNode::GetBoiteCollision() {
     return BoundingBox{ min, max };
 }
 
+BoundingBox CameraNode::GetBoiteLocale() const {
+    return BoundingBox{ {-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f} };//remplissage psk on l'utilise meme pas 
+}
+
 std::unique_ptr<SceneNode> CameraNode::Cloner(){
     auto clone = std::make_unique<CameraNode>(*this);
     clone->isSelected = true;

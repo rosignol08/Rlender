@@ -8,9 +8,12 @@ void SceneManager::DrawScene(EditorContext& variables){
     }
     std::vector<SceneNode*> selection = GetSelection();
     if(!selection.empty()){
-        for(const auto & elements : selection){//const parce qu'on le change pas
-            if (elements == nullptr) continue;
-            DrawBoundingBox(elements->GetBoiteCollision(), GREEN);
+        for(const auto & element : selection){//const parce qu'on le change pas
+            if (element == nullptr) continue;
+            rlPushMatrix();
+            rlMultMatrixf(MatrixToFloat(element->GetMatriceMonde()));
+            DrawBoundingBox(element->GetBoiteLocale(), GREEN);
+            rlPopMatrix();
         }
     }
     return;

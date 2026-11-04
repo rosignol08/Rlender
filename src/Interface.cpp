@@ -206,6 +206,11 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
                 La_scene.AjouterCylindre();
                 Les_variables.flag_changements = true; //pour mettre à jour le code
             }
+            ImGui::SameLine();
+            if(ImGui::Button("Plane", taille_bouton)){
+                La_scene.AjouterPlan();
+                Les_variables.flag_changements = true; //pour mettre à jour le code
+            }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Lumières")){
@@ -624,6 +629,29 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     //secu
                     if (objet->slices < 3) objet->slices = 3;
                 
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            }
+            else if (noeuds_selectione[0]->GetType() == "PlaneNode") {
+                PlaneNode* objet = static_cast<PlaneNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés du Plan");
+
+                if (ImGui::DragFloat("Largeur", &objet->width, 0.1f, 0.01f, 0.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+                //c'est chiant on a pas les limites tres grandes
+                if (ImGui::DragFloat("Longeur", &objet->length, 0.1f, 0.01f, 0.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragInt("Résolution X", &objet->resX, 0.2f, 1, 2048)) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+                if (ImGui::DragInt("Résolution Z", &objet->resZ, 0.2f, 1, 2048)) {
                     objet->ReconstruireMesh();
                     Les_variables.flag_changements = true;
                 }

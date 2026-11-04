@@ -104,7 +104,8 @@ void ConeNode::Draw(EditorContext& variables){
     matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
 
     //injecte dans modele
-    modele.transform = matTransform;
+    modele.transform = GetMatriceMonde();
+    //matTransform;
 
     //Draw normal (position 0, car la matrice s'occupe de tout)
     DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, couleur_rendu);
@@ -113,10 +114,31 @@ void ConeNode::Draw(EditorContext& variables){
     }
 }
 
-BoundingBox ConeNode::GetBoiteCollision(){
-    return {{position.x - taille.x, position.y - 0.0f, position.z - taille.z}, // Base au sol
-            {position.x + taille.x, position.y + taille.y, position.z + taille.z}};
+BoundingBox ConeNode::GetBoiteLocale() const {
+    return GetMeshBoundingBox(modele.meshes[0]);
 }
+
+BoundingBox ConeNode::GetBoiteCollision() {
+    BoundingBox lb = GetMeshBoundingBox(modele.meshes[0]); // locale, sans transform
+    Matrix world = GetMatriceMonde();
+
+    Vector3 corners[8] = {
+        {lb.min.x, lb.min.y, lb.min.z}, {lb.min.x, lb.min.y, lb.max.z},
+        {lb.min.x, lb.max.y, lb.min.z}, {lb.min.x, lb.max.y, lb.max.z},
+        {lb.max.x, lb.min.y, lb.min.z}, {lb.max.x, lb.min.y, lb.max.z},
+        {lb.max.x, lb.max.y, lb.min.z}, {lb.max.x, lb.max.y, lb.max.z}
+    };
+
+    Vector3 wmin = Vector3Transform(corners[0], world);
+    Vector3 wmax = wmin;
+    for (int i = 1; i < 8; i++) {
+        Vector3 p = Vector3Transform(corners[i], world);
+        wmin = Vector3Min(wmin, p);
+        wmax = Vector3Max(wmax, p);
+    }
+    return { wmin, wmax };
+}
+
 std::unique_ptr<SceneNode> ConeNode::Cloner(){
     auto clone = std::make_unique<ConeNode>(); // faut en cree un autre pour eviter les crash de mémoire
     clone->position = this->position;

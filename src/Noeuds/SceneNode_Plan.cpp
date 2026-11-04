@@ -4,12 +4,67 @@
 PlaneNode::PlaneNode(){
     nom = "Plane";
     type = "plane";
-    taille = {5.0f, 1.0f, 5.0f};
-    modele = LoadModelFromMesh(GenMeshPlane(1.0f, 1.0f, 10, 10)); // resolution 10x10
+    taille = {1.0f, 1.0f, 1.0f};
+    width = 1.0f;
+    length = 1.0f;
+    resX = 10;
+    resZ = 10;
+    modele = LoadModelFromMesh(GenMeshPlane(width, length, resX, resZ)); // resolution 10x10
 }
 
 PlaneNode::~PlaneNode(){
     UnloadModel(modele);
+}
+
+void PlaneNode::ReconstruireMesh(){
+    UnloadModel(modele);
+    modele = LoadModelFromMesh(GenMeshPlane(width, length, resX, resZ));
+}
+
+std::string PlaneNode::GetUpdateCode(EditorContext& variables){
+    return "";
+}
+
+std::string PlaneNode::GetDrawCode(){
+    std::stringstream code;
+    code << "            DrawModel(model_" << this->nom << ", pos_" << this->nom << ", 1.0f, WHITE);\n";
+    return code.str();
+}
+
+std::string PlaneNode::GetInitCode(EditorContext& variables){
+    std::stringstream code;
+    //recuperation nom materiel
+    DataMateriel* mat = variables.banque_materiaux->GetMateriau(this->id_materiau);
+    std::string nom_mat = "Defaut";
+    if (mat != nullptr) {
+        nom_mat = mat->nom;
+    } else {
+        //securite
+        mat = variables.banque_materiaux->GetMateriau(0); 
+    }
+
+    //la pos
+    code << "    Vector3 pos_" << this->nom << " = { "<< std::to_string(this->position.x) << "f, " << std::to_string(this->position.y) << "f, " << std::to_string(this->position.z) << "f };\n";
+    
+    //gen modele 3D
+    code << "    Model model_" << this->nom << " = LoadModelFromMesh(GenMeshPlane("<< std::to_string(this->width) << "f, " << std::to_string(this->length) << "f, " << std::to_string(this->resX) << ","<< std::to_string(this->resZ) <<"));\n";
+
+    //couleur genre "model_Cube_1.materials[0]...color = couleur_Bois;"
+    code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].color = couleur_" << nom_mat << ";\n";
+    
+    //texture
+    if (mat->chemins_textures.count("albedo") > 0) {
+        code << "    model_" << this->nom << ".materials[0].maps[MATERIAL_MAP_ALBEDO].texture = texture_" << nom_mat << ";\n";
+    }
+
+    //shader
+    if (!mat->nom_shader_actuel.empty()) {
+        std::string nom_shader_cle = mat->nom_shader_actuel;
+        std::string nom_shader_var = FormaterNomVariableShader(nom_shader_cle);
+        code << "    model_" << this->nom << ".materials[0].shader = " << nom_shader_var << ";\n";
+    }
+
+    return code.str();
 }
 
 void PlaneNode::Draw(EditorContext& variables){
@@ -49,7 +104,8 @@ void PlaneNode::Draw(EditorContext& variables){
     matTransform = MatrixMultiply(matTransform, MatrixTranslate(position.x, position.y, position.z));
 
     //injecte dans modele
-    modele.transform = matTransform;
+    modele.transform = GetMatriceMonde();
+    //matTransform;
 
     //Draw normal (position 0, car la matrice s'occupe de tout)
     DrawModel(modele, (Vector3){0, 0, 0}, 1.0f, couleur_rendu);
@@ -59,11 +115,29 @@ void PlaneNode::Draw(EditorContext& variables){
 }
 
 
+BoundingBox PlaneNode::GetBoiteLocale() const {
+    return GetMeshBoundingBox(modele.meshes[0]);
+}
 
-BoundingBox PlaneNode::GetBoiteCollision(){
-    return {
-        {position.x - taille.x / 2, position.y - 0.01f, position.z - taille.z / 2},
-        {position.x + taille.x / 2, position.y + 0.01f, position.z + taille.z / 2}};
+BoundingBox PlaneNode::GetBoiteCollision() {
+    BoundingBox lb = GetMeshBoundingBox(modele.meshes[0]); // locale, sans transform
+    Matrix world = GetMatriceMonde();
+
+    Vector3 corners[8] = {
+        {lb.min.x, lb.min.y, lb.min.z}, {lb.min.x, lb.min.y, lb.max.z},
+        {lb.min.x, lb.max.y, lb.min.z}, {lb.min.x, lb.max.y, lb.max.z},
+        {lb.max.x, lb.min.y, lb.min.z}, {lb.max.x, lb.min.y, lb.max.z},
+        {lb.max.x, lb.max.y, lb.min.z}, {lb.max.x, lb.max.y, lb.max.z}
+    };
+
+    Vector3 wmin = Vector3Transform(corners[0], world);
+    Vector3 wmax = wmin;
+    for (int i = 1; i < 8; i++) {
+        Vector3 p = Vector3Transform(corners[i], world);
+        wmin = Vector3Min(wmin, p);
+        wmax = Vector3Max(wmax, p);
+    }
+    return { wmin, wmax };
 }
 
 std::unique_ptr<SceneNode> PlaneNode::Cloner(){
@@ -78,16 +152,4 @@ std::unique_ptr<SceneNode> PlaneNode::Cloner(){
     clone->nom = this->nom + "_" + std::to_string(compteur_plane_clones); // nouveau nom
     compteur_plane_clones++;
     return clone;
-}
-
-std::string PlaneNode::GetUpdateCode(EditorContext& variables){
-    return "";
-}
-
-std::string PlaneNode::GetDrawCode(){
-    return "";
-}
-
-std::string PlaneNode::GetInitCode(EditorContext& variables){
-    return "";
 }
