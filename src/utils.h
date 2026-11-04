@@ -22,7 +22,7 @@ struct EditorContext {
     float tempsExige = 0.5f;//TODO issue #7
     char axe_en_cours = '0';
 
-    CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
+    CameraMode modeCameraActif = CAMERA_FREE;
     bool perspect = true;
     bool orto = false;
     int type_projection_camera = CAMERA_PERSPECTIVE;

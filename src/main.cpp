@@ -57,7 +57,7 @@ int main(void) {
     la camera 3D pour voir la scene
     ici je défini la camera et apres on va avoir une section pour changer son type dynamiquement
     */
-    CameraMode modeCameraActif = CAMERA_FIRST_PERSON;
+    CameraMode modeCameraActif = CAMERA_FREE;
     CameraProjection type_projection_camera = CAMERA_PERSPECTIVE; //type de base
     Camera3D cameraEditeur = { 0 };
     cameraEditeur.position = (Vector3){ 0.0f, 10.0f, 10.0f };
