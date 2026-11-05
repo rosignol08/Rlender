@@ -124,27 +124,31 @@ std::string codeVertexShader = "#version 330\n"
 "    gl_Position = mvp * vec4(vertexPosition, 1.0);\n"
 "}\n";
 
-std::string nom_nouveau_shader = "ShaderLive";
+    std::string nom_nouveau_shader = "ShaderLive";
 
-//les materiaux
-ManagerMateriel* banque_materiaux = nullptr;
-ShaderManager* gestionnaire_shaders = nullptr;
-ManagerModele* gestionnaire_modeles = nullptr;
-std::string nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
+    //les materiaux
+    ManagerMateriel* banque_materiaux = nullptr;
+    ShaderManager* gestionnaire_shaders = nullptr;
+    ManagerModele* gestionnaire_modeles = nullptr;
+    std::string nom_nouveau_materiau = "Nouveau_Materiau" + std::string(64, '\0');
 
-int compteur_lumieres = 0;//pour les lumières
+    int compteur_lumieres = 0;//pour les lumières
 
 
-std::vector <std::string> liste_log;//les logs
-bool defiler_log = false;
+    std::vector <std::string> liste_log;//les logs
+    bool defiler_log = false;
 
-//liste des uniform possibles
-using UniformValue = std::variant<int, float, Vector2, Vector3, Vector4, Matrix>;
-//dictionaire globale des uniforms :
-std::unordered_map<std::string, UniformValue> variables_globales;
+    //liste des uniform possibles
+    using UniformValue = std::variant<int, float, Vector2, Vector3, Vector4, Matrix>;
+    //dictionaire globale des uniforms :
+    std::unordered_map<std::string, UniformValue> variables_globales;
 
-ImGuizmo::OPERATION gizmo_operation;
-ImGuizmo::MODE gizmo_mode;
+    ImGuizmo::OPERATION gizmo_operation;
+    ImGuizmo::MODE gizmo_mode;
+
+    bool activerOmbres = true;
+    int shadowMapResolution = 1024;//TODO rendre ça changeable
+    RenderTexture2D shadowMapTarget;
 
 };
 

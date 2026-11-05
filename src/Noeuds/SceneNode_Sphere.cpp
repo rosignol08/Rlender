@@ -5,14 +5,21 @@ SphereNode::SphereNode(){
     nom = "Sphere";
     taille = {2.0f, 2.0f, 2.0f};
     rayon = 1.0f;
+    slices = 16;
+    ring = 16;
     type = "sphere";
     // ça contient automatiquement un Material par défaut
-    modele = LoadModelFromMesh(GenMeshSphere(rayon, 16.0f, 16.0f));
+    modele = LoadModelFromMesh(GenMeshSphere(rayon, ring, slices));
 }
 
 SphereNode::~SphereNode(){
     // faut decharger le modele
     UnloadModel(modele);
+}
+
+void SphereNode::ReconstruireMesh(){
+    UnloadModel(modele);
+    modele = LoadModelFromMesh(GenMeshSphere(rayon, ring, slices));
 }
 
 void SphereNode::Draw(EditorContext& variables){

@@ -80,6 +80,8 @@ class CubeNode : public SceneNode{
     private:
         Model modele;
     public :
+    bool emetOmbre = true;
+    bool recoitOmbre = true;
     CubeNode();
 
     ~CubeNode() override;
@@ -107,9 +109,13 @@ class SphereNode : public SceneNode{
         Model modele;
     public :
         float rayon;
+        int slices;
+        int ring;
+        bool emetOmbre = true;
+        bool recoitOmbre = true;
     SphereNode();
     ~SphereNode() override;
-
+    void ReconstruireMesh();
     void Draw(EditorContext& variables) override;
 
     std::string GetUpdateCode(EditorContext& variables){

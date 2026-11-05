@@ -611,6 +611,30 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     objet->ReconstruireMesh();
                     Les_variables.flag_changements = true;
                 }
+            }else if (noeuds_selectione[0]->GetType() == "SphereNode") {
+                SphereNode* objet = static_cast<SphereNode*>(noeuds_selectione[0]);
+                ImGui::Text("Propriétés du Cône");
+
+                if (ImGui::DragFloat("Rayon", &objet->rayon, 0.05f, 0.01f, 100.0f, "%.2f")) {
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+            
+                if (ImGui::DragInt("Ring", &objet->ring, 0.2f, 3, 128)) {
+                    //secu
+                    if (objet->ring < 3) objet->ring = 3;
+                
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+                if (ImGui::DragInt("Faces", &objet->slices, 0.2f, 3, 128)) {
+                    //secu
+                    if (objet->slices < 3) objet->slices = 3;
+                
+                    objet->ReconstruireMesh();
+                    Les_variables.flag_changements = true;
+                }
+                
             }else if (noeuds_selectione[0]->GetType() == "CylinderNode") {
                 CylinderNode* objet = static_cast<CylinderNode*>(noeuds_selectione[0]);
                 ImGui::Text("Propriétés du Cylindre");
