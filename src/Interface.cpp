@@ -726,12 +726,13 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 //le soleil
                 SoleilNode* objet = static_cast<SoleilNode*>(noeuds_selectione[0]);
 
-                if (ImGui::DragFloat3("Direction", &objet->direction.x, 0.01f, -1.0f, 1.0f)) {
-                    if (objet->direction.x == 0 && objet->direction.y == 0 && objet->direction.z == 0) {
-                        objet->direction = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
+                if (ImGui::DragFloat3("Direction", &objet->rotation.x, 0.1f, 0.0f, -1.0f)) {
+                    if (objet->rotation.x == 0 && objet->rotation.y == 0 && objet->rotation.z == 0) {
+                        objet->rotation = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
                     }
                     Les_variables.flag_changements = true;
                 }
+                
 
                 if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
                     Les_variables.flag_changements = true;

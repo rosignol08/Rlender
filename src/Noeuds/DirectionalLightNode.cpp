@@ -6,7 +6,19 @@ SoleilNode::SoleilNode(){
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
     puissance = 1.0f;
     est_allume = true;
+    Ombre = true;
+    res_shadowmap = 1024;//valeur par defaut on a plus besoin de la valeur générale dans utils.h
+    texture_ombre = LoadRenderTexture(res_shadowmap,res_shadowmap);
+    ombre_cam.projection = CAMERA_ORTHOGRAPHIC;
+    ombre_cam.position = position;
+    //ombre_cam.target = //a voir 
     type = "SoleilNode";
+}
+
+void SoleilNode::changement_shadowmap(){
+    //reallocation texture shadow map
+    UnloadRenderTexture(texture_ombre);
+    texture_ombre = LoadRenderTexture(res_shadowmap,res_shadowmap);
 }
 
 void SoleilNode::Update(EditorContext& variables){
@@ -16,7 +28,7 @@ void SoleilNode::Update(EditorContext& variables){
         return;
     }
 
-    //soleil : PAS de compteur_lumieres
+    //un sele soleil
     //variables uniques.
     variables.variables_globales["sunDirection"] = this->direction;
     variables.variables_globales["sunColor"] = this->couleur_lumiere;
@@ -25,7 +37,6 @@ void SoleilNode::Update(EditorContext& variables){
 
 
 void SoleilNode::Draw(EditorContext& variables){
-    //TODO dessiner un triangle ou une fleche qui pointe vers la direction du noeud 
     DrawSphereWires(position, 0.5f,16,16, YELLOW);
     Matrix matRot = MatrixRotateXYZ((Vector3){ rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD });
     Vector3 direction_par_defaut = { 0.0f, -1.0f, 0.0f };
@@ -33,18 +44,13 @@ void SoleilNode::Draw(EditorContext& variables){
     float longueur_direction = Vector3Length(direction);
     if (longueur_direction > 0.001f) {
         
-        // 3. On normalise (ramène la longueur à 1)
         Vector3 dir_norm = Vector3Normalize(direction);
         
-        // 4. On calcule le point final de la ligne (ex: longueur de 3.0 unités)
-        // fin = position + (direction * 3.0)
         Vector3 fin_ligne = Vector3Add(position, Vector3Scale(dir_norm, 3.0f));
 
-        // 5. On dessine la ligne qui montre où la lumière frappe !
         DrawLine3D(position, fin_ligne, YELLOW);
 
-        // Optionnel : Si l'objet est sélectionné, on dessine une petite "pointe" rouge 
-        // au bout de la ligne pour bien voir le sens de la flèche
+        //boule pour indiquer la direction
         if (this->isSelected) {
             DrawSphereWires(fin_ligne, 0.2f, 8, 8, RED);
         }

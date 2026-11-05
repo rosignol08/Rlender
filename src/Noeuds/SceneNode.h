@@ -143,6 +143,8 @@ public:
     float length;
     int resX;
     int resZ;
+    bool emetOmbre = true;
+    bool recoitOmbre = true;
     PlaneNode();
     ~PlaneNode() override ;
     void ReconstruireMesh();
@@ -169,6 +171,9 @@ class CylinderNode : public SceneNode {
         float radius;
         float height;
         int slices;
+        bool emetOmbre = true;
+        bool recoitOmbre = true;
+
         void ReconstruireMesh();
         CylinderNode();
         ~CylinderNode() override;
@@ -195,6 +200,9 @@ public:
     float radius;
     float height;
     int slices;
+    bool emetOmbre = true;
+    bool recoitOmbre = true;
+
     ConeNode();
     ~ConeNode() override;
     void ReconstruireMesh();
@@ -264,6 +272,8 @@ class ModeleNode : public SceneNode{
     public :
         Model* modele = nullptr;
         std::string chemin_modele;
+        bool emetOmbre = true;
+        bool recoitOmbre = true;
     ModeleNode();
 
     ~ModeleNode() override;

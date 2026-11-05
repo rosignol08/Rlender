@@ -7,7 +7,12 @@ class SoleilNode : public SceneNode {
     Vector3 couleur_lumiere;
     float puissance;
     bool est_allume = true;
+    bool Ombre;
+    int res_shadowmap;
+    Camera3D ombre_cam;
+    RenderTexture2D texture_ombre;
         SoleilNode();
+        void changement_shadowmap();
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
         std::unique_ptr<SceneNode> Cloner() override;

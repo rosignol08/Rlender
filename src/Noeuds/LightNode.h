@@ -8,7 +8,12 @@ class LightNode : public SceneNode{
     float taille;
     bool est_allume = true;
     int index;
+    bool Ombre;
+    int res_shadowmap;
+    Matrix matrices [6] = {0};//matrices des 6 cameras
+    RenderTexture texture_ombre;
         LightNode();
+        void changement_shadowmap();
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
         std::unique_ptr<SceneNode> Cloner() override;
