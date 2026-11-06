@@ -13,6 +13,7 @@ class LightNode : public SceneNode{
     Matrix matrices [6] = {0};//matrices des 6 cameras
     RenderTexture texture_ombre;
         LightNode();
+        void UpdateMatricesOmbre();
         void changement_shadowmap();
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
@@ -25,3 +26,10 @@ class LightNode : public SceneNode{
         }
         BoundingBox GetBoiteCollision() override;
 };
+
+//fonction utilitaire pour les lumieres
+//Copyright (c) 2023-2025 TheManTheMythTheGameDev (@TheManTheMythTheGameDev)
+static RenderTexture2D LoadShadowmapRenderTexture(int width, int height);
+
+// Unload shadowmap render texture from GPU memory (VRAM)
+static void UnloadShadowmapRenderTexture(RenderTexture2D target);

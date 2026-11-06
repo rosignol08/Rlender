@@ -35,6 +35,8 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
 
     //base
     code << "#include \"raylib.h\"\n\n";
+    code << "#include \"rlgl.h\"\n\n";
+    code << "#include \"raymath.h\"\n\n";
     code << "int main(void) {\n";
     code << "    InitWindow(1280, 720, \"Jeu Genere\");\n";
     code << "    SetTargetFPS(60);\n\n";
@@ -120,9 +122,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     //maj des noeuds
     for (const auto& node : nodes) {
         code << node->GetUpdateCode(Les_variables);
-    }
-    
-    
+    }   
         
     code << "          BeginDrawing();\n";
     code << "          ClearBackground(SKYBLUE);\n";

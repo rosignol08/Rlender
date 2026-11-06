@@ -97,6 +97,7 @@ int main(void) {
                 }
             }
         La_scene.Update(cameraEditeur, Les_variables);
+        La_scene.GenererOmbres(Les_variables);
         // DESSIN idée de base
         
         std::vector<SceneNode*> selection = La_scene.GetSelection();
@@ -107,12 +108,13 @@ int main(void) {
                         ClearBackground(SKYBLUE);
                         BeginMode3D(camNode->ObtenirCameraRaylib());
                             //draw la scene point de vue de la camera active
-                            for (auto& noeud : La_scene.GetNodes()) {
-                                if (noeud->type != "Camera3D"){
-                                    noeud->Draw(Les_variables);
-                                    //std::cout << "dessin" << std::endl;
-                                }
-                            }
+                            //for (auto& noeud : La_scene.GetNodes()) {
+                            //    if (noeud->type != "Camera3D"){
+                            //        noeud->Draw(Les_variables);
+                            //        //std::cout << "dessin" << std::endl;
+                            //    }
+                            //}
+                            La_scene.DrawScene(Les_variables, false);
                             EndMode3D();
                             EndTextureMode();
                         }
@@ -123,7 +125,7 @@ int main(void) {
             //TODO faire un vrai truc ici
             BeginMode3D(cameraEditeur);
             //cette ligne dessine tout
-            La_scene.DrawScene(Les_variables);
+            La_scene.DrawScene(Les_variables,true);
             DrawGrid(1000, 1.0f);
             EndMode3D();
 
@@ -148,7 +150,20 @@ int main(void) {
             gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres, CameratexturePreview);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
+            // Affiche la carte de profondeur en petit en haut à gauche de ton éditeur
+            if (Les_variables.activerOmbres) {
+                // Trouve ton SoleilNode (ou prends le premier)
+                for (auto& noeud : La_scene.GetNodes()) {
+                    if (noeud->GetType() == "SoleilNode") {
+                        SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
 
+                        // Dessiner la texture de profondeur à l'écran !
+                        DrawTextureEx(soleil->texture_ombre.depth, (Vector2){ 10, 10 }, 0.0f, 0.25f, WHITE);
+                        DrawText("SHADOW MAP PREVIEW", 10, 270, 20, RED);
+                        break;
+                    }
+                }
+            }
         EndDrawing();
         
     }

@@ -8,17 +8,18 @@ SoleilNode::SoleilNode(){
     est_allume = true;
     Ombre = true;
     res_shadowmap = 1024;//valeur par defaut on a plus besoin de la valeur générale dans utils.h
-    texture_ombre = LoadRenderTexture(res_shadowmap,res_shadowmap);
+    texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
     ombre_cam.projection = CAMERA_ORTHOGRAPHIC;
     ombre_cam.position = position;
+    ombre_cam.fovy = 20.0f;
     //ombre_cam.target = //a voir 
     type = "SoleilNode";
 }
 
 void SoleilNode::changement_shadowmap(){
     //reallocation texture shadow map
-    UnloadRenderTexture(texture_ombre);
-    texture_ombre = LoadRenderTexture(res_shadowmap,res_shadowmap);
+    UnloadShadowmapRenderTexture(texture_ombre);
+    texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
 }
 
 void SoleilNode::Update(EditorContext& variables){
@@ -33,6 +34,19 @@ void SoleilNode::Update(EditorContext& variables){
     variables.variables_globales["sunDirection"] = this->direction;
     variables.variables_globales["sunColor"] = this->couleur_lumiere;
     variables.variables_globales["sunPower"] = this->puissance;
+
+    Vector3 dir_norm = Vector3Normalize(this->direction);
+    
+    this->ombre_cam.position = Vector3Scale(dir_norm, -20.0f); 
+    
+    this->ombre_cam.target = Vector3Zero(); 
+    
+    this->ombre_cam.fovy = 40.0f;
+    if (fabs(dir_norm.x) < 0.001f && fabs(dir_norm.z) < 0.001f) {
+        this->ombre_cam.up = (Vector3){ 0.0f, 0.0f, -1.0f }; // On triche en mettant le Up sur Z
+    } else {
+        this->ombre_cam.up = (Vector3){ 0.0f, 1.0f, 0.0f };  // Comportement normal
+    }
 }
 
 
@@ -136,3 +150,47 @@ BoundingBox SoleilNode::GetBoiteCollision(){
     return ma_bounding_box;
 }
 
+
+static RenderTexture2D LoadShadowmapRenderTexture(int width, int height)
+{
+    RenderTexture2D target = { 0 };
+
+    target.id = rlLoadFramebuffer(); // Load an empty framebuffer
+    target.texture.width = width;
+    target.texture.height = height;
+
+    if (target.id > 0)
+    {
+        rlEnableFramebuffer(target.id);
+
+        // Create depth texture
+        // NOTE: No need a color texture attachment for the shadowmap
+        target.depth.id = rlLoadTextureDepth(width, height, false);
+        target.depth.width = width;
+        target.depth.height = height;
+        target.depth.format = 19; // DEPTH_COMPONENT_24BIT?
+        target.depth.mipmaps = 1;
+
+        // Attach depth texture to FBO
+        rlFramebufferAttach(target.id, target.depth.id, RL_ATTACHMENT_DEPTH, RL_ATTACHMENT_TEXTURE2D, 0);
+
+        // Check if fbo is complete with attachments (valid)
+        if (rlFramebufferComplete(target.id)) TRACELOG(LOG_INFO, "FBO: [ID %i] Framebuffer object created successfully", target.id);
+
+        rlDisableFramebuffer();
+    }
+    else TRACELOG(LOG_WARNING, "FBO: Framebuffer object can not be created");
+
+    return target;
+}
+
+// Unload shadowmap render texture from GPU memory (VRAM)
+static void UnloadShadowmapRenderTexture(RenderTexture2D target)
+{
+    if (target.id > 0)
+    {
+        // NOTE: Depth texture/renderbuffer is automatically
+        // queried and deleted before deleting framebuffer
+        rlUnloadFramebuffer(target.id);
+    }
+}

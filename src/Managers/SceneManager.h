@@ -25,7 +25,8 @@ class SceneManager{
         ManagerMateriel banque_materiaux;//la banque des materiaux
         ShaderManager shaderManager;//les shaders
         ManagerModele banque_modeles;//pour stoquer les modeles
-        void       DrawScene(EditorContext& variables); //une boucle qui parcours les noeuds et les dessines chacuns
+        void       GenererOmbres(EditorContext& variables);//pour gerer les ombres
+        void       DrawScene(EditorContext& variables, bool drawGizmos); //une boucle qui parcours les noeuds et les dessines chacuns
         void       Update(Camera3D& camera_editeur, EditorContext& variables);//la fonction pour les animation shaders etc
         void       AjouterCube(); //ça ajoute un cube simplement
         void       AjouterSphere(); //ça ajoute une sphere simplement

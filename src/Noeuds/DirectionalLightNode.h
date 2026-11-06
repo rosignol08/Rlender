@@ -11,6 +11,7 @@ class SoleilNode : public SceneNode {
     int res_shadowmap;
     Camera3D ombre_cam;
     RenderTexture2D texture_ombre;
+    Matrix lightViewProj;
         SoleilNode();
         void changement_shadowmap();
         void Update(EditorContext& variables) override;
@@ -24,3 +25,11 @@ class SoleilNode : public SceneNode {
         }
         BoundingBox GetBoiteCollision() override;
 };
+
+
+//fonction utilitaire pour les lumieres
+//Copyright (c) 2023-2025 TheManTheMythTheGameDev (@TheManTheMythTheGameDev)
+static RenderTexture2D LoadShadowmapRenderTexture(int width, int height);
+
+// Unload shadowmap render texture from GPU memory (VRAM)
+static void UnloadShadowmapRenderTexture(RenderTexture2D target);

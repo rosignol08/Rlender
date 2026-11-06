@@ -8,6 +8,8 @@ LightNode::LightNode(){
     intensite = 1.1;
     puissance = 5.0f;
     taille = 1.0f;
+    res_shadowmap = 1024;
+    texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
     type = "LightNode";
     //index et du nom par défaut
     this->index = compteur_Light_clones;
@@ -16,7 +18,47 @@ LightNode::LightNode(){
     compteur_Light_clones++;
 }
 
+void LightNode::UpdateMatricesOmbre() {
+    //directions d'observation
+    Vector3 targets[6] = {
+        Vector3Add(position, (Vector3){  1.0f,  0.0f,  0.0f }), // +X (Droite)
+        Vector3Add(position, (Vector3){ -1.0f,  0.0f,  0.0f }), // -X (Gauche)
+        Vector3Add(position, (Vector3){  0.0f,  1.0f,  0.0f }), // +Y (Haut)
+        Vector3Add(position, (Vector3){  0.0f, -1.0f,  0.0f }), // -Y (Bas)
+        Vector3Add(position, (Vector3){  0.0f,  0.0f,  1.0f }), // +Z (Avant)
+        Vector3Add(position, (Vector3){  0.0f,  0.0f, -1.0f })  // -Z (Arrière)
+    };
 
+    //"Up"
+    Vector3 ups[6] = {
+        { 0.0f, -1.0f,  0.0f }, // +X
+        { 0.0f, -1.0f,  0.0f }, // -X
+        { 0.0f,  0.0f,  1.0f }, // +Y
+        { 0.0f,  0.0f, -1.0f }, // -Y
+        { 0.0f, -1.0f,  0.0f }, // +Z
+        { 0.0f, -1.0f,  0.0f }  // -Z
+    };
+
+    Matrix matProj = MatrixPerspective(90.0f * DEG2RAD, 1.0f, 0.1f, this->intensite);
+
+    for (int i = 0; i < 6; i++) {
+        Camera3D camTemp = { 0 };
+        camTemp.position = position;
+        camTemp.target = targets[i];
+        camTemp.up = ups[i];
+        camTemp.fovy = 90.0f;
+        camTemp.projection = CAMERA_PERSPECTIVE;
+
+        Matrix matView = GetCameraMatrix(camTemp);
+        matrices[i] = MatrixMultiply(matView, matProj);
+    }
+}
+
+void LightNode::changement_shadowmap(){
+    //reallocation texture shadow map
+    UnloadShadowmapRenderTexture(texture_ombre);
+    texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
+}
 
 void LightNode::Update(EditorContext& variables){
     //limite de 4 lumières differentes
@@ -126,3 +168,44 @@ BoundingBox LightNode::GetBoiteCollision(){
     return ma_bounding_box;
 }
 
+
+static RenderTexture2D LoadShadowmapRenderTexture(int width, int height){
+    RenderTexture2D target = { 0 };
+
+    target.id = rlLoadFramebuffer(); // Load an empty framebuffer
+    target.texture.width = width;
+    target.texture.height = height;
+
+    if (target.id > 0){
+        rlEnableFramebuffer(target.id);
+
+        // Create depth texture
+        // NOTE: No need a color texture attachment for the shadowmap
+        target.depth.id = rlLoadTextureDepth(width, height, false);
+        target.depth.width = width;
+        target.depth.height = height;
+        target.depth.format = 19; // DEPTH_COMPONENT_24BIT?
+        target.depth.mipmaps = 1;
+
+        // Attach depth texture to FBO
+        rlFramebufferAttach(target.id, target.depth.id, RL_ATTACHMENT_DEPTH, RL_ATTACHMENT_TEXTURE2D, 0);
+
+        // Check if fbo is complete with attachments (valid)
+        if (rlFramebufferComplete(target.id)) TRACELOG(LOG_INFO, "FBO: [ID %i] Framebuffer object created successfully", target.id);
+
+        rlDisableFramebuffer();
+    }
+    else TRACELOG(LOG_WARNING, "FBO: Framebuffer object can not be created");
+
+    return target;
+}
+
+// Unload shadowmap render texture from GPU memory (VRAM)
+static void UnloadShadowmapRenderTexture(RenderTexture2D target){
+    if (target.id > 0)
+    {
+        // NOTE: Depth texture/renderbuffer is automatically
+        // queried and deleted before deleting framebuffer
+        rlUnloadFramebuffer(target.id);
+    }
+}

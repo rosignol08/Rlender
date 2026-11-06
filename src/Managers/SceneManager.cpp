@@ -1,19 +1,127 @@
 #include "SceneManager.h"
 
+
+void SceneManager::GenererOmbres(EditorContext& variables) {
+    for (auto& noeud : sceneNodes) {
+        if (noeud->GetType() == "SoleilNode") {
+            SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
+            
+            if (soleil->est_allume && soleil->Ombre) {
+                //activation du rendu dans la texture du soleil
+                BeginTextureMode(soleil->texture_ombre);
+                ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)
+                rlSetClipPlanes(1.0, 60.0);
+                //rendu depuis le soleil
+                BeginMode3D(soleil->ombre_cam);
+
+                //matrice View-Projection pour le shader
+                Matrix lightView = GetCameraMatrix(soleil->ombre_cam);
+                Matrix lightProj = rlGetMatrixProjection(); 
+                soleil->lightViewProj = MatrixMultiply(lightView, lightProj);
+                rlEnableBackfaceCulling();
+                rlSetCullFace(RL_CULL_FACE_FRONT);
+
+                for (auto& objet : sceneNodes) {
+                    //que les meshes 3D (pas les lumieres ni cam)
+                    if (objet->GetType() != "SoleilNode" && objet->GetType() != "LightNode" && objet->GetType() != "Camera3D") {
+                        objet->Draw(variables);
+                    }
+                }
+                rlSetCullFace(RL_CULL_FACE_BACK);
+                
+                EndMode3D();
+                rlSetClipPlanes(0.05, 4000.0);
+                EndTextureMode();
+            }
+        }
+        // TODO plus tard : Pareil pour LightNode (mais avec 6 caméras)
+    }
+}
+
 //une boucle qui parcours les noeuds et les dessines chacuns
-void SceneManager::DrawScene(EditorContext& variables){
+void SceneManager::DrawScene(EditorContext& variables, bool drawGizmos){
+    int slotTexture = 12; //pour pas écraser les textures (Albedo = 0, Normal = 1, etc.)
+    
+    for (auto& noeud : sceneNodes) {
+        
+        //SOLEIL (Directional Light -> Texture 2D)
+        if (noeud->GetType() == "SoleilNode") {
+            SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
+            
+            if (soleil->est_allume && soleil->Ombre) {
+                rlActiveTextureSlot(slotTexture);
+                rlEnableTexture(soleil->texture_ombre.depth.id); //texture 2D
+
+                if (variables.gestionnaire_shaders != nullptr) {
+                    Shader shader = variables.gestionnaire_shaders->dictionnaire_shaders["Shader_defaut"];
+                    
+                    int locVP = GetShaderLocation(shader, "lightVP");
+                    SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
+                    
+                    int locShadowMap = GetShaderLocation(shader, "shadowMap");
+                    SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
+                    std::cout << "locVP: " << locVP << " | locShadowMap: " << locShadowMap << std::endl;
+
+if (locVP != -1 && locShadowMap != -1) {
+    SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
+    SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
+} else {
+    std::cout << "ERREUR : Le shader n'a pas trouve lightVP ou shadowMap !" << std::endl;
+}
+                }
+                slotTexture++;
+            }
+        }
+        
+        //OMNILIGHT (Point Light -> Texture Cubemap)
+        else if (noeud->GetType() == "LightNode") {
+            LightNode* omni = static_cast<LightNode*>(noeud.get());
+            
+            if (omni->est_allume && omni->Ombre) {
+                rlActiveTextureSlot(slotTexture);
+                
+                // rlEnableTextureCubemap(omni->texture_ombre.depth.id); // Fonction OpenGL spécifique
+                rlEnableTexture(omni->texture_ombre.id); //avant implémentation Cubemap
+
+                if (variables.gestionnaire_shaders != nullptr) {
+                    Shader shader = variables.gestionnaire_shaders->dictionnaire_shaders["Shader_defaut"];
+                    
+                    std::string locName = "shadowCubeMap[" + std::to_string(omni->index) + "]";
+                    int locShadowCube = GetShaderLocation(shader, locName.c_str());
+                    SetShaderValue(shader, locShadowCube, &slotTexture, SHADER_UNIFORM_INT);
+                    
+                    std::string locPosName = "lightPos[" + std::to_string(omni->index) + "]";
+                    int locPos = GetShaderLocation(shader, locPosName.c_str());
+                    SetShaderValue(shader, locPos, &omni->position, SHADER_UNIFORM_VEC3);
+                }
+                slotTexture++;
+            }
+        }
+    }
+
+    //rendu scene
     //pour parcourir tous les noeuds a dessiner faut boucler sur la liste par reference pas copie
-    for(auto& noeud : sceneNodes){
+    for(auto& noeud : sceneNodes) {
         noeud->Draw(variables);//->parce que faut aller acceder à la fonction de l'objet pointée par noeud
     }
-    std::vector<SceneNode*> selection = GetSelection();
-    if(!selection.empty()){
-        for(const auto & element : selection){//const parce qu'on le change pas
-            if (element == nullptr) continue;
-            rlPushMatrix();
-            rlMultMatrixf(MatrixToFloat(element->GetMatriceMonde()));
-            DrawBoundingBox(element->GetBoiteLocale(), GREEN);
-            rlPopMatrix();
+
+    //clean
+    for (int i = 12; i < slotTexture; i++) {
+        rlActiveTextureSlot(i);
+        rlDisableTexture();
+    }
+
+    if(drawGizmos){
+        //si on est pas en mode preview
+        std::vector<SceneNode*> selection = GetSelection();
+        if(!selection.empty()){
+            for(const auto & element : selection){//const parce qu'on le change pas
+                if (element == nullptr) continue;
+                rlPushMatrix();
+                rlMultMatrixf(MatrixToFloat(element->GetMatriceMonde()));
+                DrawBoundingBox(element->GetBoiteLocale(), GREEN);
+                rlPopMatrix();
+            }
         }
     }
     return;
