@@ -67,6 +67,12 @@ std::string CylinderNode::GetInitCode(EditorContext& variables){
     return code.str();
 }
 
+std::string CylinderNode::GetCleanupCode() {
+    std::stringstream code;
+    code << "    UnloadModel(model_"<< this->nom<<");\n";
+    return code.str();
+}
+
 void CylinderNode::Draw(EditorContext& variables){
     Color couleur_rendu = WHITE;//couleur de rendu
 

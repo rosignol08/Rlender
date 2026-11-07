@@ -9,24 +9,33 @@ ModeleNode::ModeleNode(){
     //modele = LoadModel(nom_model.c_str());
 }
 
-ModeleNode::~ModeleNode()
-{
+ModeleNode::~ModeleNode(){
     // faut decharger le modele
     //UnloadModel(modele);
 }
 
 void ModeleNode::ChargerFichier3D(std::string chemin, ManagerModele* manager){
+    this->chemin_modele = chemin;
     this->modele = manager->Charger_modele(chemin);
 }
 
 std::string ModeleNode::GetDrawCode(){
     std::stringstream code;
-    code << "\t\t\t\t\t\t\t\tDrawModele(" << "pos_" << this->nom << ", " << std::to_string(this->taille.x) << ", " << std::to_string(this->taille.y) << ", " << std::to_string(this->taille.z) << ", " << "{ " << std::to_string(this->couleur.r) << ", " << std::to_string(this->couleur.g) << ", " << std::to_string(this->couleur.b) << ", 255" << "}" << ");\n";
-    return code.str();
+    if(chemin_modele != ""){
+        std::string nom_model = FormaterNomModele(chemin_modele);
+        code << "            DrawModelEx(" << nom_model
+        << ", pos_" << nom
+        << ", Vector3{0.0f, 1.0f, 0.0f}, 0.0f, "
+        << "Vector3{" << std::to_string(taille.x) << "f, "
+                      << std::to_string(taille.y) << "f, "
+                      << std::to_string(taille.z) << "f}, "
+        << "Color{" << (int)couleur.r << ", " << (int)couleur.g << ", " << (int)couleur.b << ", 255});\n";
+        return code.str();
+    }
+    return "";
 }
 
-std::string ModeleNode::GetInitCode(EditorContext& variables)
-{
+std::string ModeleNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
     code << "\t\t\t\tVector3 " << "pos_" << this->nom << " = { " << std::to_string(this->position.x) << ", " << std::to_string(this->position.y) << ", " << std::to_string(this->position.z) << "};\n";
     return code.str();
@@ -97,27 +106,6 @@ void ModeleNode::Draw(EditorContext& variables){
         }
     }
 }
-
-/*
-BoundingBox ModeleNode::GetBoiteCollision(){
-    if(modele == nullptr){
-        Vector3 min, max;
-        BoundingBox ma_bounding_box;
-        
-        min.x = position.x - taille.x/2.0f;
-        min.y = position.y - taille.y/2.0f;
-        min.z = position.z - taille.z/2.0f;
-        
-        max.x = position.x + taille.x/2.0f;
-        max.y = position.y + taille.y/2.0f;
-        max.z = position.z + taille.z/2.0f;
-        ma_bounding_box.max = max;
-        ma_bounding_box.min = min;
-        return ma_bounding_box;   
-    }
-    return GetModelBoundingBox(*modele);
-}
-*/
 
 BoundingBox ModeleNode::GetBoiteLocale() const {
     if (modele == nullptr || modele->meshCount == 0) {

@@ -41,6 +41,9 @@ target_include_directories(application PRIVATE
     lib/imgui
     lib/raylib
     lib/rlImGui
+    -Wall
+    -Wextra
+    -Werror=return-type
 )
 
 if(WIN32)

@@ -67,6 +67,12 @@ std::string PlaneNode::GetInitCode(EditorContext& variables){
     return code.str();
 }
 
+std::string PlaneNode::GetCleanupCode() {
+    std::stringstream code;
+    code << "    UnloadModel(model_"<< this->nom<<");\n";
+    return code.str();
+}
+
 void PlaneNode::Draw(EditorContext& variables){
     Color couleur_rendu = WHITE;//couleur de rendu
     

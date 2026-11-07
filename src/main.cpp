@@ -150,20 +150,6 @@ int main(void) {
             gere_interface(La_scene, cameraEditeur, Les_variables, Les_parametres, CameratexturePreview);
 
             DrawFPS(10, 10);//pour debug si le logiciel tourne bien
-            // Affiche la carte de profondeur en petit en haut à gauche de ton éditeur
-            if (Les_variables.activerOmbres) {
-                // Trouve ton SoleilNode (ou prends le premier)
-                for (auto& noeud : La_scene.GetNodes()) {
-                    if (noeud->GetType() == "SoleilNode") {
-                        SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
-
-                        // Dessiner la texture de profondeur à l'écran !
-                        DrawTextureEx(soleil->texture_ombre.depth, (Vector2){ 10, 10 }, 0.0f, 0.25f, WHITE);
-                        DrawText("SHADOW MAP PREVIEW", 10, 270, 20, RED);
-                        break;
-                    }
-                }
-            }
         EndDrawing();
         
     }

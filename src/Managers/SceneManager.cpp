@@ -23,7 +23,8 @@ void SceneManager::GenererOmbres(EditorContext& variables) {
 
                 for (auto& objet : sceneNodes) {
                     //que les meshes 3D (pas les lumieres ni cam)
-                    if (objet->GetType() != "SoleilNode" && objet->GetType() != "LightNode" && objet->GetType() != "Camera3D") {
+                    //ancien objet->GetType() != "SoleilNode" && objet->GetType() != "LightNode" && objet->GetType() != "Camera3D" && 
+                    if (objet->emetOmbre) {
                         objet->Draw(variables);
                     }
                 }
@@ -52,24 +53,14 @@ void SceneManager::DrawScene(EditorContext& variables, bool drawGizmos){
                 rlActiveTextureSlot(slotTexture);
                 rlEnableTexture(soleil->texture_ombre.depth.id); //texture 2D
 
-                if (variables.gestionnaire_shaders != nullptr) {
-                    Shader shader = variables.gestionnaire_shaders->dictionnaire_shaders["Shader_defaut"];
-                    
+                 for (auto& [nom_shader, shader] : variables.gestionnaire_shaders->dictionnaire_shaders) {
                     int locVP = GetShaderLocation(shader, "lightVP");
-                    SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
-                    
                     int locShadowMap = GetShaderLocation(shader, "shadowMap");
-                    SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
-                    std::cout << "locVP: " << locVP << " | locShadowMap: " << locShadowMap << std::endl;
-
-if (locVP != -1 && locShadowMap != -1) {
-    SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
-    SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
-} else {
-    std::cout << "ERREUR : Le shader n'a pas trouve lightVP ou shadowMap !" << std::endl;
-}
+                    if (locVP != -1 && locShadowMap != -1) {
+                        SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
+                        SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
+                    }
                 }
-                slotTexture++;
             }
         }
         

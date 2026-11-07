@@ -27,7 +27,13 @@ class SceneNode {
         Vector3 taille;
         Color couleur;
         bool isSelected;
+        bool emetOmbre = true;//utile que pour les objets physiques
+        bool recoitOmbre = true;//utile que pour les objets physiques
         std::string type; //pour pouvoir savoir à quoi on a affaire pour la sauvgarde
+        
+        virtual std::string GetShadowPassCode(EditorContext& Les_variables, std::string drawMeshes){return "";}
+        virtual std::string GetShadowBindCode(EditorContext& Les_variables){return "";}
+        virtual std::string GetShadowUnbindCode(){return "";}
         virtual BoundingBox GetBoiteCollision(){
             //pour la selectioner avec la souris l'objet a une bounding box
             return BoundingBox{{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}};
@@ -80,8 +86,6 @@ class CubeNode : public SceneNode{
     private:
         Model modele;
     public :
-    bool emetOmbre = true;
-    bool recoitOmbre = true;
     CubeNode();
 
     ~CubeNode() override;
@@ -111,8 +115,6 @@ class SphereNode : public SceneNode{
         float rayon;
         int slices;
         int ring;
-        bool emetOmbre = true;
-        bool recoitOmbre = true;
     SphereNode();
     ~SphereNode() override;
     void ReconstruireMesh();
@@ -143,8 +145,6 @@ public:
     float length;
     int resX;
     int resZ;
-    bool emetOmbre = true;
-    bool recoitOmbre = true;
     PlaneNode();
     ~PlaneNode() override ;
     void ReconstruireMesh();
@@ -154,6 +154,7 @@ public:
     
     std::string GetDrawCode() override;
     std::string GetInitCode(EditorContext& variables) override;
+    std::string GetCleanupCode() override;
 
     BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
@@ -171,8 +172,6 @@ class CylinderNode : public SceneNode {
         float radius;
         float height;
         int slices;
-        bool emetOmbre = true;
-        bool recoitOmbre = true;
 
         void ReconstruireMesh();
         CylinderNode();
@@ -183,6 +182,7 @@ class CylinderNode : public SceneNode {
         std::string GetUpdateCode(EditorContext& variables)override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
+        std::string GetCleanupCode() override;
 
         BoundingBox GetBoiteLocale() const;
         BoundingBox GetBoiteCollision() override;
@@ -200,8 +200,6 @@ public:
     float radius;
     float height;
     int slices;
-    bool emetOmbre = true;
-    bool recoitOmbre = true;
 
     ConeNode();
     ~ConeNode() override;
@@ -211,7 +209,8 @@ public:
     std::string GetUpdateCode(EditorContext& variables)override;
     std::string GetDrawCode()override;
     std::string GetInitCode(EditorContext& variables)override;
-    
+    std::string GetCleanupCode() override;
+
     BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
 
@@ -236,7 +235,7 @@ class CameraNode : public SceneNode{
 
     std::string GetInitCode(EditorContext& variables)override;
     std::string GetCleanupCode() override;
-
+    
     BoundingBox GetBoiteLocale() const;
     BoundingBox GetBoiteCollision() override;
 
@@ -272,8 +271,6 @@ class ModeleNode : public SceneNode{
     public :
         Model* modele = nullptr;
         std::string chemin_modele;
-        bool emetOmbre = true;
-        bool recoitOmbre = true;
     ModeleNode();
 
     ~ModeleNode() override;
@@ -297,4 +294,4 @@ class ModeleNode : public SceneNode{
 
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes, ManagerMateriel* materiaux_managers, ShaderManager *shaders_manager, ManagerModele *modele_manager, EditorContext& Les_variables);
 
-
+std::string FormaterNomModele(const std::string& chemin);

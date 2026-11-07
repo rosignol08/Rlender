@@ -13,6 +13,10 @@ class SoleilNode : public SceneNode {
     RenderTexture2D texture_ombre;
     Matrix lightViewProj;
         SoleilNode();
+        virtual ~SoleilNode();
+        std::string GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre) override;
+        std::string GetShadowBindCode(EditorContext&) override;
+        std::string GetShadowUnbindCode() override;
         void changement_shadowmap();
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
@@ -20,6 +24,7 @@ class SoleilNode : public SceneNode {
         std::string GetUpdateCode(EditorContext& variables) override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
+        std::string GetCleanupCode()override;
         std::string GetType() const override{
             return "SoleilNode";
         }

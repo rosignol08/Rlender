@@ -679,8 +679,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     objet->ReconstruireMesh();
                     Les_variables.flag_changements = true;
                 }
-            }
-            else if(noeuds_selectione[0]->GetType() == "ModeleNode"){
+            }else if(noeuds_selectione[0]->GetType() == "ModeleNode"){
                 ModeleNode* objet = static_cast<ModeleNode*>(noeuds_selectione[0]);
                 ImGui::Text("Propriétés du Modèle");
                     if (ImGui::Button("Ouvrir modele 3D")) {

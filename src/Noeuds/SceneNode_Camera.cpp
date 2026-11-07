@@ -4,6 +4,8 @@
 CameraNode::CameraNode(){
     nom = "camera3D";
     type = "Camera3D";
+    emetOmbre = false;
+    recoitOmbre = false;
 }
 
 void CameraNode::Draw(EditorContext& variables) {

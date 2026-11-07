@@ -82,3 +82,12 @@ std::string SceneNode::FormaterNomVariableShader(const std::string& nomBrut) {
     //return un nom unique et propre : "shader_defaut"
     return "shader_" + nomNettoye;
 }
+
+std::string FormaterNomModele(const std::string& chemin) {
+    std::string base = std::filesystem::path(chemin).stem().string(); //"voiture.obj" -> "voiture"
+    for (char& c : base) {
+        unsigned char uc = static_cast<unsigned char>(c);
+        c = std::isalnum(uc) ? static_cast<char>(std::tolower(uc)) : '_';
+    }
+    return "model_" + base;
+}

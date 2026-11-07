@@ -11,6 +11,8 @@ LightNode::LightNode(){
     res_shadowmap = 1024;
     texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
     type = "LightNode";
+    emetOmbre = false;
+    recoitOmbre = false;
     //index et du nom par défaut
     this->index = compteur_Light_clones;
     this->nom = "Light_" + std::to_string(this->index);

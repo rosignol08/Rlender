@@ -1,5 +1,7 @@
 #include "Noeuds/SceneNode.h"
 #include "Noeuds/LightNode.h"
+#include "Noeuds/DirectionalLightNode.h"//au cas où
+#include <algorithm>
 
 std::string FormaterNomVariableShader(const std::string& nomBrut) {
     std::string nomNettoye = nomBrut;
@@ -37,6 +39,34 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     code << "#include \"raylib.h\"\n\n";
     code << "#include \"rlgl.h\"\n\n";
     code << "#include \"raymath.h\"\n\n";
+    code << "static RenderTexture2D LoadShadowmapRenderTexture(int width, int height){\n";
+    code << "    RenderTexture2D target = { 0 };\n";
+    code << "    target.id = rlLoadFramebuffer(); // Load an empty framebuffer\n\n";
+    code << "    target.texture.width = width;\n";
+    code << "    target.texture.height = height;\n";
+    code << "    if (target.id > 0){\n";
+    code << "        rlEnableFramebuffer(target.id);\n";
+    code << "        target.depth.id = rlLoadTextureDepth(width, height, false);\n";
+    code << "        target.depth.width = width;\n";
+    code << "        target.depth.height = height;\n";
+    code << "        target.depth.format = 19; // DEPTH_COMPONENT_24BIT?\n";
+    code << "        target.depth.mipmaps = 1;\n";
+    code << "        // Attach depth texture to FBO\n";
+    code << "        rlFramebufferAttach(target.id, target.depth.id, RL_ATTACHMENT_DEPTH, RL_ATTACHMENT_TEXTURE2D, 0);\n";
+    code << "        // Check if fbo is complete with attachments (valid)\n";
+    code << "        if (rlFramebufferComplete(target.id)) TRACELOG(LOG_INFO, \"FBO: [ID %i] Framebuffer object created successfully\", target.id);\n";
+    code << "        rlDisableFramebuffer();\n";
+    code << "    }\n";
+    code << "    else TRACELOG(LOG_WARNING, \"FBO: Framebuffer object can not be created\");\n";
+    code << "    return target;\n";
+    code <<"} \n";
+
+    code << "static void UnloadShadowmapRenderTexture(RenderTexture2D target){\n";
+    code << "    if (target.id > 0){rlUnloadFramebuffer(target.id);}\n";
+    code << "}\n";
+
+    code << "\n";
+
     code << "int main(void) {\n";
     code << "    InitWindow(1280, 720, \"Jeu Genere\");\n";
     code << "    SetTargetFPS(60);\n\n";
@@ -81,6 +111,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         }
         code << "    " << varName << ".locs[SHADER_LOC_MATRIX_MODEL] = GetShaderLocation(" << varName << ", \"matModel\");\n";
     }
+    std::cout << "shaders initialisé" << std::endl;
     code << "\n";
     int compteur_export = 0;
     for (auto& node : nodes) {
@@ -88,11 +119,25 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
             static_cast<LightNode*>(node.get())->index = compteur_export++;
         }
     }
+    //init des modeles
+    code << "    // --- Initialisation des modeles ---\n";
+    for (const auto& [nom_modele, modele] : modele_manager->dictionnaire_modeles) {
+        std::string varName = FormaterNomModele(nom_modele);//le nom du modele c'est son emplacement absolu donc on s'en fou
+        //Les modeles sont chargés depuis les fichiers
+        std::string chemin = nom_modele; //faut remplacer chemin par "modeles/" + std::filesystem::path(nom_modele).filename().string() apres
+        std::replace(chemin.begin(), chemin.end(), '\\', '/');
+        code << "    Model " << varName << " = LoadModel(\"" << chemin << "\");\n";
+        code << "    for (int i = 0; i < " << varName << ".materialCount; ++i) { "<< varName << ".materials[i].shader = shader_defaut; }\n";
+    }
+    code << "\n";
+
+    std::cout << "modele initialisé" << std::endl;
     //init noeuds
     code << "    // --- Initialisation des objets ---\n";
     for (const auto& node : nodes) {
         code << node->GetInitCode(Les_variables);
     }
+    std::cout << "objets initialisé" << std::endl;
 
     if (est3D) {
         code << "    Camera3D* camera_active = &" << nom_camera_principale << ";\n";
@@ -100,6 +145,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << "    Camera2D* camera_active = &" << nom_camera_principale << ";\n";
     }
 
+    std::cout << "camera initialisé" << std::endl;
     //nb de lumieres pour chaque shader
     for (const auto& [nom_shader, _] : shaders_manager->dictionnaire_shaders) {
         std::string varName = FormaterNomVariableShader(nom_shader);
@@ -115,6 +161,15 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
             code << "        SetShaderValue(" << varName << ", locViewPos_" << varName << ", &camera_active->position, SHADER_UNIFORM_VEC3);\n";
         }
     }
+
+    std::cout << "est 3D initialisé" << std::endl;
+    std::stringstream ombres_liste;
+    //dessin ombres
+    for (const auto& node : nodes) {
+        if(node->emetOmbre){
+            ombres_liste << node->GetDrawCode();
+        }
+    }
     
     //boucle
     code << "\n    while (!WindowShouldClose()) {\n";
@@ -122,7 +177,17 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     //maj des noeuds
     for (const auto& node : nodes) {
         code << node->GetUpdateCode(Les_variables);
-    }   
+    }
+
+    std::cout << "Maj noeud" << std::endl;
+
+    //passe d'ombre
+    for(const auto& node : nodes){
+        code << node->GetShadowPassCode(Les_variables, ombres_liste.str());
+    }
+
+    std::cout << "pass ombre" << std::endl;
+    //code << ;
         
     code << "          BeginDrawing();\n";
     code << "          ClearBackground(SKYBLUE);\n";
@@ -133,11 +198,35 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << "            BeginMode3D(*camera_active);\n\n";//TODO donner le vrai nom
     }
     
+    //update des shaders
+    if (est3D){    
+        for (const auto& [nom_shader, _] : shaders_manager->dictionnaire_shaders) {
+            std::string varName = FormaterNomVariableShader(nom_shader);
+            code << "        SetShaderValue(" << varName << ", locViewPos_" << varName << ", &camera_active->position, SHADER_UNIFORM_VEC3);\n";
+        }
+    }
+
+    std::cout << "update shader" << std::endl;
+
+    //pour l'ombre de la lumiere directionelle
+    for (const auto& node : nodes) {
+        code << node->GetShadowBindCode(Les_variables);
+    }
+    std::cout << "ombre bind" << std::endl;
 
     //dessin noeuds
     for (const auto& node : nodes) {
         code << node->GetDrawCode();
     }
+
+    std::cout << "rendu des noeud" << std::endl;
+
+    //pour l'ombre de la lumiere directionelle
+    for (const auto& node : nodes) {
+        code << node->GetShadowUnbindCode();
+    }
+
+    std::cout << "ombre unbind" << std::endl;
 
     //fermeture
     if(est2D){
@@ -148,10 +237,14 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     code << "        EndDrawing();\n";
     code << "    }\n\n";
 
+    std::cout << "end drawing" << std::endl;
+
     //nettoyage
     for (const auto& node : nodes) {
         code << node->GetCleanupCode();
     }
+
+    std::cout << "nettoyage" << std::endl;
 
     code << "    //nettoyage\n";
     for (const auto& materiel : materiaux_managers->GetTousLesMateriaux()) {
@@ -159,11 +252,13 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
             code << "    UnloadTexture(texture_" << materiel.nom << ");\n";
         }
     }
+    std::cout << "nettoyage materiaux" << std::endl;
     for (const auto& [nom_shader, code_shader] : shaders_manager->dictionnaire_shaders) {
         std::string varName = FormaterNomVariableShader(nom_shader);
         code << "    UnloadShader(" << varName << ");\n";
     }
 
+    std::cout << "nettoyage shaders" << std::endl;
     code << "\n    CloseWindow();\n";
     code << "    return 0;\n";
     code << "}\n";
