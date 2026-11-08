@@ -36,14 +36,21 @@ set(SRCS
 )
 
 add_executable(application ${SRCS})
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
+target_compile_options(application PRIVATE -g -O0)# changer en 02 ? 
 
-target_include_directories(application PRIVATE
+# Warnings uniquement sur TES fichiers (src/), pas sur lib/
+set(MES_SRCS ${SRCS})
+list(FILTER MES_SRCS INCLUDE REGEX "^src/")
+set_source_files_properties(${MES_SRCS} PROPERTIES
+    COMPILE_OPTIONS "-Wall;-Wextra;-Werror=return-type;-Wno-missing-field-initializers;-Wno-unused-parameter"
+)
+# tinyfiledialogs.c est dans src/ mais n'est pas à toi : on coupe ses warnings
+set_source_files_properties(src/tinyfiledialogs.c PROPERTIES COMPILE_OPTIONS "-w")
+target_include_directories(application SYSTEM PRIVATE
     lib/imgui
     lib/raylib
     lib/rlImGui
-    -Wall
-    -Wextra
-    -Werror=return-type
 )
 
 if(WIN32)

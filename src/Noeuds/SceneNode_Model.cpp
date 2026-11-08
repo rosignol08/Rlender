@@ -112,7 +112,7 @@ BoundingBox ModeleNode::GetBoiteLocale() const {
         return BoundingBox{ {-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f} };
     }
 
-    BoundingBox box = GetMeshBoundingBox(modele->meshes[0]);
+    BoundingBox box = GetBoiteLocale();
     for (int i = 1; i < modele->meshCount; i++) {
         BoundingBox b = GetMeshBoundingBox(modele->meshes[i]);
         box.min = Vector3Min(box.min, b.min);
@@ -122,7 +122,7 @@ BoundingBox ModeleNode::GetBoiteLocale() const {
 }
 
 BoundingBox ModeleNode::GetBoiteCollision() {
-    BoundingBox lb = GetMeshBoundingBox(modele->meshes[0]); // locale, sans transform
+    BoundingBox lb = GetBoiteLocale();
     Matrix world = GetMatriceMonde();
 
     Vector3 corners[8] = {
