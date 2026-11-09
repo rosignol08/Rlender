@@ -709,7 +709,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 }
 
                 // Le slider d'intensité
-                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, MAXFLOAT)) {
+                if (ImGui::DragFloat("Rayon", &objet->intensite, 0.05f, 0.0f, -1.0f)) {
                     Les_variables.flag_changements = true;
                 }
 
@@ -717,7 +717,7 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                     Les_variables.flag_changements = true;
                 }
 
-                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, MAXFLOAT)){
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, -1.0f)){
                     Les_variables.flag_changements = true;
                 }
 
