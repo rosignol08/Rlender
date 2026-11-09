@@ -112,7 +112,7 @@ BoundingBox ModeleNode::GetBoiteLocale() const {
         return BoundingBox{ {-0.5f, -0.5f, -0.5f}, {0.5f, 0.5f, 0.5f} };
     }
 
-    BoundingBox box = GetBoiteLocale();
+    BoundingBox box = GetMeshBoundingBox(modele->meshes[0]);
     for (int i = 1; i < modele->meshCount; i++) {
         BoundingBox b = GetMeshBoundingBox(modele->meshes[i]);
         box.min = Vector3Min(box.min, b.min);
