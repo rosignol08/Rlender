@@ -111,21 +111,17 @@ set(TEST_SOURCES
     tests/Test_Exportation.cpp
 )
 
-# On compile les tests avec tes sources (SRCS), mais SANS ton main.cpp
 add_executable(RlenderTests ${TEST_SOURCES} ${SRCS})
 
-# On donne aux tests accès aux mêmes dossiers d'en-tête (headers) que l'application
 target_include_directories(RlenderTests SYSTEM PRIVATE
     lib/imgui
     lib/raylib
     lib/rlImGui
 )
 
-# Lien avec Catch2
+#lien avec Catch2
 target_link_libraries(RlenderTests PRIVATE Catch2::Catch2WithMain)
 
-# --- REPRODUCTION DES LIENS OS POUR LES TESTS ---
-# Les tests ont aussi besoin de Raylib et des libs systèmes pour compiler tes noeuds
 if(WIN32)
     target_link_libraries(RlenderTests PRIVATE
         ${CMAKE_SOURCE_DIR}/lib/raylib/libraylib.a
