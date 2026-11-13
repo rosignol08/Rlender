@@ -1,5 +1,5 @@
 build/
 /application
 /.continue/
-/tests
+/tests/
 ./CMakeLists_test.txt
