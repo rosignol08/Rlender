@@ -239,26 +239,26 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
 
 void Systeme_fichier(){
     if (ImGui::MenuItem("Exporter")) {
-                IGFD::FileDialogConfig config;
-                config.path = ".";
-                config.fileName = "exporte.cpp";
-                config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
-                ImGuiFileDialog::Instance()->OpenDialog(
-                    "DlgExport",              // clé unique de ce dialogue
-                    "Choisir un nom de fichier",
-                    ".cpp",                   // filtre
-                    config
-                );
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        config.fileName = "exporte.cpp";
+        config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+        ImGuiFileDialog::Instance()->OpenDialog(
+            "DlgExport", // cle unique
+            "Choisir un nom de fichier",
+            ".cpp",
+            config
+        );
     }
     if (ImGui::MenuItem("Enregistrer")) {
         IGFD::FileDialogConfig config;
         config.path = ".";
-        config.fileName = "sauvgarde.json";
+        config.fileName = "sauvegarde.json";
         config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
         ImGuiFileDialog::Instance()->OpenDialog(
-            "DlgSauvegarde",              // clé de sauvgarde
+            "DlgSauvegarde",
             "Choisir un nom de projet",
-            ".json",                   // filtre
+            ".json",
             config
         );
     }
@@ -326,21 +326,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
 
         if(ImGui::BeginMenu("Fichier")){
             //si c'est true c'est qu'on a cliqué dessus
-            if (ImGui::MenuItem("Ouvrir...")) {
-                const char* filtres[1] = { "*.json" };
-                const char* cheminChoisi = tinyfd_openFileDialog(
-                    "Ouvrir un projet", //titre
-                    "",                 //chemin par défaut
-                    1, filtres,        //filtres d'extension (*.json)
-                    "Fichiers JSON",   //fescription
-                    0                  //sélection multiple désactivée
-                );
-
-                if (cheminChoisi != NULL) {
-                    La_scene.ChargerProjet(cheminChoisi);
-                }
-            }
-            
+            Systeme_fichier();
             ImGui::EndMenu();
         }
         //grisé si rien de selectionné
@@ -418,19 +404,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
         }
         ImGui::EndMainMenuBar();
     }
-    //La_scene.SauvegarderProjet();//le chemin je le chope comment ?
-    ImVec2 taille(800, 500);
-    if (ImGuiFileDialog::Instance()->Display("DlgExport", ImGuiWindowFlags_NoCollapse, taille)) {
-        if (ImGuiFileDialog::Instance()->IsOk()) {
-            std::string cheminChoisi = ImGuiFileDialog::Instance()->GetFilePathName();
-
-            std::string contenu = GenererCodeComplet(
-                La_scene.GetNodes(), &La_scene.banque_materiaux,
-                &La_scene.shaderManager, &La_scene.banque_modeles, Les_variables);
-            Exporter(cheminChoisi, contenu);
-        }
-        ImGuiFileDialog::Instance()->Close();   // toujours fermer, OK ou annulé
-    }
+    Dessin_Dialogue_fichier(La_scene, Les_variables);
 }
 
 //une couleur et un nom pour chaque type d'objet
