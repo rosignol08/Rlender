@@ -295,3 +295,4 @@ class ModeleNode : public SceneNode{
 std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& nodes, ManagerMateriel* materiaux_managers, ShaderManager *shaders_manager, ManagerModele *modele_manager, EditorContext& Les_variables);
 
 std::string FormaterNomModele(const std::string& chemin);
+std::string FormaterNomVariableShader(const std::string& nomBrut);

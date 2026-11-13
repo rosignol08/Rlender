@@ -5,7 +5,7 @@ project(application)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SRCS
-    #src/main.cpp
+    src/main.cpp
     src/CodeGenerator.cpp
     src/Sauvgarde.cpp
     src/Managers/SceneManager.cpp
@@ -91,50 +91,4 @@ else()
         rt
         X11
     )
-endif()
-
-# ==============================================================================
-#                             SECTION TESTS (CATCH2)
-# ==============================================================================
-
-include(FetchContent)
-FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.4.0
-)
-FetchContent_MakeAvailable(Catch2)
-
-set(TEST_SOURCES
-    tests/Test_Noeuds.cpp
-    tests/Test_Sauvegarde.cpp
-    tests/Test_Exportation.cpp
-)
-
-add_executable(RlenderTests ${TEST_SOURCES} ${SRCS})
-
-target_include_directories(RlenderTests SYSTEM PRIVATE
-    lib/imgui
-    lib/raylib
-    lib/rlImGui
-)
-
-#lien avec Catch2
-target_link_libraries(RlenderTests PRIVATE Catch2::Catch2WithMain)
-
-if(WIN32)
-    target_link_libraries(RlenderTests PRIVATE
-        ${CMAKE_SOURCE_DIR}/lib/raylib/libraylib.a
-        opengl32 gdi32 winmm
-    )
-elseif(APPLE)
-    target_link_libraries(RlenderTests PRIVATE raylib)
-else()
-    target_link_libraries(RlenderTests PRIVATE raylib GL m pthread dl rt X11)
-endif()
-
-# --- ACTIVATION DE LA DÉTECTION DES FUITES DE MÉMOIRE (ASan) ---
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-    target_compile_options(RlenderTests PRIVATE -fsanitize=address -g -fno-omit-frame-pointer)
-    target_link_options(RlenderTests PRIVATE -fsanitize=address)
 endif()

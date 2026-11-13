@@ -331,14 +331,12 @@ void SceneManager::SupprimerSelection(){
     //on doit utiliser le pointeur
     for (auto it = sceneNodes.begin(); it != sceneNodes.end(); ) {
         if ((*it)->isSelected) {
-            if (noeudSelectionne[0] == it->get()) {
-                noeudSelectionne[0] = nullptr;
-            }
             it = sceneNodes.erase(it); //delete et récupère le nouvel itérateur valide
         } else {
             ++it;
         }
     }
+    noeudSelectionne.clear();
 }
 
 std::vector<SceneNode*> SceneManager::GetSelection(){
