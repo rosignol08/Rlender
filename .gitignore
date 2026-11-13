@@ -2,4 +2,4 @@ build/
 /application
 /.continue/
 /tests/
-./CMakeLists_test.txt
+CMakeLists_test.txt
