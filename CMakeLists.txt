@@ -33,6 +33,8 @@ set(SRCS
     lib/imgui/imgui_widgets.cpp
     lib/imgui/ImGuizmo.cpp
     lib/imgui/ImSequencer.cpp
+    lib/imgui/ImGuiFileDialog.cpp
+
 )
 
 add_executable(application src/main.cpp ${SRCS})
