@@ -20,4 +20,5 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);
 void Initialiser_Logs(EditorContext* contexte_cible);
 void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_variables);
-void Dessin_fichier(SceneManager& La_scene, EditorContext& Les_variables);
+void Systeme_fichier(SceneManager& La_scene, EditorContext& Les_variables);
+void Dessin_Dialogue_fichier(SceneManager& La_scene, EditorContext& Les_variables);

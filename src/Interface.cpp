@@ -237,7 +237,7 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
     ImGui::End();
 }
 
-void Dessin_fichier(SceneManager& La_scene, EditorContext& Les_variables){
+void Systeme_fichier(){
     if (ImGui::MenuItem("Exporter")) {
                 IGFD::FileDialogConfig config;
                 config.path = ".";
@@ -251,18 +251,58 @@ void Dessin_fichier(SceneManager& La_scene, EditorContext& Les_variables){
                 );
     }
     if (ImGui::MenuItem("Enregistrer")) {
-                IGFD::FileDialogConfig config;
-                config.path = ".";
-                config.fileName = "sauvgarde.json";
-                config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
-                ImGuiFileDialog::Instance()->OpenDialog(
-                    "DlgSauvegarde",              // clé de sauvgarde
-                    "Choisir un nom de projet",
-                    ".json",                   // filtre
-                    config
-                );
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        config.fileName = "sauvgarde.json";
+        config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+        ImGuiFileDialog::Instance()->OpenDialog(
+            "DlgSauvegarde",              // clé de sauvgarde
+            "Choisir un nom de projet",
+            ".json",                   // filtre
+            config
+        );
+    }
+    if (ImGui::MenuItem("Ouvrir...")) {
+        IGFD::FileDialogConfig config;
+        config.path = ".";
+        config.countSelectionMax = 1;
+        config.flags = ImGuiFileDialogFlags_Modal;
+        ImGuiFileDialog::Instance()->OpenDialog("DlgOuvrir", "Ouvrir un projet", ".json", config);
     }
 }
+
+
+void Dessin_Dialogue_fichier(SceneManager& La_scene, EditorContext& Les_variables){
+    ImVec2 taille(800, 500);
+
+    //bouton export
+    if (ImGuiFileDialog::Instance()->Display("DlgExport", ImGuiWindowFlags_NoCollapse, taille)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string contenu = GenererCodeComplet(
+                La_scene.GetNodes(), &La_scene.banque_materiaux,
+                &La_scene.shaderManager, &La_scene.banque_modeles, Les_variables);
+            Exporter(ImGuiFileDialog::Instance()->GetFilePathName(), contenu);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    //bouton sauvegarde
+    if (ImGuiFileDialog::Instance()->Display("DlgSauvegarde", ImGuiWindowFlags_NoCollapse, taille)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            La_scene.SauvegarderProjet(ImGuiFileDialog::Instance()->GetFilePathName());
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    //bouton ouvrir
+    if (ImGuiFileDialog::Instance()->Display("DlgOuvrir", ImGuiWindowFlags_NoCollapse, taille)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            La_scene.ChargerProjet(ImGuiFileDialog::Instance()->GetFilePathName());
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+}
+
 
 void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //recuperation des variables etc
