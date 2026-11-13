@@ -237,6 +237,33 @@ void Dessiner_Boutons_Ajouts(SceneManager& La_scene, EditorContext& Les_variable
     ImGui::End();
 }
 
+void Dessin_fichier(SceneManager& La_scene, EditorContext& Les_variables){
+    if (ImGui::MenuItem("Exporter")) {
+                IGFD::FileDialogConfig config;
+                config.path = ".";
+                config.fileName = "exporte.cpp";
+                config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+                ImGuiFileDialog::Instance()->OpenDialog(
+                    "DlgExport",              // clé unique de ce dialogue
+                    "Choisir un nom de fichier",
+                    ".cpp",                   // filtre
+                    config
+                );
+    }
+    if (ImGui::MenuItem("Enregistrer")) {
+                IGFD::FileDialogConfig config;
+                config.path = ".";
+                config.fileName = "sauvgarde.json";
+                config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+                ImGuiFileDialog::Instance()->OpenDialog(
+                    "DlgSauvegarde",              // clé de sauvgarde
+                    "Choisir un nom de projet",
+                    ".json",                   // filtre
+                    config
+                );
+    }
+}
+
 void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variables, Parametres& Les_parametres){
     //recuperation des variables etc
     std::vector<SceneNode*> noeuds_selectione = La_scene.GetSelection();
@@ -273,34 +300,7 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
                     La_scene.ChargerProjet(cheminChoisi);
                 }
             }
-            if (ImGui::MenuItem("Enregistrer")) {
-                const char* filtres[1] = { "*.json" };
-                const char* cheminChoisi = tinyfd_saveFileDialog(
-                    "Choisir un nom de projet", //titre
-                    "projet.json",                 //chemin par défaut
-                    1, filtres,        //filtres d'extension (*.json)
-                    "Fichiers JSON"   //fescription
-                );
-
-                if (cheminChoisi != NULL) {
-                    La_scene.SauvegarderProjet(cheminChoisi);
-                }
-            }
-            if (ImGui::MenuItem("Exporter")) {
-                const char* filtres[1] = { "*.cpp" };
-                const char* cheminChoisi = tinyfd_saveFileDialog(
-                    "Choisir un nom de fichier", //titre
-                    "exporte.cpp",                 //chemin par défaut
-                    1, filtres,        //filtres d'extension (*.json)
-                    "Fichiers CPP"
-                );
-
-                if (cheminChoisi != NULL) {
-                    std::string contenu = GenererCodeComplet(La_scene.GetNodes(),&La_scene.banque_materiaux,&La_scene.shaderManager,&La_scene.banque_modeles,Les_variables);
-                    Exporter(cheminChoisi, contenu);
-                }
-            }
-
+            
             ImGui::EndMenu();
         }
         //grisé si rien de selectionné
@@ -377,6 +377,19 @@ void Dessiner_MenuPrincipale(SceneManager& La_scene, EditorContext& Les_variable
             ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
+    }
+    //La_scene.SauvegarderProjet();//le chemin je le chope comment ?
+    ImVec2 taille(800, 500);
+    if (ImGuiFileDialog::Instance()->Display("DlgExport", ImGuiWindowFlags_NoCollapse, taille)) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string cheminChoisi = ImGuiFileDialog::Instance()->GetFilePathName();
+
+            std::string contenu = GenererCodeComplet(
+                La_scene.GetNodes(), &La_scene.banque_materiaux,
+                &La_scene.shaderManager, &La_scene.banque_modeles, Les_variables);
+            Exporter(cheminChoisi, contenu);
+        }
+        ImGuiFileDialog::Instance()->Close();   // toujours fermer, OK ou annulé
     }
 }
 

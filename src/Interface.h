@@ -11,6 +11,8 @@
 #include "rlImGui.h"
 #include "Sauvgarde.h"
 #include "tinyfiledialogs.h"
+#include "ImGuiFileDialog.h"
+
 #include "Noeuds/LightNode.h"
 #include "Noeuds/DirectionalLightNode.h"
 //pour l'interface utilisateur pour reduire la taille du code dans main.cpp
@@ -18,3 +20,4 @@ void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorConte
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);
 void Initialiser_Logs(EditorContext* contexte_cible);
 void Gerer_gizmo(Camera3D& camera, SceneManager& La_scene, EditorContext& Les_variables);
+void Dessin_fichier(SceneManager& La_scene, EditorContext& Les_variables);
