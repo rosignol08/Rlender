@@ -9,7 +9,7 @@
 #include "MaterialManager.h"
 #include "ModelManager.h"
 #include "../Noeuds/LightNode.h"
-#include "../Noeuds/DirectionalLightNode.h"
+#include "../Noeuds/LumiereOmbreNode.h"
 #pragma once
 /*
 classe pour gerer la scene qui va permettre d'ajouter ou suprimer des noeuds

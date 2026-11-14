@@ -1,32 +1,94 @@
-#include "DirectionalLightNode.h"
+#include "LumiereOmbreNode.h"
 
-SoleilNode::SoleilNode(){
-    position = {0.0f, 0.0f, 0.0f};
-    direction = {0.0f, -1.0f, 0.0f};
-    couleur_lumiere = {1.0f, 1.0f, 1.0f};
-    puissance = 1.0f;
-    est_allume = true;
-    Ombre = true;
+LumiereOmbreNode::LumiereOmbreNode(){
     res_shadowmap = 1024;//valeur par defaut on a plus besoin de la valeur générale dans utils.h
     texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
-    ombre_cam.projection = CAMERA_ORTHOGRAPHIC;
-    ombre_cam.position = position;
-    ombre_cam.fovy = 40.0f;
-    //ombre_cam.target = //a voir 
-    type = "SoleilNode";
     emetOmbre = false;
     recoitOmbre = false;
 }
 
-SoleilNode::~SoleilNode(){
+LumiereOmbreNode::~LumiereOmbreNode(){
     //destructeur
     UnloadShadowmapRenderTexture(texture_ombre);
 }
 
-void SoleilNode::changement_shadowmap(){
+void LumiereOmbreNode::changement_shadowmap(){
     //reallocation texture shadow map
     UnloadShadowmapRenderTexture(texture_ombre);
     texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
+}
+
+std::string LumiereOmbreNode::GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre){
+    std::stringstream code;
+    if(est_allume && Ombre){
+        code << "BeginTextureMode(texture_ombre_" << nom << ");\n";
+        code << "ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)\n";
+        code << "rlSetClipPlanes(1.0, 60.0);\n";
+        code << "BeginMode3D(ombre_cam_" << nom << ");\n";
+
+        code << "Matrix lightView_"<< nom <<" = GetCameraMatrix(ombre_cam_" << nom << ");\n";
+        code << "Matrix lightProj_"<< nom <<" = rlGetMatrixProjection(); \n";
+        code << "lightViewProj_" << nom << " = MatrixMultiply(lightView_"<<nom<<", lightProj_"<< nom <<");\n";
+        code << "rlEnableBackfaceCulling();\n";
+        code << "rlSetCullFace(RL_CULL_FACE_FRONT);\n";
+        code << Liste_rendu_ombre;
+        code << "rlSetCullFace(RL_CULL_FACE_BACK);\n";
+        
+
+        code << "EndMode3D();\n";
+        code << "rlSetClipPlanes(0.05, 4000.0);\n";
+        code << "EndTextureMode();\n";
+        // après EndTextureMode :
+        for (const auto& [nom_shader, _] : Les_variables.gestionnaire_shaders->dictionnaire_shaders) {
+            std::string s_var = FormaterNomVariableShader(nom_shader);
+            code << "SetShaderValueMatrix(" << s_var << ", loc_vp_" << nom << "_" << s_var
+                 << ", lightViewProj_" << nom << ");\n";
+        }
+        return code.str();
+    }else{
+        return "";
+    }
+}
+
+std::string LumiereOmbreNode::GetShadowBindCode(EditorContext& Les_variables){
+    if(!(est_allume && Ombre)) return "";
+    std::stringstream code;
+    code << "rlActiveTextureSlot(slot_" << nom << ");\n";
+    code << "rlEnableTexture(texture_ombre_" << nom << ".depth.id);\n";
+    for (const auto& [nom_shader, _] : Les_variables.gestionnaire_shaders->dictionnaire_shaders) {
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+        code << "SetShaderValue(" << s_var << ", loc_shadow_" << nom << "_" << s_var
+             << ", &slot_" << nom << ", SHADER_UNIFORM_INT);\n";
+    }
+    return code.str();
+}
+
+std::string LumiereOmbreNode::GetShadowUnbindCode(){
+    if(!(est_allume && Ombre)) return "";
+    std::stringstream code;
+    code << "rlActiveTextureSlot(slot_" << nom << ");\n";
+    code << "rlDisableTexture();\n";
+    return code.str();
+}
+
+std::string LumiereOmbreNode::GetCleanupCode(){
+    //nettoyage
+    if(!Ombre) return "";
+    std::stringstream code;
+    code << "UnloadShadowmapRenderTexture(texture_ombre_" << nom << ");\n";
+    return code.str();
+}
+
+
+
+SoleilNode::SoleilNode(){
+    direction = {0.0f, -1.0f, 0.0f};
+    position = {0.0f, 0.0f, 0.0f};
+    ombre_cam.projection = CAMERA_ORTHOGRAPHIC;
+    ombre_cam.position = {0.0f, 0.0f, 0.0f};//ça va etre change apres mais oklm securite
+    ombre_cam.fovy = 40.0f;
+    ombre_cam.up = {0,1,0};
+    type = "SoleilNode";
 }
 
 void SoleilNode::Update(EditorContext& variables){
@@ -55,7 +117,6 @@ void SoleilNode::Update(EditorContext& variables){
         this->ombre_cam.up = Vector3{ 0.0f, 1.0f, 0.0f };  // Comportement normal
     }
 }
-
 
 void SoleilNode::Draw(EditorContext& variables){
     DrawSphereWires(position, 0.5f,16,16, YELLOW);
@@ -96,59 +157,6 @@ std::unique_ptr<SceneNode> SoleilNode::Cloner(){
     return clone;
 }
 
-std::string SoleilNode::GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre){
-    std::stringstream code;
-    if(est_allume && Ombre){
-        code << "BeginTextureMode(texture_ombre_" << nom << ");\n";
-        code << "ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)\n";
-        code << "rlSetClipPlanes(1.0, 60.0);\n";
-        code << "BeginMode3D(ombre_cam_" << nom << ");\n";
-
-        code << "Matrix lightView_"<< nom <<" = GetCameraMatrix(ombre_cam_" << nom << ");\n";
-        code << "Matrix lightProj_"<< nom <<" = rlGetMatrixProjection(); \n";
-        code << "lightViewProj_" << nom << " = MatrixMultiply(lightView_"<<nom<<", lightProj_"<< nom <<");\n";
-        code << "rlEnableBackfaceCulling();\n";
-        code << "rlSetCullFace(RL_CULL_FACE_FRONT);\n";
-        code << Liste_rendu_ombre;
-        code << "rlSetCullFace(RL_CULL_FACE_BACK);\n";
-        
-
-        code << "EndMode3D();\n";
-        code << "rlSetClipPlanes(0.05, 4000.0);\n";
-        code << "EndTextureMode();\n";
-        // après EndTextureMode :
-        for (const auto& [nom_shader, _] : Les_variables.gestionnaire_shaders->dictionnaire_shaders) {
-            std::string s_var = FormaterNomVariableShader(nom_shader);
-            code << "SetShaderValueMatrix(" << s_var << ", loc_vp_" << nom << "_" << s_var
-                 << ", lightViewProj_" << nom << ");\n";
-        }
-        return code.str();
-    }else{
-        return "";
-    }
-}
-
-std::string SoleilNode::GetShadowBindCode(EditorContext& Les_variables){
-    if(!(est_allume && Ombre)) return "";
-    std::stringstream code;
-    code << "rlActiveTextureSlot(slot_" << nom << ");\n";
-    code << "rlEnableTexture(texture_ombre_" << nom << ".depth.id);\n";
-    for (const auto& [nom_shader, _] : Les_variables.gestionnaire_shaders->dictionnaire_shaders) {
-        std::string s_var = FormaterNomVariableShader(nom_shader);
-        code << "SetShaderValue(" << s_var << ", loc_shadow_" << nom << "_" << s_var
-             << ", &slot_" << nom << ", SHADER_UNIFORM_INT);\n";
-    }
-    return code.str();
-}
-
-std::string SoleilNode::GetShadowUnbindCode(){
-    if(!(est_allume && Ombre)) return "";
-    std::stringstream code;
-    code << "rlActiveTextureSlot(slot_" << nom << ");\n";
-    code << "rlDisableTexture();\n";
-    return code.str();
-}
-
 std::string SoleilNode::GetUpdateCode(EditorContext& variables){
     std::stringstream code;
     //maj direction et couleur
@@ -183,14 +191,6 @@ std::string SoleilNode::GetUpdateCode(EditorContext& variables){
 
 std::string SoleilNode::GetDrawCode(){
     return "";
-}
-
-std::string SoleilNode::GetCleanupCode(){
-    //nettoyage
-    if(!Ombre) return "";
-    std::stringstream code;
-    code << "UnloadShadowmapRenderTexture(texture_ombre_" << nom << ");\n";
-    return code.str();
 }
 
 std::string SoleilNode::GetInitCode(EditorContext& variables){
@@ -240,9 +240,17 @@ BoundingBox SoleilNode::GetBoiteCollision(){
     return ma_bounding_box;
 }
 
+SpotNode::SpotNode(){
+    direction = {0.0f, -1.0f, 0.0f};
+    position = {0.0f, 5.0f, 0.0f};
+    ombre_cam.projection = CAMERA_PERSPECTIVE;
+    ombre_cam.position = {0.0f, 0.0f, 0.0f};//ça va etre change apres mais oklm securite
+    ombre_cam.fovy = 40.0f;
+    ombre_cam.up = {0,1,0};
+    type = "SpotNode";
+}
 
-static RenderTexture2D LoadShadowmapRenderTexture(int width, int height)
-{
+RenderTexture2D LoadShadowmapRenderTexture(int width, int height){
     RenderTexture2D target = { 0 };
 
     target.id = rlLoadFramebuffer(); // Load an empty framebuffer
@@ -275,8 +283,7 @@ static RenderTexture2D LoadShadowmapRenderTexture(int width, int height)
 }
 
 // Unload shadowmap render texture from GPU memory (VRAM)
-static void UnloadShadowmapRenderTexture(RenderTexture2D target)
-{
+void UnloadShadowmapRenderTexture(RenderTexture2D target){
     if (target.id > 0)
     {
         // NOTE: Depth texture/renderbuffer is automatically

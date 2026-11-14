@@ -1,6 +1,6 @@
 #include "Noeuds/SceneNode.h"
 #include "Noeuds/LightNode.h"
-#include "Noeuds/DirectionalLightNode.h"//au cas où
+#include "Noeuds/LumiereOmbreNode.h"//au cas où
 #include <algorithm>
 
 std::string FormaterNomVariableShader(const std::string& nomBrut) {

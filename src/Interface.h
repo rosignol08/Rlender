@@ -14,7 +14,7 @@
 #include "ImGuiFileDialog.h"
 
 #include "Noeuds/LightNode.h"
-#include "Noeuds/DirectionalLightNode.h"
+#include "Noeuds/LumiereOmbreNode.h"
 //pour l'interface utilisateur pour reduire la taille du code dans main.cpp
 void gere_interface(SceneManager& La_scene, Camera3D& cameraEditeur, EditorContext& Les_variables, Parametres &Les_parametres, RenderTexture2D& texture_preview);
 void Fonction_Log(int type_message, const char *texte,  va_list arguments);

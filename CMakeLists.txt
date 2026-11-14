@@ -22,7 +22,7 @@ set(SRCS
     src/Noeuds/SceneNode_Plan.cpp
     src/Noeuds/SceneNode_Model.cpp
     src/Noeuds/LightNode.cpp
-    src/Noeuds/DirectionalLightNode.cpp
+    src/Noeuds/LumiereOmbreNode.cpp
     src/Interface.cpp
     src/tinyfiledialogs.c
     lib/rlImGui/rlImGui.cpp
