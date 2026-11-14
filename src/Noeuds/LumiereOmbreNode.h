@@ -23,7 +23,7 @@ class LumiereOmbreNode : public SceneNode {
         virtual ~LumiereOmbreNode();
         
         void changement_shadowmap();
-        virtual void Maj_camera_Ombre() = 0;
+        //virtual void Maj_camera_Ombre() = 0; jsp si ça sert ou pas de deleguer dans une fonction autre que update
         
         std::string GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre) override;
         std::string GetShadowBindCode(EditorContext&) override;
@@ -39,8 +39,6 @@ class SoleilNode : public LumiereOmbreNode {
         Vector3 direction;
     
         SoleilNode();
-        
-        void Maj_camera_Ombre();
         
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
@@ -60,8 +58,6 @@ class SpotNode : public LumiereOmbreNode {
         Vector3 direction;
     
         SpotNode();
-        
-        void Maj_camera_Ombre();
         
         void Update(EditorContext& variables) override;
         void Draw(EditorContext& variables) override;
