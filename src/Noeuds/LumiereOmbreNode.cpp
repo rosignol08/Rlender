@@ -23,12 +23,12 @@ std::string LumiereOmbreNode::GetShadowPassCode(EditorContext& Les_variables, st
     if(est_allume && Ombre){
         code << "BeginTextureMode(texture_ombre_" << nom << ");\n";
         code << "ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)\n";
-        code << "rlSetClipPlanes(1.0, 60.0);\n";
+        code << "rlSetClipPlanes(" << std::to_string(near_ombre) << ", " << std::to_string(far_ombre) << ");\n";
         code << "BeginMode3D(ombre_cam_" << nom << ");\n";
 
         code << "Matrix lightView_"<< nom <<" = GetCameraMatrix(ombre_cam_" << nom << ");\n";
         code << "Matrix lightProj_"<< nom <<" = rlGetMatrixProjection(); \n";
-        code << "lightViewProj_" << nom << " = MatrixMultiply(lightView_"<<nom<<", lightProj_"<< nom <<");\n";
+        code << "lightViewProj_" << nom << " = MatrixMultiply(lightView_"<< nom <<", lightProj_"<< nom <<");\n";
         code << "rlEnableBackfaceCulling();\n";
         code << "rlSetCullFace(RL_CULL_FACE_FRONT);\n";
         code << Liste_rendu_ombre;
@@ -84,6 +84,7 @@ std::string LumiereOmbreNode::GetCleanupCode(){
 SoleilNode::SoleilNode(){
     direction = {0.0f, -1.0f, 0.0f};
     position = {0.0f, 0.0f, 0.0f};
+    couleur_lumiere = {1.0f, 1.0f, 1.0f};
     ombre_cam.projection = CAMERA_ORTHOGRAPHIC;
     ombre_cam.position = {0.0f, 0.0f, 0.0f};//ça va etre change apres mais oklm securite
     ombre_cam.fovy = 40.0f;
@@ -200,13 +201,13 @@ std::string SoleilNode::GetInitCode(EditorContext& variables){
     code << "Vector3 couleur_" << nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
     code << "float puissance_" << nom << " = " << std::to_string(puissance) <<"f;\n";
     if(Ombre){
-        code << "int slot_" << nom << " = 12;\n";
+        code << "int slot_" << nom << " = 12+"<< index_ombre <<";\n";
         code << "RenderTexture2D texture_ombre_" << nom << " = LoadShadowmapRenderTexture(" << std::to_string(res_shadowmap) << "," << std::to_string(res_shadowmap) << ");\n";
         code << "Camera3D ombre_cam_" << nom << " = {0};\n";
         code << "ombre_cam_" << nom <<".projection = CAMERA_ORTHOGRAPHIC;\n";
         code << "ombre_cam_" << nom <<".position = Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
         code << "ombre_cam_" << nom <<".fovy = 40.0f;\n";
-        code << "Matrix lightViewProj_" << nom <<";\n";
+        code << "Matrix lightViewProj_" << nom <<" = {0};\n";
     }
         //les locs pour chaque shader de la banque
         //std::string idx = std::to_string(this->index); pas besoin on en a qu'un seul soleil
@@ -240,14 +241,189 @@ BoundingBox SoleilNode::GetBoiteCollision(){
     return ma_bounding_box;
 }
 
+
+
+///////////spotlight////////////
 SpotNode::SpotNode(){
     direction = {0.0f, -1.0f, 0.0f};
     position = {0.0f, 5.0f, 0.0f};
+    couleur_lumiere = {1.0f, 1.0f, 1.0f};
     ombre_cam.projection = CAMERA_PERSPECTIVE;
     ombre_cam.position = {0.0f, 0.0f, 0.0f};//ça va etre change apres mais oklm securite
-    ombre_cam.fovy = 40.0f;
+    ombre_cam.fovy = angle;
     ombre_cam.up = {0,1,0};
+    near_ombre = 0.5f;
+    far_ombre  = porte;
     type = "SpotNode";
+}
+
+
+void SpotNode::Update(EditorContext& variables){
+    if (!est_allume) {
+        //eteint puissance = 0
+        variables.variables_globales["spotPower"] = 0.0f;
+        return;
+    }
+
+    //un sele soleil
+    //variables uniques.
+    variables.variables_globales["spotDirection"] = this->direction;
+    variables.variables_globales["spotColor"] = this->couleur_lumiere;
+    variables.variables_globales["spotPower"] = this->puissance;
+    variables.variables_globales["spotAngle"] = this->angle;
+    variables.variables_globales["spotPosition"] = this->position;
+
+    Vector3 dir_norm = Vector3Normalize(this->direction);
+    
+    this->ombre_cam.position = position;
+    
+    this->ombre_cam.target = Vector3Add(position, dir_norm);
+    
+    this->ombre_cam.fovy = angle;
+    near_ombre = 0.5f;
+    far_ombre  = porte;
+
+    if (fabs(dir_norm.x) < 0.001f && fabs(dir_norm.z) < 0.001f) {
+        this->ombre_cam.up = Vector3{ 0.0f, 0.0f, -1.0f }; //triche en mettant le Up sur Z
+    } else {
+        this->ombre_cam.up = Vector3{ 0.0f, 1.0f, 0.0f };  //comportement normal
+    }
+}
+
+std::string SpotNode::GetDrawCode(){
+    return "";
+}
+
+std::string SpotNode::GetInitCode(EditorContext& variables){
+    std::stringstream code;
+    //on donne nos loc ? je sais pas si c'est pas dans le shader qu'on fait ça plutot
+    code << "Vector3 spotdir_" << nom << "= Vector3{" << std::to_string(direction.x) <<"f,"<< std::to_string(direction.y) <<"f,"<< std::to_string(direction.z)<<"f};\n";
+    code << "Vector3 spotpos_" << nom << "= Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
+    code << "Vector3 spotcouleur_" << nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
+    code << "float spotpuissance_" << nom << " = " << std::to_string(puissance) <<"f;\n";
+    if(Ombre){
+        code << "int slot_" << nom << " = 12+"<< index_ombre <<";\n";
+        code << "RenderTexture2D texture_ombre_" << nom << " = LoadShadowmapRenderTexture(" << std::to_string(res_shadowmap) << "," << std::to_string(res_shadowmap) << ");\n";
+        code << "Camera3D ombre_cam_" << nom << " = {0};\n";
+        code << "ombre_cam_" << nom <<".projection = CAMERA_PERSPECTIVE;\n";
+        code << "ombre_cam_" << nom <<".position = Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
+        code << "ombre_cam_" << nom <<".fovy = " << std::to_string(angle) << "f;\n";
+        code << "ombre_cam_" << nom <<".target = spotpos_" << nom << " + spotdir_" << nom << ";\n";
+        code << "Matrix lightViewProj_" << nom <<" = {0};\n";
+    }
+        //les locs pour chaque shader de la banque
+        //std::string idx = std::to_string(this->index); pas besoin on en a qu'un seul soleil
+        for (const auto& [nom_shader, _] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+            std::string s_var = FormaterNomVariableShader(nom_shader);
+
+            code << "    int loc_spotdir_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotDirection\");\n";
+            code << "    int loc_spotcol_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotColor\");\n";
+            code << "    int loc_spotpow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotPower\");\n";
+            code << "    int loc_spotpos_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotPos\");\n";
+            code << "    int loc_spotangle_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotAngle\");\n";
+
+            if(Ombre){
+                code << "    int loc_vp_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightVP\");\n";
+                code << "    int loc_shadow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"shadowMap\");\n";
+            }
+        }
+        return code.str();
+}
+
+std::string SpotNode::GetUpdateCode(EditorContext& variables){
+    std::stringstream code;
+    //maj direction position et couleur
+    code << "    spotdir_" << nom << " = { " 
+         << std::to_string(direction.x) << "f, "
+         << std::to_string(direction.y) << "f, "
+         << std::to_string(direction.z) << "f };\n";
+    
+    code << "    spotpos_" << nom << " = { " 
+         << std::to_string(position.x) << "f, "
+         << std::to_string(position.y) << "f, "
+         << std::to_string(position.z) << "f };\n";
+
+    code << "    spotcouleur_" << nom << " = { " 
+         << std::to_string(couleur_lumiere.x) << "f, "
+         << std::to_string(couleur_lumiere.y) << "f, "
+         << std::to_string(couleur_lumiere.z) << "f };\n";
+
+    code << "    spotangle_" << nom << " = " << std::to_string(angle) <<"f;\n";
+
+    //check les shaders enregistrés pour générer l'envoi vers chacun
+    for (const auto& [nom_shader, shader_raylib] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        std::string s_var = FormaterNomVariableShader(nom_shader);
+        code << "    SetShaderValue(" << s_var << ", loc_spotdir_" << this->nom << "_" << s_var << ", &spotdir_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_spotpos_" << this->nom << "_" << s_var << ", &spotpos_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_spotcol_" << this->nom << "_" << s_var << ", &spotcouleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_spotpow_" << this->nom << "_" << s_var << ", &spotpuissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_spotangle_" << this->nom << "_" << s_var << ", &spotangle_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+    }
+    if(Ombre){
+        code << "Vector3 dir_norm_"<< nom << " = Vector3Normalize(spotdir_" << nom << ");\n";
+        code << "ombre_cam_" << nom << ".position = Vector3Scale(dir_norm_"<< nom <<", -20.0f);\n";
+        code << "ombre_cam_" << nom << ".target = Vector3Zero();\n";
+        code << "ombre_cam_" << nom << ".fovy = 40.0f;\n";
+        code << "if (fabs(dir_norm_"<< nom <<".x) < 0.001f && fabs(dir_norm_"<< nom <<".z) < 0.001f) {ombre_cam_" << nom << ".up = Vector3{ 0.0f, 0.0f, -1.0f };}\n";
+        code << "else{ombre_cam_" << nom << ".up = Vector3{ 0.0f, 1.0f, 0.0f };}\n";
+    }
+
+    return code.str();
+}
+
+BoundingBox SpotNode::GetBoiteCollision(){
+    Vector3 min, max;
+    BoundingBox ma_bounding_box;
+    float rayon_selection = 0.5f;
+    min.x = position.x - rayon_selection;
+    min.y = position.y - rayon_selection;
+    min.z = position.z - rayon_selection;
+    max.x = position.x + rayon_selection;
+    max.y = position.y + rayon_selection;
+    max.z = position.z + rayon_selection;
+
+    ma_bounding_box.min = min;
+    ma_bounding_box.max = max;
+    return ma_bounding_box;
+}
+
+void SpotNode::Draw(EditorContext& variables){
+    Matrix matRot = MatrixRotateXYZ(Vector3{ rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD });
+    Vector3 direction_par_defaut = { 0.0f, -1.0f, 0.0f };
+    
+    this->direction = Vector3Transform(direction_par_defaut, matRot);
+    DrawLine3D(position, Vector3{this->porte*tan(angle/2),this->porte*tan(angle/2),this->porte*tan(angle/2)},YELLOW);
+    float longueur_direction = Vector3Length(direction);
+    if (longueur_direction > 0.001f) {
+        
+        Vector3 dir_norm = Vector3Normalize(direction);
+        
+        Vector3 fin_ligne = Vector3Add(position, Vector3Scale(dir_norm, 3.0f));
+
+        DrawLine3D(position, fin_ligne, YELLOW);
+    }
+}
+
+std::unique_ptr<SceneNode> SpotNode::Cloner(){
+    auto clone = std::make_unique<SpotNode>(); //faut en cree un autre pour eviter les crash de mémoire
+    clone->position = position;
+    clone->angle = angle;
+    clone->angle_interieur = angle_interieur;
+    clone->porte = porte;
+    clone->taille = taille;
+    clone->couleur_lumiere = couleur_lumiere;
+    clone->couleur = couleur;
+    clone->direction = direction;
+    clone->puissance = puissance;
+    clone->est_allume = est_allume;
+    clone->isSelected = true;
+    clone->Ombre = Ombre;
+    clone->res_shadowmap = res_shadowmap;
+    static unsigned int compteur_Soleil_clones = 0; //logiquement on a un compteur pour les clones
+    clone->nom = this->nom + "_" + std::to_string(compteur_Soleil_clones); // nouveau nom
+    compteur_Soleil_clones++;
+    clone->changement_shadowmap();//securite pour shadowmap
+    return clone;
 }
 
 RenderTexture2D LoadShadowmapRenderTexture(int width, int height){

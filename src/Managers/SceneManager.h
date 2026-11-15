@@ -37,6 +37,7 @@ class SceneManager{
         void       AjouterCamera2D(); //idem pour une caméra2D
         void       AjouterLight(); //ça ajoute une lumiere (pointlight)
         void       AjouterSoleil(); //ça ajoute un soleil
+        void       AjouterSpot(); //ça ajoute un soleil
         void       AjouterModele();
         void       SupprimerSelection(); //pour enlever un noeud de la liste TODO faut faire attention à la mémoire
         

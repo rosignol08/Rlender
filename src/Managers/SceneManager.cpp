@@ -10,7 +10,7 @@ void SceneManager::GenererOmbres(EditorContext& variables) {
                 //activation du rendu dans la texture du soleil
                 BeginTextureMode(soleil->texture_ombre);
                 ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)
-                rlSetClipPlanes(1.0, 60.0);
+                rlSetClipPlanes(soleil->near_ombre, soleil->far_ombre);
                 //rendu depuis le soleil
                 BeginMode3D(soleil->ombre_cam);
 
@@ -272,6 +272,27 @@ void SceneManager::AjouterSoleil(){
             if(elem->nom == nom_test){
                 nom_deja_pris = true;
                 compteur_Soleil++;
+                break;
+            }
+        }
+    }
+    //on fait comme ça :
+    sceneNodes.push_back(std::make_unique<SoleilNode>());
+    sceneNodes.back()->nom = nom_test; //nouveau nom
+    SetSelection(sceneNodes.back().get());
+}
+
+void SceneManager::AjouterSpot(){
+    unsigned int compteur_Spot = 0;
+    bool nom_deja_pris = true;
+    std::string nom_test;
+    while(nom_deja_pris == true){
+        nom_deja_pris = false;//je dit que de base on a un bon nom
+        nom_test = "Spot_" + std::to_string(compteur_Spot);
+        for(const auto & elem : sceneNodes){
+            if(elem->nom == nom_test){
+                nom_deja_pris = true;
+                compteur_Spot++;
                 break;
             }
         }

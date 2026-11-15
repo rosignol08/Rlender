@@ -4,13 +4,14 @@
 
 class LumiereOmbreNode : public SceneNode {
     public :
-    //Vector3 direction;
     Vector3 couleur_lumiere;
     float puissance = 1.0f;
     bool est_allume = true;
     bool Ombre = true;
     int res_shadowmap = 1024;
     int index_ombre = 0;
+    float near_ombre = 1.0f;
+    float far_ombre  = 60.0f;
     Camera3D ombre_cam = {};
     RenderTexture2D texture_ombre = {};
     Matrix lightViewProj = {};
@@ -28,7 +29,6 @@ class LumiereOmbreNode : public SceneNode {
         std::string GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre) override;
         std::string GetShadowBindCode(EditorContext&) override;
         std::string GetShadowUnbindCode() override;
-        std::string GetInitCode(EditorContext& variables) override;
         std::string GetCleanupCode()override;
         //std::string GetType() const override;
         //BoundingBox GetBoiteCollision() override;
@@ -37,7 +37,7 @@ class LumiereOmbreNode : public SceneNode {
 class SoleilNode : public LumiereOmbreNode {
     public:
         Vector3 direction;
-    
+
         SoleilNode();
         
         void Update(EditorContext& variables) override;
@@ -46,7 +46,6 @@ class SoleilNode : public LumiereOmbreNode {
         std::string GetUpdateCode(EditorContext& variables) override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
-        std::string GetCleanupCode() override;
         std::string GetType() const {
             return "SoleilNode";
         }
@@ -55,6 +54,9 @@ class SoleilNode : public LumiereOmbreNode {
 
 class SpotNode : public LumiereOmbreNode {
     public:
+        float porte;
+        float angle = 45.0f;//angle cone
+        float angle_interieur = 30.0f; //adoucissement bords
         Vector3 direction;
     
         SpotNode();
@@ -65,8 +67,9 @@ class SpotNode : public LumiereOmbreNode {
         std::string GetUpdateCode(EditorContext& variables) override;
         std::string GetDrawCode() override;
         std::string GetInitCode(EditorContext& variables) override;
-        std::string GetCleanupCode() override;
-        std::string GetType() const override;
+        std::string GetType() const {
+            return "SpotNode";
+        }
         BoundingBox GetBoiteCollision() override;
 };
 
