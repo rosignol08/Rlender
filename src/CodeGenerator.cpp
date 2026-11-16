@@ -111,7 +111,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         }
         code << "    " << varName << ".locs[SHADER_LOC_MATRIX_MODEL] = GetShaderLocation(" << varName << ", \"matModel\");\n";
     }
-    std::cout << "shaders initialisé" << std::endl;
+    //std::cout << "shaders initialisé" << std::endl;
     code << "\n";
     int compteur_export = 0;
     for (auto& node : nodes) {
@@ -131,13 +131,13 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     }
     code << "\n";
 
-    std::cout << "modele initialisé" << std::endl;
+    //std::cout << "modele initialisé" << std::endl;
     //init noeuds
     code << "    // --- Initialisation des objets ---\n";
     for (const auto& node : nodes) {
         code << node->GetInitCode(Les_variables);
     }
-    std::cout << "objets initialisé" << std::endl;
+    //std::cout << "objets initialisé" << std::endl;
 
     if (est3D) {
         code << "    Camera3D* camera_active = &" << nom_camera_principale << ";\n";
@@ -145,7 +145,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << "    Camera2D* camera_active = &" << nom_camera_principale << ";\n";
     }
 
-    std::cout << "camera initialisé" << std::endl;
+    //std::cout << "camera initialisé" << std::endl;
     //nb de lumieres pour chaque shader
     for (const auto& [nom_shader, _] : shaders_manager->dictionnaire_shaders) {
         std::string varName = FormaterNomVariableShader(nom_shader);
@@ -162,7 +162,7 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         }
     }
 
-    std::cout << "est 3D initialisé" << std::endl;
+    //std::cout << "est 3D initialisé" << std::endl;
     std::stringstream ombres_liste;
     //dessin ombres
     for (const auto& node : nodes) {
@@ -179,14 +179,14 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         code << node->GetUpdateCode(Les_variables);
     }
 
-    std::cout << "Maj noeud" << std::endl;
+    //std::cout << "Maj noeud" << std::endl;
 
     //passe d'ombre
     for(const auto& node : nodes){
         code << node->GetShadowPassCode(Les_variables, ombres_liste.str());
     }
 
-    std::cout << "pass ombre" << std::endl;
+    //std::cout << "pass ombre" << std::endl;
     //code << ;
         
     code << "          BeginDrawing();\n";
@@ -206,27 +206,27 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
         }
     }
 
-    std::cout << "update shader" << std::endl;
+    //std::cout << "update shader" << std::endl;
 
     //pour l'ombre de la lumiere directionelle
     for (const auto& node : nodes) {
         code << node->GetShadowBindCode(Les_variables);
     }
-    std::cout << "ombre bind" << std::endl;
+    //std::cout << "ombre bind" << std::endl;
 
     //dessin noeuds
     for (const auto& node : nodes) {
         code << node->GetDrawCode();
     }
 
-    std::cout << "rendu des noeud" << std::endl;
+    //std::cout << "rendu des noeud" << std::endl;
 
     //pour l'ombre de la lumiere directionelle
     for (const auto& node : nodes) {
         code << node->GetShadowUnbindCode();
     }
 
-    std::cout << "ombre unbind" << std::endl;
+    //std::cout << "ombre unbind" << std::endl;
 
     //fermeture
     if(est2D){
@@ -237,14 +237,14 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
     code << "        EndDrawing();\n";
     code << "    }\n\n";
 
-    std::cout << "end drawing" << std::endl;
+    //std::cout << "end drawing" << std::endl;
 
     //nettoyage
     for (const auto& node : nodes) {
         code << node->GetCleanupCode();
     }
 
-    std::cout << "nettoyage" << std::endl;
+    //std::cout << "nettoyage" << std::endl;
 
     code << "    //nettoyage\n";
     for (const auto& materiel : materiaux_managers->GetTousLesMateriaux()) {
@@ -252,13 +252,13 @@ std::string GenererCodeComplet(const std::vector<std::unique_ptr<SceneNode>>& no
             code << "    UnloadTexture(texture_" << materiel.nom << ");\n";
         }
     }
-    std::cout << "nettoyage materiaux" << std::endl;
+    //std::cout << "nettoyage materiaux" << std::endl;
     for (const auto& [nom_shader, code_shader] : shaders_manager->dictionnaire_shaders) {
         std::string varName = FormaterNomVariableShader(nom_shader);
         code << "    UnloadShader(" << varName << ");\n";
     }
 
-    std::cout << "nettoyage shaders" << std::endl;
+    //std::cout << "nettoyage shaders" << std::endl;
     code << "\n    CloseWindow();\n";
     code << "    return 0;\n";
     code << "}\n";

@@ -3,39 +3,7 @@
 
 void SceneManager::GenererOmbres(EditorContext& variables) {
     for (auto& noeud : sceneNodes) {
-        if (noeud->GetType() == "SoleilNode") {
-            SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
-            
-            if (soleil->est_allume && soleil->Ombre) {
-                //activation du rendu dans la texture du soleil
-                BeginTextureMode(soleil->texture_ombre);
-                ClearBackground(WHITE); // Le blanc = profondeur maximale (loin)
-                rlSetClipPlanes(soleil->near_ombre, soleil->far_ombre);
-                //rendu depuis le soleil
-                BeginMode3D(soleil->ombre_cam);
-
-                //matrice View-Projection pour le shader
-                Matrix lightView = GetCameraMatrix(soleil->ombre_cam);
-                Matrix lightProj = rlGetMatrixProjection(); 
-                soleil->lightViewProj = MatrixMultiply(lightView, lightProj);
-                rlEnableBackfaceCulling();
-                rlSetCullFace(RL_CULL_FACE_FRONT);
-
-                for (auto& objet : sceneNodes) {
-                    //que les meshes 3D (pas les lumieres ni cam)
-                    //ancien objet->GetType() != "SoleilNode" && objet->GetType() != "LightNode" && objet->GetType() != "Camera3D" && 
-                    if (objet->emetOmbre) {
-                        objet->Draw(variables);
-                    }
-                }
-                rlSetCullFace(RL_CULL_FACE_BACK);
-                
-                EndMode3D();
-                rlSetClipPlanes(0.05, 4000.0);
-                EndTextureMode();
-            }
-        }
-        // TODO plus tard : Pareil pour LightNode (mais avec 6 caméras)
+        noeud->GenererOmbreEditeur(variables, sceneNodes);
     }
 }
 
@@ -45,27 +13,11 @@ void SceneManager::DrawScene(EditorContext& variables, bool drawGizmos){
     
     for (auto& noeud : sceneNodes) {
         
-        //SOLEIL (Directional Light -> Texture 2D)
-        if (noeud->GetType() == "SoleilNode") {
-            SoleilNode* soleil = static_cast<SoleilNode*>(noeud.get());
-            
-            if (soleil->est_allume && soleil->Ombre) {
-                rlActiveTextureSlot(slotTexture);
-                rlEnableTexture(soleil->texture_ombre.depth.id); //texture 2D
-
-                 for (auto& [nom_shader, shader] : variables.gestionnaire_shaders->dictionnaire_shaders) {
-                    int locVP = GetShaderLocation(shader, "lightVP");
-                    int locShadowMap = GetShaderLocation(shader, "shadowMap");
-                    if (locVP != -1 && locShadowMap != -1) {
-                        SetShaderValueMatrix(shader, locVP, soleil->lightViewProj);
-                        SetShaderValue(shader, locShadowMap, &slotTexture, SHADER_UNIFORM_INT);
-                    }
-                }
-            }
-        }
+        //SOLEIL ou spot
+        noeud->BindShadowEditeur(variables, slotTexture);//si c'est un spot ou autre il le fait sinon il skip
         
-        //OMNILIGHT (Point Light -> Texture Cubemap)
-        else if (noeud->GetType() == "LightNode") {
+        //OMNILIGHT (Point Light -> Texture Cubemap) //TODO à surcharger pour adapter
+        if (noeud->GetType() == "LightNode") {
             LightNode* omni = static_cast<LightNode*>(noeud.get());
             
             if (omni->est_allume && omni->Ombre) {
@@ -298,7 +250,7 @@ void SceneManager::AjouterSpot(){
         }
     }
     //on fait comme ça :
-    sceneNodes.push_back(std::make_unique<SoleilNode>());
+    sceneNodes.push_back(std::make_unique<SpotNode>());
     sceneNodes.back()->nom = nom_test; //nouveau nom
     SetSelection(sceneNodes.back().get());
 }

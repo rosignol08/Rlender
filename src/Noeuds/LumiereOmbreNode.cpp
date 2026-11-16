@@ -18,6 +18,46 @@ void LumiereOmbreNode::changement_shadowmap(){
     texture_ombre = LoadShadowmapRenderTexture(res_shadowmap,res_shadowmap);
 }
 
+void LumiereOmbreNode::BindShadowEditeur(EditorContext& variables, int& slotTexture){
+    if (!(est_allume && Ombre)) return;
+    rlActiveTextureSlot(slotTexture);
+    rlEnableTexture(texture_ombre.depth.id);
+    for (auto& [nom_shader, shader] : variables.gestionnaire_shaders->dictionnaire_shaders) {
+        int locVP = GetShaderLocation(shader, nom_uniform_vp.c_str());
+        int locSM = GetShaderLocation(shader, nom_uniform_shadow.c_str());
+        if (locVP != -1 && locSM != -1) {
+            SetShaderValueMatrix(shader, locVP, lightViewProj);
+            SetShaderValue(shader, locSM, &slotTexture, SHADER_UNIFORM_INT);
+        }
+    }
+    slotTexture++;
+}
+
+
+void LumiereOmbreNode::GenererOmbreEditeur(EditorContext& variables, std::vector<std::unique_ptr<SceneNode>>& noeuds) {
+    if (!(est_allume && Ombre)) {return;}
+
+    BeginTextureMode(texture_ombre);
+    ClearBackground(WHITE);
+    rlSetClipPlanes(near_ombre, far_ombre);
+    BeginMode3D(ombre_cam);
+
+    Matrix lightView = GetCameraMatrix(ombre_cam);
+    Matrix lightProj = rlGetMatrixProjection();
+    lightViewProj = MatrixMultiply(lightView, lightProj);
+
+    rlEnableBackfaceCulling();
+    rlSetCullFace(RL_CULL_FACE_FRONT);
+    for (auto& objet : noeuds) {
+        if (objet->emetOmbre) objet->Draw(variables);
+    }
+    rlSetCullFace(RL_CULL_FACE_BACK);
+
+    EndMode3D();
+    rlSetClipPlanes(0.05, 4000.0);
+    EndTextureMode();
+}
+
 std::string LumiereOmbreNode::GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre){
     std::stringstream code;
     if(est_allume && Ombre){
@@ -28,6 +68,7 @@ std::string LumiereOmbreNode::GetShadowPassCode(EditorContext& Les_variables, st
 
         code << "Matrix lightView_"<< nom <<" = GetCameraMatrix(ombre_cam_" << nom << ");\n";
         code << "Matrix lightProj_"<< nom <<" = rlGetMatrixProjection(); \n";
+        
         code << "lightViewProj_" << nom << " = MatrixMultiply(lightView_"<< nom <<", lightProj_"<< nom <<");\n";
         code << "rlEnableBackfaceCulling();\n";
         code << "rlSetCullFace(RL_CULL_FACE_FRONT);\n";
@@ -246,8 +287,11 @@ BoundingBox SoleilNode::GetBoiteCollision(){
 ///////////spotlight////////////
 SpotNode::SpotNode(){
     direction = {0.0f, -1.0f, 0.0f};
-    position = {0.0f, 5.0f, 0.0f};
+    position = {0.0f, 1.0f, 0.0f};
     couleur_lumiere = {1.0f, 1.0f, 1.0f};
+    taille = {1.0f, 1.0f, 1.0f};
+    nom_uniform_vp = "lightVPSpot";
+    nom_uniform_shadow = "shadowMapSpot";
     ombre_cam.projection = CAMERA_PERSPECTIVE;
     ombre_cam.position = {0.0f, 0.0f, 0.0f};//ça va etre change apres mais oklm securite
     ombre_cam.fovy = angle;
@@ -271,7 +315,8 @@ void SpotNode::Update(EditorContext& variables){
     variables.variables_globales["spotColor"] = this->couleur_lumiere;
     variables.variables_globales["spotPower"] = this->puissance;
     variables.variables_globales["spotAngle"] = this->angle;
-    variables.variables_globales["spotPosition"] = this->position;
+    variables.variables_globales["spotPos"] = this->position;
+    variables.variables_globales["spotPorte"] = this->porte;
 
     Vector3 dir_norm = Vector3Normalize(this->direction);
     
@@ -296,11 +341,12 @@ std::string SpotNode::GetDrawCode(){
 
 std::string SpotNode::GetInitCode(EditorContext& variables){
     std::stringstream code;
-    //on donne nos loc ? je sais pas si c'est pas dans le shader qu'on fait ça plutot
     code << "Vector3 spotdir_" << nom << "= Vector3{" << std::to_string(direction.x) <<"f,"<< std::to_string(direction.y) <<"f,"<< std::to_string(direction.z)<<"f};\n";
     code << "Vector3 spotpos_" << nom << "= Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
     code << "Vector3 spotcouleur_" << nom << "= {" << std::to_string(couleur_lumiere.x) <<"f,"<< std::to_string(couleur_lumiere.y) <<"f,"<< std::to_string(couleur_lumiere.z)<<"f};\n";
     code << "float spotpuissance_" << nom << " = " << std::to_string(puissance) <<"f;\n";
+    code << "float spotangle_" << nom << " = " << std::to_string(angle) << "f;\n";
+    code << "float spotporte_" << nom << " = " << std::to_string(porte) << "f;\n";
     if(Ombre){
         code << "int slot_" << nom << " = 12+"<< index_ombre <<";\n";
         code << "RenderTexture2D texture_ombre_" << nom << " = LoadShadowmapRenderTexture(" << std::to_string(res_shadowmap) << "," << std::to_string(res_shadowmap) << ");\n";
@@ -308,7 +354,8 @@ std::string SpotNode::GetInitCode(EditorContext& variables){
         code << "ombre_cam_" << nom <<".projection = CAMERA_PERSPECTIVE;\n";
         code << "ombre_cam_" << nom <<".position = Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
         code << "ombre_cam_" << nom <<".fovy = " << std::to_string(angle) << "f;\n";
-        code << "ombre_cam_" << nom <<".target = spotpos_" << nom << " + spotdir_" << nom << ";\n";
+        code << "ombre_cam_" << nom <<".target = Vector3Add(spotpos_" << nom << " + spotdir_" << nom << ";\n";
+        code << "ombre_cam_" << nom <<".up =  Vector3{0.0f, 1.0f, 0.0f};\n";
         code << "Matrix lightViewProj_" << nom <<" = {0};\n";
     }
         //les locs pour chaque shader de la banque
@@ -321,10 +368,11 @@ std::string SpotNode::GetInitCode(EditorContext& variables){
             code << "    int loc_spotpow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotPower\");\n";
             code << "    int loc_spotpos_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotPos\");\n";
             code << "    int loc_spotangle_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotAngle\");\n";
+            code << "    int loc_spotporte_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"spotPorte\");\n";
 
             if(Ombre){
-                code << "    int loc_vp_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"lightVP\");\n";
-                code << "    int loc_shadow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"shadowMap\");\n";
+                code << "    int loc_vp_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"" << nom_uniform_vp << "\");\n";
+                code << "    int loc_shadow_" << nom << "_" << s_var << " = GetShaderLocation(" << s_var << ", \"" << nom_uniform_shadow << "\");\n";
             }
         }
         return code.str();
@@ -349,6 +397,8 @@ std::string SpotNode::GetUpdateCode(EditorContext& variables){
          << std::to_string(couleur_lumiere.z) << "f };\n";
 
     code << "    spotangle_" << nom << " = " << std::to_string(angle) <<"f;\n";
+    code << "    spotporte_" << nom << " = " << std::to_string(porte) <<"f;\n";
+    
 
     //check les shaders enregistrés pour générer l'envoi vers chacun
     for (const auto& [nom_shader, shader_raylib] : variables.gestionnaire_shaders->dictionnaire_shaders) {
@@ -358,12 +408,13 @@ std::string SpotNode::GetUpdateCode(EditorContext& variables){
         code << "    SetShaderValue(" << s_var << ", loc_spotcol_" << this->nom << "_" << s_var << ", &spotcouleur_" << this->nom << ", SHADER_UNIFORM_VEC3);\n";
         code << "    SetShaderValue(" << s_var << ", loc_spotpow_" << this->nom << "_" << s_var << ", &spotpuissance_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
         code << "    SetShaderValue(" << s_var << ", loc_spotangle_" << this->nom << "_" << s_var << ", &spotangle_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
+        code << "    SetShaderValue(" << s_var << ", loc_spotporte_" << this->nom << "_" << s_var << ", &spotangle_" << this->nom << ", SHADER_UNIFORM_FLOAT);\n";
     }
     if(Ombre){
         code << "Vector3 dir_norm_"<< nom << " = Vector3Normalize(spotdir_" << nom << ");\n";
-        code << "ombre_cam_" << nom << ".position = Vector3Scale(dir_norm_"<< nom <<", -20.0f);\n";
+        code << "ombre_cam_" << nom << ".position = Vector3{" << std::to_string(position.x) <<"f,"<< std::to_string(position.y) <<"f,"<< std::to_string(position.z)<<"f};\n";
         code << "ombre_cam_" << nom << ".target = Vector3Zero();\n";
-        code << "ombre_cam_" << nom << ".fovy = 40.0f;\n";
+        code << "ombre_cam_" << nom << ".fovy = " << std::to_string(angle) << "f;\n";
         code << "if (fabs(dir_norm_"<< nom <<".x) < 0.001f && fabs(dir_norm_"<< nom <<".z) < 0.001f) {ombre_cam_" << nom << ".up = Vector3{ 0.0f, 0.0f, -1.0f };}\n";
         code << "else{ombre_cam_" << nom << ".up = Vector3{ 0.0f, 1.0f, 0.0f };}\n";
     }
@@ -389,19 +440,34 @@ BoundingBox SpotNode::GetBoiteCollision(){
 
 void SpotNode::Draw(EditorContext& variables){
     Matrix matRot = MatrixRotateXYZ(Vector3{ rotation.x * DEG2RAD, rotation.y * DEG2RAD, rotation.z * DEG2RAD });
-    Vector3 direction_par_defaut = { 0.0f, -1.0f, 0.0f };
-    
-    this->direction = Vector3Transform(direction_par_defaut, matRot);
-    DrawLine3D(position, Vector3{this->porte*tan(angle/2),this->porte*tan(angle/2),this->porte*tan(angle/2)},YELLOW);
-    float longueur_direction = Vector3Length(direction);
-    if (longueur_direction > 0.001f) {
-        
-        Vector3 dir_norm = Vector3Normalize(direction);
-        
-        Vector3 fin_ligne = Vector3Add(position, Vector3Scale(dir_norm, 3.0f));
+    direction = Vector3Transform(Vector3{0.0f, -1.0f, 0.0f}, matRot);
+    Vector3 dir = Vector3Normalize(direction);
 
-        DrawLine3D(position, fin_ligne, YELLOW);
+    float longueur = fminf(porte, 5.0f);
+    float rayon = longueur * tanf(angle * 0.5f * DEG2RAD);
+
+    //base cone
+    Vector3 centre = Vector3Add(position, Vector3Scale(dir, longueur));
+
+    //vecteurs perpendiculaires dir
+    Vector3 ref = (fabsf(dir.y) > 0.99f) ? Vector3{1, 0, 0} : Vector3{0, 1, 0};
+    Vector3 u = Vector3Normalize(Vector3CrossProduct(dir, ref));
+    Vector3 v = Vector3CrossProduct(dir, u);
+
+    const int segments = 24;
+    Vector3 precedent = Vector3Add(centre, Vector3Scale(u, rayon));
+    for (int i = 1; i <= segments; i++) {
+        float a = (2.0f * PI * i) / segments;
+        Vector3 p = Vector3Add(centre,
+            Vector3Add(Vector3Scale(u, cosf(a) * rayon), Vector3Scale(v, sinf(a) * rayon)));
+        DrawLine3D(precedent, p, YELLOW); // cercle base
+        if (i % 6 == 0) DrawLine3D(position, p, YELLOW); //sommet
+        precedent = p;
     }
+
+    //axe central
+    DrawLine3D(position, centre, isSelected ? RED : ColorAlpha(YELLOW, 0.5f));//vilain mais osef c'est du draw
+    DrawSphereWires(position, 0.15f, 8, 8, YELLOW);
 }
 
 std::unique_ptr<SceneNode> SpotNode::Cloner(){

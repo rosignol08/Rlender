@@ -69,6 +69,9 @@ class SceneNode {
 
     //pour l'ui
     virtual std::string GetType() const = 0; //les enfants disent qui ils sont
+    virtual void BindShadowEditeur(EditorContext& variables, int& slotTexture) {}
+    virtual void UnbindShadowEditeur(int& slotTexture) {}
+    virtual void GenererOmbreEditeur(EditorContext&, std::vector<std::unique_ptr<SceneNode>>& noeuds) {}
     //faut faire un constructeur par défaut au cas où
     SceneNode(){
         nom = "";
@@ -78,6 +81,7 @@ class SceneNode {
         couleur = WHITE;
         isSelected = false;
     }
+    
     std::string FormaterNomVariableShader(const std::string& nomBrut);
 };
 

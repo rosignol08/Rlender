@@ -3,7 +3,7 @@
 // Sphere
 SphereNode::SphereNode(){
     nom = "Sphere";
-    taille = {2.0f, 2.0f, 2.0f};
+    taille = {1.0f, 1.0f, 1.0f};
     rayon = 1.0f;
     slices = 16;
     ring = 16;

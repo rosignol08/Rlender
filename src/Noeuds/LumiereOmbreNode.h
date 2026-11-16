@@ -4,6 +4,8 @@
 
 class LumiereOmbreNode : public SceneNode {
     public :
+    std::string nom_uniform_vp = "lightVP";
+    std::string nom_uniform_shadow = "shadowMap";
     Vector3 couleur_lumiere;
     float puissance = 1.0f;
     bool est_allume = true;
@@ -25,7 +27,8 @@ class LumiereOmbreNode : public SceneNode {
         
         void changement_shadowmap();
         //virtual void Maj_camera_Ombre() = 0; jsp si ça sert ou pas de deleguer dans une fonction autre que update
-        
+        void BindShadowEditeur(EditorContext& variables, int& slotTexture);
+        void GenererOmbreEditeur(EditorContext&, std::vector<std::unique_ptr<SceneNode>>& noeuds);
         std::string GetShadowPassCode(EditorContext& Les_variables, std::string Liste_rendu_ombre) override;
         std::string GetShadowBindCode(EditorContext&) override;
         std::string GetShadowUnbindCode() override;
@@ -54,11 +57,13 @@ class SoleilNode : public LumiereOmbreNode {
 
 class SpotNode : public LumiereOmbreNode {
     public:
-        float porte;
+        float porte = 1.0f;
         float angle = 45.0f;//angle cone
         float angle_interieur = 30.0f; //adoucissement bords
         Vector3 direction;
     
+        //nom_uniform_vp = "lightVPSpot";
+        //nom_uniform_shadow = "shadowMapSpot";
         SpotNode();
         
         void Update(EditorContext& variables) override;

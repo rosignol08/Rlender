@@ -778,6 +778,37 @@ void Dessiner_Inspecteur(SceneManager& La_scene, EditorContext& Les_variables, P
                 }
 
             }
+            else if(noeuds_selectione[0]->GetType() == "SpotNode"){
+                //spotlight
+                SpotNode* objet = static_cast<SpotNode*>(noeuds_selectione[0]);
+
+                if (ImGui::DragFloat3("Direction", &objet->rotation.x, 0.1f, 0.0f, -1.0f)) {
+                    if (objet->rotation.x == 0 && objet->rotation.y == 0 && objet->rotation.z == 0) {
+                        objet->rotation = {0.0f, -1.0f, 0.0f}; // par défaut vers le bas
+                    }
+                    Les_variables.flag_changements = true;
+                }
+                
+
+                if (ImGui::ColorEdit3("Couleur", &objet->couleur_lumiere.x)) {
+                    Les_variables.flag_changements = true;
+                }
+
+                if(ImGui::DragFloat("Puissance", &objet->puissance, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+                if(ImGui::DragFloat("Portée", &objet->porte, 0.1f, 0.0f, 100.0f)){
+                    Les_variables.flag_changements = true;
+                }
+                if(ImGui::DragFloat("Angle", &objet->angle, 0.1f, 0.0f, 180.0f)){
+                    Les_variables.flag_changements = true;
+                }
+
+                if (ImGui::Checkbox("Allumée", &objet->est_allume)) {
+                    Les_variables.flag_changements = true;
+                }
+
+            }
             else if(noeuds_selectione[0]->GetType() == "Camera3D"){
                 CameraNode* objet = static_cast<CameraNode*>(noeuds_selectione[0]);
                 ImGui::Text("Apercu Camera :");
